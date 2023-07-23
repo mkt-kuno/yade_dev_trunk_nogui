@@ -1152,10 +1152,10 @@ which then appears in the documentation similar to :yref:`InteractionLoop`.
 Enums
 ^^^^^^^^^^^^^^^^^^^
 
-It is possible to expose ``enum`` and ``enum class`` (the ``enum class`` is the preferred one because it has stronger type safety to protect programmer from mistakes) in GUI in a dropdown menu. This approach is backward compatible, an assignment of ``int`` value in an old python script will work the same as before. Additionally it will be possible to assign the ``string`` type values to an enum. To enable the dropdown menu one must put a macro ``YADE_ENUM( Scope , EnumName , (ValueName1)(ValueName2)(ValueName3)(ValueName4) )`` in a ``.cpp`` file. Where each macro argument means:
+It is possible to expose ``enum class`` in GUI in a dropdown menu. This approach is backward compatible, an assignment of ``int`` value in an old python script will work the same as before. Additionally it will be possible to assign the ``string`` type values to an enum. To enable the dropdown menu one must ``#include <lib/serialization/EnumSupport.hpp>`` and put a macro ``YADE_ENUM( Scope , EnumName , (ValueName1)(ValueName2)(ValueName3)(ValueName4) )`` in a ``.cpp`` file. Where each macro argument means:
 
 	1. ``Scope`` is the full scope name in which the enum resides. For example the scope of ``yade::OpenGLRenderer::BlinkHighlight`` is ``yade::OpenGLRenderer``.
-	2. ``EnumName`` is the name of the enum to be registered
+	2. ``EnumName`` is the name of the enum type (not variable name!) to be registered
 	3. ``ValueName`` are all enum values that are to be exposed to python. They have to be updated if the C++ enum declaration in ``.hpp`` file changes.
 
 After it is registered, like for example in :ysrccommit:`OpenGLRenderer.cpp<42d676ec83183ec3/pkg/common/OpenGLRenderer.cpp#L20>` it is available for use. Additionally the registered enum class type definitions are exposed in ``yade.EnumClass_*`` scope, for example one can check the ``names`` and ``values`` dictionaries:
@@ -1174,19 +1174,19 @@ Keep in mind that these are **not the variable instances** hence trying to assig
 .. ipython::
 	:okexcept:
 
-	Yade [1]: r = yade.FlowEngine() # this is only a test of enum, not of FlowEngine
+	Yade [1]: r = yade.NewtonIntegrator() # this is only a test of enum, not of NewtonIntegrator
 
-	Yade [1]: r.useSolver
+	Yade [1]: r.rotAlgorithm # check current rotation algorithm (also available in the GUI Inspector of Engines)
 
-	Yade [1]: r.useSolver = 'GaussSeidel'
+	Yade [1]: r.rotAlgorithm = 'Omelyan1998'
 
 	Yade [1]: try:
-	   ...:     r.useSolver = 20    # assigning incorrect value has no effect
+	   ...:     r.rotAlgorithm = 20    # assigning incorrect value throws an exception
 	   ...: except:
-	   ...:     print("Error, value is still equal to:",r.useSolver)
+	   ...:     print("Error, value is still equal to:",r.rotAlgorithm)
 	   ...:
 
-	Yade [1]: r.useSolver
+	Yade [1]: r.rotAlgorithm
 
 Alternatively the dropdown menu in GUI can be used for the same effect.
 
