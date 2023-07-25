@@ -288,6 +288,7 @@ void CapillarityEngine::solveBridgesT(Real suction, bool reset)
 	timingDeltas->checkpoint("compute all");
 	if (fusionDetection) checkFusion();
 	timingDeltas->checkpoint("check fusion");
+	createDistantMeniscii = false;
 }
 
 shared_ptr<CapillaryPhysDelaunay> CapillarityEngine::solveStandalone(

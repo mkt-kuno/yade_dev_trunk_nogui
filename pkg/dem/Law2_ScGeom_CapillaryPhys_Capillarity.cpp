@@ -244,6 +244,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 			}
 		}
 	}
+	createDistantMeniscii = false;
 }
 
 capillarylaw::capillarylaw() { }

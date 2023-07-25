@@ -96,7 +96,7 @@ public:
 	((Real,capillaryPressure,0.,,"Value of the capillary pressure Uc defined as Uc=Ugas-Uliquid"))
 	((bool,fusionDetection,false,,"If true potential menisci overlaps are checked, computing :yref:`fusionNumber<CapillaryPhys.fusionNumber>` for each capillary interaction, and reducing :yref:`fCap<CapillaryPhys.fCap>` according to :yref:`binaryFusion<Law2_ScGeom_CapillaryPhys_Capillarity.binaryFusion>`"))
 	((bool,binaryFusion,true,,"If true, capillary forces are set to zero as soon as, at least, 1 overlap (menisci fusion) is detected. Otherwise :yref:`fCap<CapillaryPhys.fCap>` = :yref:`fCap<CapillaryPhys.fCap>` / (:yref:`fusionNumber<CapillaryPhys.fusionNumber>` + 1 ) (experimental)"))
-	((bool,createDistantMeniscii,false,,"Generate meniscii between distant spheres ? Else only maintain the existing ones. For modeling a wetting path this flag should always be false. For a drying path it should be true for one step (initialization) then false, as in the logic of [Scholtes2009c]_"))
+	((bool,createDistantMeniscii,false,,"Generate meniscii between distant spheres ? Else only maintain the existing ones. For modeling a wetting path this flag should always be false. For a drying path it should be true for one step (initialization) then false, as in the logic of [Scholtes2009c]_. The engine turns it off automatically after one execution."))
         ((Real,surfaceTension,0.073,,"Value of considered surface tension")) // (0.073 N/m is air-water surface tension at 20 Celsius degrees)
 	((string,suffCapFiles,"",,"Capillary files suffix: M(r=X)suffCapFiles"))
 	,,/*constructor*/
