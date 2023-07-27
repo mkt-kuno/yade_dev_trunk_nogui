@@ -30,7 +30,10 @@ class NewtonIntegrator : public FieldApplier {
 	inline void leapfrogTranslate(State*, const Real& dt);                           // leap-frog translate
 	inline void leapfrogSphericalRotate(State*, const Real& dt);                     // leap-frog rotate of spherical body
 	inline void leapfrogAsphericalRotate(State*, const Real& dt, const Vector3r& M); // leap-frog rotate of aspherical body
+	inline void leapfrogAsphericalRotateOmelyan_1998(State*, const Real& dt, const Vector3r& M, int iter);
+	inline void leapfrogAsphericalRotateCarlos_2023(State* state, const Real& dt, const Vector3r& M, int iter);
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
+	inline Vector3r w_dot(const Vector3r w, const Vector3r M, const Vector3r II);
 
 	// compute linear and angular acceleration, respecting State::blockedDOFs
 	Vector3r computeAccel(const Vector3r& force, const Real& mass, int blockedDOFs);
@@ -53,9 +56,9 @@ class NewtonIntegrator : public FieldApplier {
 	Vector3r computeAccelWithoutGravity(const Vector3r& force, const Real& mass, int blockedDOFs);
 	Vector3r addGravity(int blockedDOFs);
 
-
 public:
 	bool densityScaling;     // internal for density scaling
+	enum class RotAlgorithm { delValle2023 = 1, Omelyan1998 = 2, Fincham1992 = 3 };
 	Real updatingDispFactor; //(experimental) Displacement factor used to trigger bound update: the bound is updated only if updatingDispFactor*disp>sweepDist when >0, else all bounds are updated.
 	// function to save maximum velocity, for the verlet-distance optimization
 	void saveMaximaVelocity(const Body::id_t& id, State* state);
@@ -72,7 +75,10 @@ public:
 		((Real,damping,0.2,,"damping coefficient for Cundall's non viscous damping (see :ref:`NumericalDamping` and [Chareyre2005]_)"))
 		((Vector3r,gravity,Vector3r::Zero(),,"Gravitational acceleration (effectively replaces GravityEngine)."))
 		((Real,maxVelocitySq,0,,"stores max. displacement, based on which we trigger collision detection. |yupdate|"))
-		((bool,exactAsphericalRot,true,,"Enable more exact body rotation integrator for :yref:`aspherical bodies<Body.aspherical>` *only*, using formulation from [Allen1989]_, pg. 89."))
+		((bool,exactAsphericalRot,true,,"Enable more exact body rotation integrator for :yref:`aspherical bodies<Body.aspherical>` *only*, using formulations from [delValle2023]_, [Omelyan1998]_, or [Fincham1992]_ depending on :yref:`rotAlgorithm<NewtonIntegrator.rotAlgorithm>`"))
+		((RotAlgorithm,rotAlgorithm,RotAlgorithm::delValle2023,,"Which rotation algorithm to use. Options are: delValle2023, Omelyan1998, Fincham1992."))
+		((int,normalizeEvery,5000,,"Normalize the quaternion every normalizeEvery step. Only used in the aspherical formulations from [delValle2023]_, [Omelyan1998]_."))
+		((int,niterOmelyan1998,3,,"The number of iterations used to solve the nonlinear system of [Omelyan1998]_ formulation. Provided a small enough timestep, three iterations are enough to make the system converge."))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),,"Store previous velocity gradient (:yref:`Cell::velGrad`) to track average acceleration in periodic simulations. |yupdate|"))
 		#ifdef YADE_BODY_CALLBACK
 			((vector<shared_ptr<BodyCallback> >,callbacks,,,"List (std::vector in c++) of :yref:`BodyCallbacks<BodyCallback>` which will be called for each body as it is being processed."))

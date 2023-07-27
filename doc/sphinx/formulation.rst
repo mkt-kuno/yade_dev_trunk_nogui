@@ -452,6 +452,10 @@ The algorithm can then be written down by first computing current mean velocity 
 
 Positions are known at times $i\Delta t$ (if $\Delta t$ is constant) while velocities are known at $i\Delta t+\frac{\Delta t}{2}$. The fact that they interleave (jump over each other) in such way gave rise to the colloquial name "leapfrog" scheme.
 
+Orientation
+------------------------
+YADE has three different algorithms for integrating the rotational motion of non-spherical particles and one for spherical particles. 
+
 Orientation (spherical)
 ------------------------
 Updating particle orientation $\curr{q}$ proceeds in an analogous way to position update. First, we compute current angular acceleration $\curraaccel$ from known current torque $\vec{T}$. For spherical particles where the inertia tensor is diagonal in any orientation (therefore also in current global orientation), satisfying $\vec{I}_{11}=\vec{I}_{22}=\vec{I}_{33}$, we can write
@@ -465,12 +469,12 @@ We use the same approximation scheme, obtaining an equation analogous to :eq:`eq
 The quaternion $\Delta q$ representing rotation vector $\nnextangvel\Dt$ is constructed, i.e. such that
 
 .. math::
-	:nowrap:
+    :nowrap:
 
-	\begin{align*}
-		(\Delta q)_{\theta}&=|\nnextangvel|, \\
-		(\Delta q)_{\vec{u}}&=\normalized{\nnextangvel}
-	\end{align*}
+    \begin{align*}
+        (\Delta q)_{\theta}&=|\nnextangvel|, \\
+        (\Delta q)_{\vec{u}}&=\normalized{\nnextangvel}
+    \end{align*}
 
 Finally, we compute the next orientation $\next{q}$ by rotation composition
 
@@ -478,68 +482,144 @@ Finally, we compute the next orientation $\next{q}$ by rotation composition
 
 Orientation (aspherical)
 ------------------------
-Integrating rotation of aspherical particles is considerably more complicated than their position, as their local reference frame is not inertial. Rotation of rigid body in the local frame, where inertia matrix $\mat{I}$ is diagonal, is described in the continuous form by Euler's equations ($i\in\{1,2,3\}$ and $i$, $j$, $k$ are subsequent indices):
+Integrating the rotation of aspherical particles is considerably more complicated than their position, as their local reference frame is not inertial. Rotation of rigid body in the local frame, where inertia matrix $\mat{I}$ is diagonal, is described in the continuous form by Euler's equations ($i\in\{1,2,3\}$ and $i$, $j$, $k$ are subsequent indices):
 
 .. math:: \vec{T}_i=\mat{I}_{ii}\dot{\vec{\omega}}_i+(\mat{I}_{kk}-\mat{I}_{jj})\vec{\omega}_j\vec{\omega}_k.
 
-Due to the presence of the current values of both $\vec{\omega}$ and $\dot{\vec{\omega}}$, they cannot be solved using the standard leapfrog algorithm (that was the case for translational motion and also for the spherical bodies' rotation where this equation reduced to $\vec{T}=\mat{I}\dot{\vec{\omega}}$).
-			
-The algorithm presented here is described by [Allen1989]_ (pg. 84--89) and was designed by Fincham for molecular dynamics problems; it is based on extending the leapfrog algorithm by mid-step/on-step estimators of quantities known at on-step/mid-step points in the basic formulation. Although it has received criticism and more precise algorithms are known ([Omelyan1999]_, [Neto2006]_, [Johnson2008]_), this one is currently implemented in Yade for its relative simplicity.
+Due to the presence of both $\vec{\omega}$ and $\dot{\vec{\omega}}$, the equation cannot be solved using the standard leapfrog algorithm (that was the case for translational motion and also for the spherical bodies' rotation where this equation reduced to $\vec{T}=\mat{I}\dot{\vec{\omega}}$). The different integration algorithms for non-spherical particles can be selected using the :yref:`NewtonIntegrator.rotAlgorithm` argument of the :yref:`NewtonIntegrator`. 
+
+The default algorithm and the most accurate one was proposed by [delValle2023]_. The algorithm uses a leapfrog formulation that conserves the norm of the quaternion. [Omelyan1998]_, a more general version of [Omelyan1999]_ algorithm, is also implemented. Previously, YADE used the algorithm described by [Allen1989]_ (pg. 84--89) and designed by [Fincham1992]_ for molecular dynamics problems; it consists of extending the leapfrog algorithm by mid-step/on-step estimators of quantities known at on-step/mid-step points in the basic formulation. Although it has received criticism and more precise algorithms were known ([Omelyan1999]_, [Neto2006]_, [Johnson2008]_), this algorithm is implemented in Yade for its relative simplicity.
 
 .. Finchman: Leapfrog Rotational Algorithms: http://www.informaworld.com/smpp/content~content=a756872469&db=all
-	Schvanberg: Leapfrog Rotational Algorithms: http://www.informaworld.com/smpp/content~content=a914299295&db=all
+    Schvanberg: Leapfrog Rotational Algorithms: http://www.informaworld.com/smpp/content~content=a914299295&db=all
 
-			
+            
 Each body has its local coordinate system based on the principal axes of inertia for that body. We use $\locframe{\bullet}$ to denote vectors in local coordinates. The orientation of the local system is given by the current particle's orientation $\curr{q}$ as a quaternion; this quaternion can be expressed as the (current) rotation matrix $\mat{A}$. Therefore, every vector $\vec{a}$ is transformed as $\locframe{\vec{a}}=q\vec{a}q^{*}=\mat{A}\vec{a}$. Since $\mat{A}$ is a rotation (orthogonal) matrix, the inverse rotation $\mat{A}^{-1}=\mat{A}^{T}$.
 
-For given particle in question, we know
+For a given particle, we know
 
 * $\loccurr{\mat{I}}$ (constant) inertia matrix; diagonal, since in local, principal coordinates,
 * $\curr{\vec{T}}$ external torque,
 * $\curr{q}$ current orientation (and its equivalent rotation matrix $\mat{A}$),
 * $\pprev{\vec{\omega}}$  mid-step angular velocity,
-* $\pprev{\vec{L}}$ mid-step angular momentum; this is an auxiliary variable that must be tracked in addition for use in this algorithm. It will be zero in the initial step.
+* $\pprev{\vec{L}}$ mid-step angular momentum; this is an auxiliary variable needed in Fincham's algorithm. It will be zero in the initial step.
 
-Our goal is to compute new values of the latter three, that is $\nnext{\vec{L}}$, $\next{q}$, $\nnext{\vec{\omega}}$. We first estimate current angular momentum and compute current local angular velocity:
 
-.. math::
-	:nowrap:
+del Valle et al. Algorithm
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-	\begin{align*}
-		\curr{\vec{L}}&=\pprev{\vec{L}}+\curr{\vec{T}}\frac{\Dt}{2}, &\loccurr{\vec{L}}&=\mat{A}\curr{\vec{L}}, \\
-		\nnext{\vec{L}}&=\pprev{\vec{L}}+\curr{\vec{T}}\Dt, &\nnext{\locframe{\vec{L}}}&=\mat{A}\nnext{\vec{L}}, \\
-		\loccurr{\vec{\omega}}&=\curr{\locframe{\mat{I}}}{}^{-1}\loccurr{\vec{L}}, \\
-		\nnext{\locframe{\vec{\omega}}}&=\curr{\locframe{\mat{I}}}{}^{-1}\nnext{\locframe{\vec{L}}}. \\
-	\end{align*}
-
-Then we compute $\curr{\dot{q}}$, using $\curr{q}$ and $\loccurr{\vec{\omega}}$:
+Our goal is to compute new values of the latter three, that is, $\nnext{\vec{L}}$, $\next{q}$, $\nnext{\vec{\omega}}$. We first estimate the current angular velocity:
 
 .. math::
-	:label: eq-quaternion-derivative
-	:nowrap:
+    :nowrap:
 
-		\begin{align*}
-			\begin{pmatrix}\curr{\dot{q}}_w \\ \curr{\dot{q}}_x \\ \curr{\dot{q}}_y \\ \curr{\dot{q}}_z\end{pmatrix}&=
-				\def\cq{\curr{q}}
-				\frac{1}{2}\begin{pmatrix}
-					\cq_w & -\cq_x & -\cq_y & -\cq_z \\
-					\cq_x & \cq_w & -\cq_z & \cq_y \\
-					\cq_y & \cq_z & \cq_w & -\cq_x \\
-					\cq_z & -\cq_y & \cq_x & \cq_w
-				\end{pmatrix}
-				\begin{pmatrix} 0 \\ \loccurr{\vec{\omega}}_x \\ \loccurr{\vec{\omega}}_y \\ \loccurr{\vec{\omega}}_z	\end{pmatrix},  \\
-				\nnext{q}&=\curr{q}+\curr{\dot{q}}\frac{\Dt}{2}.\\
-		\end{align*}
+    \begin{align*}
+        \vec{K_1} &= dt\dot{\locframe{\vec{\omega}}}(\pprev{\locframe{\vec{\omega}}} ,\curr{\locframe{\vec{T}}}), \\
+        \vec{K_2} &= dt\dot{\locframe{\vec{\omega}}}(\pprev{\locframe{\vec{\omega}}} + \vec{K_1},\curr{\locframe{\vec{T}}}), \\
+        \vec{K_3} &= dt\dot{\locframe{\vec{\omega}}}(\pprev{\locframe{\vec{\omega}}} + \frac{1}{4}(\vec{K_1} + \vec{K_2}),\curr{\locframe{\vec{T}}}), \\
+        \nnext{\locframe{\vec{\omega}}} &= \pprev{\locframe{\vec{\omega}}} + \frac{1}{6}(\vec{K_1} + \vec{K_2} + 4\vec{K_3}),
+    \end{align*}
 
-We evaluate $\nnext{\dot{q}}$ from $\nnext{q}$ and $\nnext{\locframe{\vec{\omega}}}$ in the same way as in :eq:`eq-quaternion-derivative` but shifted by $\Dt/2$ ahead. Then we can finally compute the desired values
+where $\locframe{\dot{\vec{\omega}}}$ is given by Euler's equation of motion, and we treat it as a function of angular velocity and torque. This way of integrating the angular velocity is similar to the Strong Stability Preserving Runge-Kutta-3 (SSPRK3) scheme but keeps the torque constant during the time step to avoid costly force recalculations. Then, we compute $\next{q}$, using $\curr{q}$ and $\nnext{\locframe{\vec{\omega}}}$: 
 
 .. math::
-	:nowrap:
+    :nowrap:
 
-	\begin{align*}
-		\next{q}&=\curr{q}+\nnext{\dot{q}}\Dt, \\
-		\nnext{\vec{\omega}}&=\mat{A}^{-1}\nnext{\locframe{\vec{\omega}}}
-	\end{align*}
+    \begin{align*}
+        \next{q} &= \curr{q}(\cos{\theta} + \frac{\nnext{\locframe{\vec{\omega}}}}{|\nnext{\locframe{\vec{\omega}}}|}\sin{\theta}), \\
+        \theta &= \frac{dt}{2}|\nnext{\locframe{\vec{\omega}}}|,
+    \end{align*}
+
+
+where the quantity inside the parenthesis is a quaternion represented by its scalar part and its imaginary (vectorial) part. The algorithm offers a third-order approximation for both the quaternion and angular velocity calculations. As this formulation conserves the norm of the quaternion, it does not need to be normalized every time step. It is normalized every :yref:`NewtonIntegrator.normalizeEvery` steps. To finish, we compute the angular velocity and momentum in the global reference frame:
+
+.. math::
+    :nowrap:
+
+    \begin{align*}
+        \nnext{\vec{\omega}} &= \mat{A}^{-1}\nnext{\locframe{\vec{\omega}}}. \\
+        \nnext{\vec{L}} &= \mat{A}^{-1}(\loccurr{\mat{I}}\nnext{\locframe{\vec{\omega}}}).
+    \end{align*}
+
+
+Omelyan Algorithm
+^^^^^^^^^^^^^^^^^^
+[Omelyan1999]_ algorithm is also a leapfrog formulation. However, note that in a leapfrog formulation, we require the mid-step velocity and the current derivative of the velocity. But, in the case of Euler's equation, the current angular acceleration depends on the current angular velocity, which is unknown. Then, Omelyan proposes to interpolate the current angular velocity product as $\curr{\locframe{\vec{\omega}}}_j\curr{\locframe{\vec{\omega}}}_k \approx \frac{1}{2}(\pprev{\locframe{\vec{\omega}}}_j\pprev{\locframe{\vec{\omega}}}_k + \nnext{\locframe{\vec{\omega}}}_j\nnext{\locframe{\vec{\omega}}}_k)$. This leads to a non-linear system of equations that can efficiently be solved by iteration:
+
+.. math::
+    :nowrap:
+
+    \begin{align*}
+        \nnext{\locframe{\vec{\omega}}}_{i, n+1} &= \pprev{\locframe{\vec{\omega}}}_i + \frac{dt}{\mat{I}_{ii}}\left(\curr{\locframe{\vec{T}}}_i - \frac{1}{2}(\mat{I}_{kk}-\mat{I}_{jj})(\pprev{\locframe{\vec{\omega}}}_j\pprev{\locframe{\vec{\omega}}}_k + \nnext{\locframe{\vec{\omega}}}_{j, n}\nnext{\locframe{\vec{\omega}}}_{k, n})\right).
+    \end{align*}
+
+
+Then, we can compute the orientation of the particle with
+
+.. math::
+    :nowrap:
+
+    \begin{align*}
+        \next{q} = \frac{1 - \frac{dt^2}{16}|\nnext{\locframe{\vec{\omega}}}|^2}{1 + \frac{dt^2}{16}|\nnext{\locframe{\vec{\omega}}}|^2}\curr{q} + \frac{dt\curr{\dot{q}}}{1 + \frac{dt^2}{16}|\nnext{\locframe{\vec{\omega}}}|^2}.
+    \end{align*}
+
+
+The norm-conserving derivative of a quaternion can be calculated as
+
+.. math::
+    :label: eq-quaternion-derivative
+    :nowrap:
+
+    \begin{align*}
+        \curr{\dot{q}} = \frac{1}{2}\curr{q}\nnext{\locframe{\omega}},
+    \end{align*}
+
+where $\nnext{\locframe{\omega}}$ is a quaternion with a real part equal to zero and an imaginary part equal to the angular velocity. This can also be written as 
+
+.. math::
+    :nowrap:
+    
+    \begin{align*}
+        \begin{pmatrix}\curr{\dot{q}}_w \\ \curr{\dot{q}}_x \\ \curr{\dot{q}}_y \\ \curr{\dot{q}}_z\end{pmatrix}&=
+            \def\cq{\curr{q}}
+            \frac{1}{2}\begin{pmatrix}
+                \cq_w & -\cq_x & -\cq_y & -\cq_z \\
+                \cq_x & \cq_w & -\cq_z & \cq_y \\
+                \cq_y & \cq_z & \cq_w & -\cq_x \\
+                \cq_z & -\cq_y & \cq_x & \cq_w
+            \end{pmatrix}
+            \begin{pmatrix} 0 \\ \loccurr{\vec{\omega}}_x \\ \loccurr{\vec{\omega}}_y \\ \loccurr{\vec{\omega}}_z
+            \end{pmatrix},  \\
+    \end{align*}
+
+
+In the same way as the last algorithm, it is a third-order approximation, and the formulation is orthonormal, meaning that the norm of the quaternion is conserved. However, this formulation is numerically not as stable as the previous one.
+
+Fincham Algorithm
+^^^^^^^^^^^^^^^^^^
+
+Unlike the other two algorithms, [Fincham1992]_ does not conserve the norm of the quaternion. Then, :yref:`NewtonIntegrator.normalizeEvery` has no effect over this algorithm. This algorithm is second-order. The algorithm goes as follows: first, we estimate the current angular momentum and compute the current local angular velocity:
+
+.. math::
+    :nowrap:
+
+    \begin{align*}
+        \curr{\vec{L}}&=\pprev{\vec{L}}+\curr{\vec{T}}\frac{\Dt}{2}, &\loccurr{\vec{L}}&=\mat{A}\curr{\vec{L}}, \\
+        \nnext{\vec{L}}&=\pprev{\vec{L}}+\curr{\vec{T}}\Dt, &\nnext{\locframe{\vec{L}}}&=\mat{A}\nnext{\vec{L}}, \\
+        \loccurr{\vec{\omega}}&=\curr{\locframe{\mat{I}}}{}^{-1}\loccurr{\vec{L}}, \\
+        \nnext{\locframe{\vec{\omega}}}&=\curr{\locframe{\mat{I}}}{}^{-1}\nnext{\locframe{\vec{L}}}. \\
+    \end{align*}
+
+
+Then, we evaluate $\nnext{\dot{q}}$ from $\nnext{q}$ and $\nnext{\locframe{\vec{\omega}}}$ in the same way as in :eq:`eq-quaternion-derivative` but shifted by $\Dt/2$ ahead. Then we can finally compute the desired values
+
+.. math::
+    :nowrap:
+
+    \begin{align*}
+        \next{q}&=\curr{q}+\nnext{\dot{q}}\Dt, \\
+        \nnext{\vec{\omega}}&=\mat{A}^{-1}\nnext{\locframe{\vec{\omega}}}.
+    \end{align*}
 
 Clumps (rigid aggregates)
 -------------------------
