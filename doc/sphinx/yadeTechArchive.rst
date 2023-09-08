@@ -22,7 +22,7 @@ YTA seeks a variety of Yade related materials including, but not limited to:
 
 Contact
 =======
-If you wish to contribute, please contact rob.caulk@gmail.com. Questions about individual publications are referred to the email address attached to the document description. If you have general questions regarding code, we refer you to `our Q&A forum <https://answers.launchpad.net/yade>`__. 
+If you wish to contribute, please contact rob.caulk@gmail.com. Questions about individual publications are referred to the email address attached to the document description. If you have general questions regarding code, we refer you to `our Q&A forum <https://gitlab.com/yade-dev/answers>`__. 
 
 
 Archive

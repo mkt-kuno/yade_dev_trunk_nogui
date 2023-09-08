@@ -115,10 +115,10 @@ and `GitLab <https://gitlab.com/yade-dev/>`__:
 
 * `source code on gitlab <https://gitlab.com/yade-dev/trunk>`__
 * `issue and bug tracking on gitlab <https://gitlab.com/yade-dev/trunk/issues>`__
-* `release downloads on launchpad <https://launchpad.net/yade/+download>`__
+* `release downloads on launchpad <https://gitlab.com/yade-dev/trunk/-/releases>`__
 * `yade-dev mailing list on launchpad <https://launchpad.net/~yade-dev>`__: yade-dev@lists.launchpad.net
 * `yade-users mailing list on launchpad <https://launchpad.net/~yade-users>`__: yade-users@lists.launchpad.net
-* `questions and answers on launchpad <https://answers.launchpad.net/yade/>`__
+* `questions and answers on GitLab <https://gitlab.com/yade-dev/answers>`__
 
 The versioning software used is `GIT <http://git-scm.com/>`__, for which a short
 tutorial can be found in :ref:`yade-gitrepo-label`.
