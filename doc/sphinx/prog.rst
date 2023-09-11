@@ -115,7 +115,7 @@ and `GitLab <https://gitlab.com/yade-dev/>`__:
 
 * `source code on gitlab <https://gitlab.com/yade-dev/trunk>`__
 * `issue and bug tracking on gitlab <https://gitlab.com/yade-dev/trunk/issues>`__
-* `release downloads on launchpad <https://gitlab.com/yade-dev/trunk/-/releases>`__
+* `release downloads on GitLab <https://gitlab.com/yade-dev/trunk/-/releases>`__
 * `yade-dev mailing list on launchpad <https://launchpad.net/~yade-dev>`__: yade-dev@lists.launchpad.net
 * `yade-users mailing list on launchpad <https://launchpad.net/~yade-users>`__: yade-users@lists.launchpad.net
 * `questions and answers on GitLab <https://gitlab.com/yade-dev/answers>`__
