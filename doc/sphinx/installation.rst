@@ -67,6 +67,11 @@ To install the daily-version you need to add the repository to your
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ bookworm main" >> /etc/apt/sources.list.d/yadedaily.list'
 
 
+- Debian 13 **trixie** also with :ref:`high precision<highPrecisionReal>` ``long double``, ``float128`` and ``mpfr150`` packages::
+
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ trixie main" >> /etc/apt/sources.list.d/yadedaily.list'
+
+
 - Ubuntu 16.04 **xenial**::
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ xenial main" >> /etc/apt/sources.list.d/yadedaily.list'
@@ -140,6 +145,10 @@ Docker images are based on supported distributions:
 - Debian 12 **bookworm**::
 
 	docker run -it registry.gitlab.com/yade-dev/docker-prod:debian-bookworm
+
+- Debian 13 **trixie**::
+
+	docker run -it registry.gitlab.com/yade-dev/docker-prod:debian-trixie
 
 - Ubuntu 16.04 **xenial**::
 

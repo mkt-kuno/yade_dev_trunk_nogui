@@ -33,7 +33,7 @@ The last two types are arbitrary precision, and their number of bits ``Nbit`` or
 Installation
 ===========================================
 
-The :ref:`precompiled Yade Daily packages <provided-packages>` for Ubuntu 22.04 and Debian Bookworm are provided for high precision types ``long double``, ``float128`` and ``mpfr150``.
+The :ref:`precompiled Yade Daily packages <provided-packages>` for Ubuntu 22.04 and Debian Bookworm, Trixie are provided for high precision types ``long double``, ``float128`` and ``mpfr150``.
 To use high precision on other linux distributions Yade has to be compiled and installed from source code by following the
 regular :ref:`installation instructions <install-from-source-code>`. With extra following caveats:
 

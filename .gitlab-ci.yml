@@ -262,6 +262,11 @@ make_bookworm:
   <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bookworm
 
+make_trixie:
+  <<: *make_definition
+  <<: *artifacts_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
+
 make_archlinux:
   <<: *make_definition
   <<: *artifacts_definition
@@ -580,6 +585,13 @@ test_bookworm:
     - make_bookworm
   needs: ["make_bookworm"]
 
+test_trixie:
+  <<: *test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
+  dependencies:
+    - make_trixie
+  needs: ["make_trixie"]
+
 test_archlinux:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:archlinux-current
@@ -813,6 +825,14 @@ check_buster:
     - make_buster
   needs: ["make_buster"]
 
+check_bullseye:
+  <<: *check_definition
+  before_script:
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  dependencies:
+    - make_bullseye
+  needs: ["make_bullseye"]
+
 check_bookworm:
   <<: *check_definition
   before_script:
@@ -821,13 +841,13 @@ check_bookworm:
     - make_bookworm
   needs: ["make_bookworm"]
 
-check_bullseye:
+check_trixie:
   <<: *check_definition
   before_script:
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
   dependencies:
-    - make_bullseye
-  needs: ["make_bullseye"]
+    - make_trixie
+  needs: ["make_trixie"]
 
 check_archlinux:
   <<: *check_definition
@@ -1084,6 +1104,13 @@ deb_bookworm:
   before_script:
     - rm -rf ./deb
     - ./scripts/ppa_ci/builddeb.py -d "bookworm"
+
+deb_trixie:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
+  before_script:
+    - rm -rf ./deb
+    - ./scripts/ppa_ci/builddeb.py -d "trixie"
 
 deb_bookworm_long_double:
   <<: *deb_definition
