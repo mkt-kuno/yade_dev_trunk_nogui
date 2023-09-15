@@ -1105,13 +1105,6 @@ deb_bookworm:
     - rm -rf ./deb
     - ./scripts/ppa_ci/builddeb.py -d "bookworm"
 
-deb_trixie:
-  <<: *deb_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
-  before_script:
-    - rm -rf ./deb
-    - ./scripts/ppa_ci/builddeb.py -d "trixie"
-
 deb_bookworm_long_double:
   <<: *deb_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bookworm
@@ -1135,6 +1128,37 @@ deb_bookworm_mpfr150:
     - rm -rf ./deb
     - export PREC_NAME="-mpfr150"
     - ./scripts/ppa_ci/builddeb.py -d "bookworm" -p "mpfr150"
+
+deb_trixie:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
+  before_script:
+    - rm -rf ./deb
+    - ./scripts/ppa_ci/builddeb.py -d "trixie"
+
+deb_trixie_long_double:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
+  before_script:
+    - rm -rf ./deb
+    - export PREC_NAME="-long-double"
+    - ./scripts/ppa_ci/builddeb.py -d "trixie" -p "long-double"
+
+deb_trixie_float128:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
+  before_script:
+    - rm -rf ./deb
+    - export PREC_NAME="-float128"
+    - ./scripts/ppa_ci/builddeb.py -d "trixie" -p "float128"
+
+deb_trixie_mpfr150:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
+  before_script:
+    - rm -rf ./deb
+    - export PREC_NAME="-mpfr150"
+    - ./scripts/ppa_ci/builddeb.py -d "trixie" -p "mpfr150"
 
 deb_xenial:
   <<: *deb_definition
