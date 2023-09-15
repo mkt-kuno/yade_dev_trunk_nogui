@@ -16,6 +16,107 @@ Real Law2_ScGeom_MindlinPhys_Mindlin::getshearEnergy() const { return (Real)shea
 Real Law2_ScGeom_MindlinPhys_Mindlin::getnormDampDissip() const { return (Real)normDampDissip; }
 Real Law2_ScGeom_MindlinPhys_Mindlin::getshearDampDissip() const { return (Real)shearDampDissip; }
 
+
+/* Functions to calculate velocity-dependent coefficient of restitution as in [Brilliantov1996]_ and [Mueller2011]_ */
+
+// Function to calculate the restitution coefficient as a function of normalised velocity for the viscous damping model of [Brilliantov1996]_ using Pade approximation, as in [Mueller2011]_
+Real restitutionCoefficient(const Real v_star)
+{
+	// 3/6 coefficients
+	const Real a_i[] = { 1.0, 1.07232, 0.574198, 0.141552 };
+	const Real b_i[] = { 1.0, 1.07232, 1.72765, 1.37842, 1.19449, 0.467273, 0.235585 };
+
+	// Initialize sum to 0
+	Real A = 0.0, B = 0.0, n = 0.0;
+
+	for (auto& i : a_i) {
+		A += i * math::pow(v_star, n);
+		n += 1.0;
+	}
+
+	n = 0.0;
+	for (auto& i : b_i) {
+		B += i * math::pow(v_star, n);
+		n += 1.0;
+	}
+
+	return A / B;
+}
+
+// Function to calculate derivative used in Newton-Raphson iterations
+Real restitutionCoefficientDeriv(const Real v_star)
+{
+	// 3/6 coefficients
+	const Real a_i[] = { 1.0, 1.07232, 0.574198, 0.141552 };
+	const Real b_i[] = { 1.0, 1.07232, 1.72765, 1.37842, 1.19449, 0.467273, 0.235585 };
+
+	// Initialize sums to 0
+	Real A = 0.0, B = 0.0, dA = 0.0, dB = 0.0, n = 0.0;
+
+	for (auto& i : a_i) {
+		A += i * math::pow(v_star, n);
+		n += 1.0;
+	}
+
+	n = 0.0;
+	for (auto& i : b_i) {
+		B += i * math::pow(v_star, n);
+		n += 1.0;
+	}
+
+	// 3/6 coefficients Derivative
+	const Real da_i[] = { 1.07232, 0.574198, 0.141552 };
+	const Real db_i[] = { 1.07232, 1.72765, 1.37842, 1.19449, 0.467273, 0.235585 };
+
+	n = 0.0;
+	for (auto& i : da_i) {
+		dA += (n + 1.0) * i * math::pow(v_star, n);
+		n += 1.0;
+	}
+
+	n = 0.0;
+	for (auto& i : db_i) {
+		dB += (n + 1.0) * i * math::pow(v_star, n);
+		n += 1.0;
+	}
+
+	return (dA * B - A * dB) / (B * B);
+}
+
+
+// Function to calculate vstar as a function of the coefficient of restitution according to [Mueller2011]_
+Real getVstar(const Real en)
+{
+	const int max_iter = 1000; // Maximum number of iterations
+	int       i        = 0;
+	Real      xr       = 0.5; // Initial guess
+
+	// Check if en is in the range [0,1]
+	if (en == 1.0) return 0.0;
+	else if (en > 1.0)
+		throw std::runtime_error("getVstar: en > 1. Restitution coefficient must be between 0 and 1.");
+	else if (en < 0.0)
+		throw std::runtime_error("getVstar: en < 0. Restitution coefficient must be between 0 and 1.");
+
+	// Newton Rapshon method
+	for (i = 0; i < max_iter; ++i) {
+		// Check if root was found
+		if (math::abs(restitutionCoefficient(xr) - en) <= std::numeric_limits<Real>::epsilon()) break;
+
+		// New root approximation
+		xr -= (restitutionCoefficient(xr) - en) / restitutionCoefficientDeriv(xr);
+	}
+
+	// Check if maximum number of iterations was reached
+	if (i >= max_iter) {
+		std::cerr << "WARNING: getVstar: Maximum number of iterations reached. Root not found." << std::endl;
+		std::cerr << "WARNING: getVstar: | f(x) - targuet | = " << math::fabs(restitutionCoefficient(xr) - en) << std::endl;
+	}
+
+	return xr;
+}
+
+
 /******************** Ip2_FrictMat_FrictMat_MindlinPhys *******/
 CREATE_LOGGER(Ip2_FrictMat_FrictMat_MindlinPhys);
 
@@ -72,8 +173,15 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1, const
 	if (en && betan) throw std::invalid_argument("Ip2_FrictMat_FrictMat_MindlinPhys: only one of en, betan can be specified.");
 	if (es && betas) throw std::invalid_argument("Ip2_FrictMat_FrictMat_MindlinPhys: only one of es, betas can be specified.");
 
+	if (vn && betan) throw std::invalid_argument("Ip2_FrictMat_FrictMat_MindlinPhys: only one of vn, betan can be specified.");
+	if (vn && betas) throw std::invalid_argument("Ip2_FrictMat_FrictMat_MindlinPhys: only one of vn, betas can be specified.");
+
 	// en or es specified
-	if (en || es) {
+	if (en && vn) { // Velocity-dependent coefficient of restitution
+		Real vstar           = getVstar((*en)(mat1->id, mat2->id));
+		contactPhysics->beta = vstar * vstar * math::pow((*vn)(mat1->id, mat2->id), -0.2); // ^-1/5 = ^-2/10
+		if (es) { std::cout << "Since vn is defined, the shear coefficient of restitution es will not be used." << endl; }
+	} else if (en || es) {              // Constant coefficient of restitution
 		const Real h1  = -6.918798; // Fitting coefficients h_i from  Table 2 - Thornton et al. (2013).
 		const Real h2  = -16.41105;
 		const Real h3  = 146.8049;
@@ -103,7 +211,7 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1, const
 		contactPhysics->betas = (Es == 1.0) ? 0 : sqrt(1.0 / (1.0 - (math::pow(1.0 + Es, 2)) * exp(alphas)) - 1.0);
 
 		// betan/betas specified, use that value directly
-	} else {
+	} else { // Constant coefficient of restitution
 		contactPhysics->betan = betan ? (*betan)(mat1->id, mat2->id) : 0;
 		contactPhysics->betas = betas ? (*betas)(mat1->id, mat2->id) : contactPhysics->betan;
 	}
@@ -283,14 +391,14 @@ bool Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	const shared_ptr<Body>& b1 = Body::byId(id1, scene);
 	const shared_ptr<Body>& b2 = Body::byId(id2, scene);
 
-	bool useDamping = (phys->betan != 0. || phys->betas != 0.);
+	bool useDamping = (phys->betan != 0. || phys->betas != 0. || phys->beta != 0.);
 
 #ifdef PARTIALSAT
 	if (contact->isFresh(scene)) {
 		phys->initD = scg->penetrationDepth; // only useful for partialsat break criteria
 	}
 #endif
-	// tangential and normal stiffness coefficients, recomputed from betan,betas at every step
+
 	Real cn = 0, cs = 0;
 
 	/****************/
@@ -339,24 +447,28 @@ bool Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/* DAMPING COEFFICIENTS */
 	/************************/
 
-	// Inclusion of local damping if requested
-	// viscous damping is defined for both linear and non-linear elastic case
-	if (useDamping) { // see Thornton (2015)
-		Real mbar    = (!b1->isDynamic() && b2->isDynamic())
-		           ? de2->mass
-		           : ((!b2->isDynamic() && b1->isDynamic())
-		                      ? de1->mass
-		                      : (de1->mass * de2->mass
-                                      / (de1->mass
-                                         + de2->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
-		Real Cn_crit = 2. * sqrt(mbar * phys->kn);  // Critical damping coefficient (normal direction)
-		Real Cs_crit = 2. * sqrt(mbar * phys->ks);  // Critical damping coefficient (shear direction)
+	if (useDamping) {
+		Real mbar = (!b1->isDynamic() && b2->isDynamic())
+		        ? de2->mass
+		        : ((!b2->isDynamic() && b1->isDynamic())
+		                   ? de1->mass
+		                   : (de1->mass * de2->mass
+		                      / (de1->mass
+		                         + de2->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
+		if (phys->betan != 0. || phys->betas != 0.) {      // Constant coefficient of restitution (see Thornton, 2015)
+			Real Cn_crit = 2. * sqrt(mbar * phys->kn); // Critical damping coefficient (normal direction)
+			Real Cs_crit = 2. * sqrt(mbar * phys->ks); // Critical damping coefficient (shear direction)
 
-		cn = Cn_crit * phys->betan; // Damping normal coefficient
-		cs = Cs_crit * phys->betas; // Damping tangential coefficient
-		if (phys->kn < 0 || phys->ks < 0) {
-			cerr << "Negative stiffness kn=" << phys->kn << " ks=" << phys->ks << " for ##" << b1->getId() << "+" << b2->getId() << ", step "
-			     << scene->iter << endl;
+			cn = Cn_crit * phys->betan; // Damping normal coefficient
+			cs = Cs_crit * phys->betas; // Damping tangential coefficient
+			if (phys->kn < 0 || phys->ks < 0) {
+				cerr << "Negative stiffness kn=" << phys->kn << " ks=" << phys->ks << " for ##" << b1->getId() << "+" << b2->getId()
+				     << ", step " << scene->iter << endl;
+			}
+		} else if (phys->beta != 0.) {                                                   // Velocity-dependent coefficient of restitution
+			const Real A = 2.0 * phys->beta * math::pow(phys->kno / mbar, -0.4) / 3; // ^-2/5
+			cn           = A * phys->kn;
+			cs           = A * phys->kn;
 		}
 	}
 

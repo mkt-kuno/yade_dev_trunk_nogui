@@ -55,6 +55,7 @@ public:
 			// Contact damping ratios
 			((Real,betan,0.0,,"Normal Damping Ratio. Fraction of the viscous damping coefficient (normal direction) equal to $\\frac{c_{n}}{C_{n,crit}}$."))
 			((Real,betas,0.0,,"Shear Damping Ratio. Fraction of the viscous damping coefficient (shear direction) equal to $\\frac{c_{s}}{C_{s,crit}}$."))
+			((Real,beta,0.0,,"Auxiliary parameter used in the viscous damping model of [Mueller2011]_"))
 
 			// temporary
 			((Vector3r,prevU,Vector3r::Zero(),,"Previous local displacement; only used with :yref:`Law2_L3Geom_FrictPhys_HertzMindlin`."))
@@ -80,23 +81,24 @@ public:
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS(
 			Ip2_FrictMat_FrictMat_MindlinPhys,IPhysFunctor, 
-				R"""(Calculate physical parameters needed to obtain the normal and shear stiffnesses according to the Hertz-Mindlin formulation (as implemented in PFC).
-The viscous damping coefficients $c_n$, $c_s$ can be specified either using viscous damping ratios ($\beta_n$, $\beta_s$) or coefficients of restitution ($e_n$, $e_s$).
+				R"""(Calculate physical parameters needed to obtain the normal and shear stiffness values according to the Hertz-Mindlin formulation (no slip solution).\\
 
-# If the viscous damping ratio $\beta_n$ ($\beta_s$) is given, it is assigned directly to :yref:`MindlinPhys.betan` (:yref:`MindlinPhys.betas`) and the viscous damping coefficient is calculated as $c_n=2 \cdot \beta_n \cdot \sqrt{m_{bar} \cdot k_n}$ ($c_s=2 \cdot \beta_s \cdot \sqrt{m_{bar} \cdot k_s}$), where $k_n$ ($k_s$) the tangent normal (shear) stiffness. Replacing $k_n=3/2 \cdot k_{no} \cdot {u_{N}}^{0.5}$ ($k_s=k_{so} \cdot {u_{N}}^{0.5}$) and $k_{no}=4/3 \cdot E \cdot \sqrt{R}$ ($k_{so}=8 \cdot G \cdot \sqrt{R}$), we get $c_n=2 \cdot \beta_n \cdot \sqrt{m_{bar}} \cdot \sqrt{2 \cdot E \cdot \sqrt{R}}\cdot {u_{N}}^{0.25}$ ($c_s=2 \cdot \beta_s  \cdot \sqrt{m_{bar}} \cdot \sqrt{8 \cdot G \cdot \sqrt{R}} \cdot {u_N}^{0.25}$), where $m_{bar}$, $R$, $E$, $G$ the effective mass, radius, elastic and shear moduli of the interacting particles.
+There are two available viscous damping models for (1) constant and (2) velocity-dependent coefficient of restitution. In both cases, the viscous forces are calculated as $F_{n,viscous}=c_n \cdot v_n$ ($F_{s,viscous}=c_s \cdot v_s$), where $c_n$ ($c_s$) the normal (shear) viscous damping coefficient and $v_n$ ($v_s$) the normal (shear) component of the relative velocity.\\
 
-# If the coefficient of restitution $e_n$ is given instead, the normal viscous damping ratio is computed using formula (B6) from [Thornton2013]_, written specifically for the Hertz-Mindlin model (no-slip solution) where the end of contact is considered to take place once the normal force is zero and not once the overlap is zero, thus not allowing attractive elastic forces for non-adhesive contacts, as also discussed in [Schwager2007]_.
+(1) Constant coefficient of restitution: The normal (shear) viscous damping coefficient is given by $c_n=2 \cdot \beta_n \cdot \sqrt{m_{bar} \cdot k_n}$ ($c_s=2 \cdot \beta_s \cdot \sqrt{m_{bar} \cdot k_s}$),  where $m_{bar}$ the effective mass, $\beta_n$ ($\beta_s$) normal (shear) viscous damping ratios, and $k_{n}=2 \cdot E^* \cdot \sqrt{R^* \cdot \u_N}$ ($k_{s}=8 \cdot G^* \cdot \sqrt{R \cdot u_N}$) the normal (shear) tangential stiffness values, according to the formulations of Hertz and Mindlin, respectively, and $R^*$, $E^*$, $G^*$ the effective radius, elastic and shear moduli of the interacting particles.
 
-In both cases, the viscous forces are calculated as $F_{n,viscous}=c_n \cdot v_n$ ($F_{s,viscous}=c_s \cdot v_s$), where $v_n$ ($v_s$) the normal (shear) component of the relative velocity.
+The normal (shear) viscous damping coefficient $c_n$ ($c_s$) can be specified either by providing the normal (shear) viscous damping ratio $\beta_n$ ($\beta_s$), which is then assigned directly to :yref:`MindlinPhys.betan` (:yref:`MindlinPhys.betas`), or by defining the normal (shear) coefficient of restitution $e_n$ ($e_s$) in which case the viscous damping ratios are computed using formula (B6) of [Thornton2013]_, written specifically for the Hertz-Mindlin model (no-slip solution) where the end of contact is considered to take place once the normal force is zero and not once the overlap is zero, thus not allowing attractive elastic forces for non-adhesive contacts, as also discussed in [Schwager2007]_.
+
+(2) Velocity-dependent coefficient of restitution: The viscous damping coefficients are given by $c_n=c_s=A \cdot k_n$, where $A$ a dissipative constant. To calculate this constant, the user has to provide a coefficient of restitution ($e_n$) and an impact velocity ($v_n$) corresponding to this $e_n$, as described in [Mueller2011]_.
+
 The following rules apply:
+# It is an error to specify both $e_n$ and $\beta_n$ ($e_s$ and $\beta_s$) or both $v_n$ and $\beta_n$.
 
-# It is an error to specify both $e_n$ and $\beta_n$ ($e_s$ and $\beta_s$).
-
-# If neither $e_n$ nor $\beta_n$ is given, zero value for :yref:`MindlinPhys.betan` is used; there will be no viscous effects.
+# If neither $e_n$ nor $\beta_n$ is given, then :yref:`MindlinPhys.betan` will be zero and no viscous damping will be considered.
 
 # If neither $e_s$ nor $\beta_s$ is given, the value of :yref:`Ip2_FrictMat_FrictMat_MindlinPhys.en` is used for :yref:`Ip2_FrictMat_FrictMat_MindlinPhys.es` and the value of :yref:`MindlinPhys.betan` is used for :yref:`MindlinPhys.betas`, respectively.
 
-The $e_n$, $\beta_n$, $e_s$, $\beta_s$ are :yref:`MatchMaker` objects; they can be constructed from float values to always return constant values.
+The $e_n$, $\beta_n$, $e_s$, $\beta_s$, $v_n$ are :yref:`MatchMaker` objects; they can be constructed from float values to always return constant values.
 
 )""",
 			((Real,gamma,0.0,,"Surface energy parameter [J/m^2] per each unit contact surface, to derive DMT formulation from HM"))
@@ -107,6 +109,7 @@ The $e_n$, $\beta_n$, $e_s$, $\beta_s$ are :yref:`MatchMaker` objects; they can 
 			((shared_ptr<MatchMaker>,es,,,"Shear coefficient of restitution $e_s$."))
 			((shared_ptr<MatchMaker>,betan,,,"Normal viscous damping ratio $\\beta_n$."))
 			((shared_ptr<MatchMaker>,betas,,,"Shear viscous damping ratio $\\beta_s$."))
+			((shared_ptr<MatchMaker>,vn,,,"Impact velocity corresponding to the en value to calculate the dissipative constant $An$ used in the viscous damping model of [Mueller2011]_."))
 			((shared_ptr<MatchMaker>,frictAngle,,,"Instance of :yref:`MatchMaker` determining how to compute the friction angle of an interaction. If ``None``, minimum value is used."))
 	);
 	// clang-format on
