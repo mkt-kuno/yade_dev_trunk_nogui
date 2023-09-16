@@ -12,6 +12,7 @@
 #error "This file cannot be included alone, include Real.hpp instead"
 #endif
 
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Interval_nt.h>
 #include <CGAL/NT_converter.h>
 #include <CGAL/number_type_basic.h>
@@ -139,7 +140,15 @@ public:
 	template <> struct Algebraic_structure_traits<::yade::RealHP<levelHP>> : public RealHP_Algebraic_structure_traits<levelHP> {                           \
 	};                                                                                                                                                     \
 	template <> struct Real_embeddable_traits<::yade::RealHP<levelHP>> : public RealHP_embeddable_traits<levelHP> {                                        \
-	};
+	};                                                                                                                                                     \
+	namespace internal {                                                                                                                                   \
+		template <> struct Exact_field_selector<::yade::RealHP<levelHP>> {                                                                             \
+			using Type = boost::multiprecision::mpq_rational;                                                                                      \
+		};                                                                                                                                             \
+		template <> struct Exact_ring_selector<::yade::RealHP<levelHP>> {                                                                              \
+			using Type = boost::multiprecision::mpq_rational;                                                                                      \
+		};                                                                                                                                             \
+	}
 
 // When faster CGAL computations are needed, we might want to use and specialize converter for /usr/include/CGAL/Lazy_exact_nt.h
 
