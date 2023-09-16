@@ -32,11 +32,11 @@ if 'MPI' in yade.config.features:
 		O.timingEnabled = True
 
 	#FIXME: most of what follows don't have to be guarded by rank==0
-	fileName = 'SiloLargeOrifice'
+	fileName = 'Case1_SiloFlow_Walls_LargeOrifice'
 	#fileName='SiloSmallOrifice'
-	if fileName == 'SiloLargeOrifice':
+	if fileName == 'Case1_SiloFlow_Walls_LargeOrifice':
 		z = 70  # This is the height of the lowest point of the funnel (at the orifice), measuring from the lowest cylindrical cross section of the silo
-	elif fileName == 'SiloSmallOrifice':
+	elif fileName == 'Case1_SiloFlow_Walls_SmallOrifice':
 		z = 80
 
 	particleRadius = 8  # 2mm in the benchmark, bigger for less particles
@@ -118,14 +118,14 @@ if 'MPI' in yade.config.features:
 
 		from yade import ymport
 		if not os.path.exists(
-		        '/tmp/' + fileName + '.stl'
+		        '/tmp/' + fileName + '.txt'
 		):  # even if test starts as a different user, he will have read permissions. So test won't fail.
 			print("Downloading mesh file")
 			try:
-				os.system('wget http://perso.3sr-grenoble.fr/users/bchareyre/yade/input/' + fileName + '.stl -O /tmp/' + fileName + '.stl')
+				os.system('wget https://yade-dem.org/publi/data/DEM8/' + fileName + '.txt -O /tmp/' + fileName + '.txt')
 			except:
 				print("** probably no internet connection, grab the *.stl files by yourself **")
-		facets = ymport.stl('/tmp/' + fileName + '.stl', color=(0, 1, 0), material=Steel)
+		facets = ymport.textFacets('/tmp/' + fileName + '.txt', color=(0, 1, 0), scale=1000, material=Steel)
 		fctIds = range(len(facets))
 
 		O.bodies.append(facets)
