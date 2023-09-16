@@ -86,7 +86,11 @@ public:
 				*nn_out++ = std::make_pair(start->vertex(k), weights[k]);
 		} else {
 			normals.clear();
+#if CGAL_VERSION_NR < CGAL_VERSION_NUMBER(5, 6, 0)
 			CGAL_triangulation_precondition(dt.dimension() == 3);
+#else
+			CGAL_precondition(dt.dimension() == 3);
+#endif
 			Dt::Locate_type lt;
 			int             li, lj;
 			Dt::Cell_handle c = dt.locate(Q, lt, li, lj, start);
