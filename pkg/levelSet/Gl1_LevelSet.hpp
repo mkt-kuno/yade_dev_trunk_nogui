@@ -2,7 +2,7 @@
 *  2022 DLH van der Haven, dannyvdhaven@gmail.com                        *
 *  This program is free software, see file LICENSE for details.          *
 *  Code here is based on the Gl1_PotentialParticle.*pp by CWBoon 2015    *
-*  for the implementation of potential particles in YADE.  				       *
+*  for the implementation of potential particles in YADE.  				 *
 *************************************************************************/
 #pragma once
 #ifdef YADE_LS_DEM

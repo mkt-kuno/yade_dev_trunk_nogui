@@ -1,5 +1,6 @@
 /*************************************************************************
-*  2021 jerome.duriez@inrae.fr                                           *
+*  2021 Jérôme Duriez, jerome.duriez@inrae.fr                            *
+*  2023 Danny van der Haven, dannyvdhaven@gmail.com                      *
 *  This program is free software, see file LICENSE for details.          *
 *************************************************************************/
 
@@ -215,23 +216,25 @@ bool LevelSet::rayTraceInCell(const Vector3r& ray, const Vector3r& pointP, const
 	return touched;
 }
 
-Vector3r LevelSet::normal(const Vector3r& pt) const
+Vector3r LevelSet::normal(const Vector3r& pt, const bool& unbound) const
 {
-	// Returns the normal vector at pt
+	// Returns the normal vector at pt from distance gradient
 	// Checking which cell we're in:
-	Vector3i indices = lsGrid->closestCorner(pt);
+	Vector3i indices = lsGrid->closestCorner(pt,unbound);
 	int      xInd(indices[0]), yInd(indices[1]), zInd(indices[2]);
 
 	if (xInd < 0 || yInd < 0 || zInd < 0) { // operators precedence OK in || vs <
-		LOG_ERROR("Can not compute the normal, returning a NaN vector");
+		LOG_ERROR("Can not compute the normal, returning a NaN vector.");
 		return Vector3r(NaN, NaN, NaN);
 	}
 	// Some declarations:
 	Real     spac   = lsGrid->spacing;
 	Vector3r corner = lsGrid->gridPoint(xInd, yInd, zInd);
-	Real     xRed((pt[0] - corner[0]) / spac), yRed((pt[1] - corner[1]) / spac),
-	        zRed((pt[2] - corner[2]) / spac); // dimensionless x,y,z in [0;1] in one cell (3., top p. 4 Kawamoto2016)
-	Real nx(0), ny(0), nz(0);                 // x, y, z components of normal
+	// Then, the reduced coordinates in one cell, i.e. dimensionless x,y,z expected to be in [0;1] (3., top p. 4 Kawamoto2016). Actually capped into [0;1] even for out-of-the grid points (VLS-DEM wants normal = normal(corresponding edge grid corner) in such a case):
+	Real xRed = math::max(math::min((pt[0] - corner[0]) / spac, 1.0), 0.0),
+		yRed = math::max(math::min((pt[1] - corner[1]) / spac, 1.0), 0.0),
+		zRed = math::max(math::min((pt[2] - corner[2]) / spac, 1.0), 0.0);
+	Real nx(0), ny(0), nz(0); // The x, y, z components of normal, computed below
 	// Computing normal as the gradient of trilinear interpolation (e.g. Eq. (2) Kawamoto2016):
 	for (int indA = 0; indA < 2; indA++) {
 		for (int indB = 0; indB < 2; indB++) {
@@ -243,7 +246,7 @@ Vector3r LevelSet::normal(const Vector3r& pt) const
 			}
 		}
 	}
-	return Vector3r(nx, ny, nz).normalized(); // do we really need the normalized() ?.. normally, no
+	return Vector3r(nx, ny, nz).normalized(); // Do we really need the normalized() ?.. normally, no
 }
 
 void LevelSet::initSurfNodes()
@@ -407,32 +410,64 @@ void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, bo
 	initDone = true;
 }
 
-Real LevelSet::distance(const Vector3r& pt) const
+Real LevelSet::distance(const Vector3r& pt, const bool& unbound) const
 {
-	// We work here in the "reference configuration"
-	Vector3i indices = lsGrid->closestCorner(pt);
-	int      xInd(indices[0]), yInd(indices[1]), zInd(indices[2]);
-	if (xInd < 0 || yInd < 0 || zInd < 0) { // operators precedence OK in || vs <
-		LOG_ERROR("Can not compute the distance, returning NaN");
-		return (NaN);
+	// We work here in the "reference configuration" or local axes
+	Vector3i indices = lsGrid->closestCorner(pt,unbound);
+	int xInd(indices[0]), yInd(indices[1]), zInd(indices[2]);
+	Real dist;
+
+	if(!unbound){ // Points outside the grid are NOT allowed.
+		if (xInd < 0 || yInd < 0 || zInd < 0) { // operators precedence OK in || vs <
+			LOG_ERROR("Can not compute the distance, returning NaN.");
+			return (NaN);
+		}
+		// Do grid interpolation.
+		Real                               f0yz(NaN), f1yz(NaN); // distance values at the same y and z as pt and for a x-value just before (resp. after) pt
+		std::array<Real, 2>                yzCoord = { pt[1], pt[2] };
+		std::array<Real, 2>                yExtr   = { lsGrid->gridPoint(xInd, yInd, zInd)[1], lsGrid->gridPoint(xInd, yInd + 1, zInd)[1] };
+		std::array<Real, 2>                zExtr   = { lsGrid->gridPoint(xInd, yInd, zInd)[2], lsGrid->gridPoint(xInd, yInd, zInd + 1)[2] };
+		std::array<std::array<Real, 2>, 2> knownValx0;
+		knownValx0[0][0] = distField[xInd][yInd][zInd];
+		knownValx0[0][1] = distField[xInd][yInd][zInd + 1];
+		knownValx0[1][0] = distField[xInd][yInd + 1][zInd];
+		knownValx0[1][1] = distField[xInd][yInd + 1][zInd + 1];
+		std::array<std::array<Real, 2>, 2> knownValx1;
+		knownValx1[0][0] = distField[xInd + 1][yInd][zInd];
+		knownValx1[0][1] = distField[xInd + 1][yInd][zInd + 1];
+		knownValx1[1][0] = distField[xInd + 1][yInd + 1][zInd];
+		knownValx1[1][1] = distField[xInd + 1][yInd + 1][zInd + 1];
+		f0yz             = ShopLS::biInterpolate(yzCoord, yExtr, zExtr, knownValx0);
+		f1yz             = ShopLS::biInterpolate(yzCoord, yExtr, zExtr, knownValx1);
+		dist = (pt[0] - lsGrid->gridPoint(xInd, yInd, zInd)[0]) / lsGrid->spacing * (f1yz - f0yz) + f0yz;
+	}else{ // Points outside the grid are allowed
+		Vector3i gpPerAxis = lsGrid->nGP;
+		int nGPx(gpPerAxis[0]), nGPy(gpPerAxis[1]), nGPz(gpPerAxis[2]);
+		// Check if we pass either the lower or upper bound of the grid
+		if (xInd == 0 || yInd == 0 || zInd == 0 || xInd == (nGPx-2) || yInd == (nGPy-2) || zInd == (nGPz-2)){ 
+			// Do grid extrapolation.
+			Vector3r cornerC = lsGrid->gridPoint(xInd, yInd, zInd); // Get the closest point on the grid.
+			Real nx(0), ny(0), nz(0);	// The x, y, z components of normal, computed below
+			// Faster version of LevelSet::normal() for points exactly on the grid, 
+			// the dimensionless x, y, z of top p. 4 Kawamoto2016 are all zero here.
+			for (int indA = 0; indA < 2; indA++) {
+				for (int indB = 0; indB < 2; indB++) {
+					for (int indC = 0; indC < 2; indC++) {
+						Real lsVal = distField[xInd + indA][yInd + indB][zInd + indC];
+						nx += lsVal * (2 * indA - 1) * (1 - indB) * (1 - indC);
+						ny += lsVal * (2 * indB - 1) * (1 - indA) * (1 - indC);
+						nz += lsVal * (2 * indC - 1) * (1 - indA) * (1 - indB);
+					}
+				}
+			}
+			Vector3r normalC = Vector3r(nx, ny, nz).normalized();
+			Real distanceC = distField[xInd][yInd][zInd];
+			Vector3r projectC = cornerC - distanceC*normalC; // Project corner onto the object surface.
+			dist = (projectC-pt).norm(); // Take the distance between the projected point and pt.
+		}
 	}
-	Real                               f0yz(NaN), f1yz(NaN); // distance values at the same y and z than pt and for a x-value just before (resp. after) pt
-	std::array<Real, 2>                yzCoord = { pt[1], pt[2] };
-	std::array<Real, 2>                yExtr   = { lsGrid->gridPoint(xInd, yInd, zInd)[1], lsGrid->gridPoint(xInd, yInd + 1, zInd)[1] };
-	std::array<Real, 2>                zExtr   = { lsGrid->gridPoint(xInd, yInd, zInd)[2], lsGrid->gridPoint(xInd, yInd, zInd + 1)[2] };
-	std::array<std::array<Real, 2>, 2> knownValx0;
-	knownValx0[0][0] = distField[xInd][yInd][zInd];
-	knownValx0[0][1] = distField[xInd][yInd][zInd + 1];
-	knownValx0[1][0] = distField[xInd][yInd + 1][zInd];
-	knownValx0[1][1] = distField[xInd][yInd + 1][zInd + 1];
-	std::array<std::array<Real, 2>, 2> knownValx1;
-	knownValx1[0][0] = distField[xInd + 1][yInd][zInd];
-	knownValx1[0][1] = distField[xInd + 1][yInd][zInd + 1];
-	knownValx1[1][0] = distField[xInd + 1][yInd + 1][zInd];
-	knownValx1[1][1] = distField[xInd + 1][yInd + 1][zInd + 1];
-	f0yz             = ShopLS::biInterpolate(yzCoord, yExtr, zExtr, knownValx0);
-	f1yz             = ShopLS::biInterpolate(yzCoord, yExtr, zExtr, knownValx1);
-	return (pt[0] - lsGrid->gridPoint(xInd, yInd, zInd)[0]) / lsGrid->spacing * (f1yz - f0yz) + f0yz;
+
+	return dist;
 }
 
 Real LevelSet::getVolume()

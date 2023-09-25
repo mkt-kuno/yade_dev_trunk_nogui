@@ -15,7 +15,7 @@ public:
 	        boost::python::tuple& t,
 	        boost::python::dict&) override; // way to go for constructor variants: adding a .def(boost::python::init<..>) does not seem to work
 	//	adopting const member functions for the following, so that the compiler knows they should not change anything of *this:
-	Vector3i closestCorner(const Vector3r&) const; // the i,j,k grid indices of the closest "smaller" grid point
+	Vector3i closestCorner(const Vector3r&, const bool& unbound = false) const; // the i,j,k grid indices of the closest "smaller" grid point
 	Vector3r getDims() const;
 	Vector3r gridPoint(int, int, int) const;
 	//	Vector3r gridPoint(Vector3i) const; // would make sense for the C++ world, but would require extra work for the python exposure to work (as an overloaded C++ function)
@@ -31,7 +31,7 @@ public:
 		.def("gridPoint",&RegularGrid::gridPoint,(boost::python::args("i", "j", "k")),"Returns the Vector3 position of any grid point, given its indices *i* (along the X-axis), *j* (Y-axis), *k* (Z-axis).")
 		.def("max",&RegularGrid::max,"Returns the maximum corner of the grid.")
 		.def("dims",&RegularGrid::getDims,"Returns the grid dimensions along the three axes, as a Vector3.")
-		.def("closestCorner",&RegularGrid::closestCorner,(boost::python::arg("pt")),"Returns the Vector3i indices of the closest gridpoint which is smaller (for all components) than *pt*.")
+		.def("closestCorner",&RegularGrid::closestCorner,(boost::python::arg("pt"),boost::python::arg("unbound")=false),"Returns the Vector3i indices of the closest gridpoint which is smaller (for all components) than *pt*.")
 				    );
 	// clang-format on
 	DECLARE_LOGGER;
