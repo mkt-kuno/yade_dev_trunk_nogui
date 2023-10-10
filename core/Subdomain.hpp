@@ -404,7 +404,7 @@ public:
 	void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*) override;
 	FUNCTOR1D(Subdomain);
 	// clang-format off
-	YADE_CLASS_BASE_DOC(Bo1_Subdomain_Aabb,BoundFunctor,"Creates/updates an :yref:`Aabb` of a :yref:`Facet`.");
+	YADE_CLASS_BASE_DOC(Bo1_Subdomain_Aabb,BoundFunctor,"Creates/updates an :yref:`Aabb` of a :yref:`Subdomain` (mpi parallel simulations).");
 	// clang-format on
 	DECLARE_LOGGER;
 };
