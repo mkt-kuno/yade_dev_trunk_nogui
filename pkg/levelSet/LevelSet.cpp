@@ -465,6 +465,7 @@ Real LevelSet::distance(const Vector3r& pt, const bool& unbound) const
 			Vector3r projectC = cornerC - distanceC*normalC; // Project corner onto the object surface.
 			dist = (projectC-pt).norm(); // Take the distance between the projected point and pt.
 		}
+		else dist = distance(pt,false); // fallback to classical grid interpolation for this inside point
 	}
 
 	return dist;

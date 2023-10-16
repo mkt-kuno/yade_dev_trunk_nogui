@@ -26,6 +26,8 @@ if ('LS_DEM' in features):
 	normals = [pt/pt.norm() for pt in pts] # Normal of a sphere is c*(x,y,z) where c is the normalisation constant.
 	if not equalNbr(lsSph.shape.distance(pts[0]),distVals[0],5.e-3):
 		raise YadeCheckError("Incorrect distance value to a unit sphere for an inside point",pts[0],":", lsSph.shape.distance(pts[0]), "vs", distVals[0] , "expected.")
+	if not equalNbr(lsSph.shape.distance(pts[0],True),distVals[0],5.e-3):
+		raise YadeCheckError("When using unbound=True, incorrect distance value to a unit sphere for an inside point",pts[0],":", lsSph.shape.distance(pts[0]), "vs", distVals[0] , "expected.")
 	if not equalVectors(lsSph.shape.normal(pts[0]),normals[0],0.06):
 		raise YadeCheckError("Incorrect normal for a unit sphere for an inside point",pts[0],":", lsSph.shape.normal(pts[0]), "vs", normals[0] , "expected.")
 	for idx in [1,2]: # out-of-the grid points
