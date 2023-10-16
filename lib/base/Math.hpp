@@ -45,6 +45,10 @@
 #define YADE_CAST static_cast
 #endif
 
+#ifndef YADE_DYN_CAST
+#define YADE_DYN_CAST dynamic_cast
+#endif
+
 #ifndef YADE_PTR_DYN_CAST
 #define YADE_PTR_DYN_CAST ::boost::dynamic_pointer_cast
 #endif
