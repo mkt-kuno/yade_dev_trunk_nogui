@@ -592,9 +592,9 @@ IF( (NOT REAL_DECIMAL_PLACES) AND (    REAL_PRECISION_BITS))
   ENDIF()
 ENDIF()
 
-IF((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 11.3.0) OR (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 11.3.0))
+IF(((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 11.3.0) OR (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 11.3.0)) AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 12.0.0))
   SET(ENABLE_MPFR "OFF")
-  MESSAGE(STATUS "Warning: g++ version >= 11.3.0 causes MPFR to crash upon exit from YADE. Will use boost::multiprecision::cpp_bin_float until this gets resolved.")
+  MESSAGE(STATUS "Warning: g++ 12.0.0 > version >= 11.3.0 causes MPFR to crash upon exit from YADE. Will use boost::multiprecision::cpp_bin_float")
 ENDIF()
 
 IF(REAL_USE_ARBITRARY)
