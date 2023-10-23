@@ -102,14 +102,20 @@ public:
 	//! Recalculate body's inertia tensor in rotated coordinates.
 	static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot);
 
-	boost::python::dict members_get();
+	boost::python::dict members_get() const;
+	vector<Body::id_t> ids_get() const {
+		auto ids_ = vector<Body::id_t>();
+		for (const auto& m : members) ids_.push_back(m.first);
+		return ids_;
+	}
 
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Clump,Shape,"Rigid aggregate of bodies whose usage is detailed :ref:`here<ClumpSection>`",
 		((MemberMap,members,,Attr::hidden,"Ids and relative positions+orientations of members of the clump (should not be accessed directly)"))
-		 ((vector<int>,ids,,Attr::readonly,"Ids of constituent particles (only informative; direct modifications will have no effect).")) //FIXME
 		,/*ctor*/ createIndex();
-		,/*py*/ .add_property("members",&Clump::members_get,"Return clump members as {'id1':(relPos,relOri),...}")
+		,/*py*/
+		.add_property("members",&Clump::members_get,"Return clump members as {'id1':(relPos,relOri),...}")
+		.add_property("ids",&Clump::ids_get,"Ids of constituent particles (only informative; direct modifications will have no effect).")
 	);
 	// clang-format on
 	DECLARE_LOGGER;

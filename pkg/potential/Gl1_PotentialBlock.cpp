@@ -566,11 +566,12 @@ void PotentialBlockVTKRecorder::action()
 			const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(b->shape));
 
 			//vtkSmartPointer<ImpFunc> functionBool [clump->ids.size()];
-			functionBool   = new vtkSmartPointer<ImpFuncPB>[clump->ids.size()];
-			ImplicitBoolNo = clump->ids.size();
+			auto clumpIds = clump->ids_get();
+			functionBool   = new vtkSmartPointer<ImpFuncPB>[clumpIds.size()];
+			ImplicitBoolNo = clumpIds.size();
 
-			for (unsigned int i = 0; i < clump->ids.size(); i++) {
-				const shared_ptr<Body> clumpMember  = Body::byId(clump->ids[i], scene);
+			for (unsigned int i = 0; i < clumpIds.size(); i++) {
+				const shared_ptr<Body> clumpMember  = Body::byId(clumpIds[i], scene);
 				const PotentialBlock*  pbShape      = dynamic_cast<PotentialBlock*>(clumpMember->shape.get());
 				functionBool[i]                     = vtkSmartPointer<ImpFuncPB>::New();
 				functionBool[i]->R                  = pbShape->R;

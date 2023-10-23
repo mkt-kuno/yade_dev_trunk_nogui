@@ -16,7 +16,7 @@ using math::min; // using inside .cpp file is ok.
 YADE_PLUGIN((Clump));
 CREATE_LOGGER(Clump);
 
-boost::python::dict Clump::members_get()
+boost::python::dict Clump::members_get() const
 {
 	boost::python::dict ret;
 	for (const auto& b : members) {

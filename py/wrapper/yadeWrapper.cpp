@@ -185,18 +185,12 @@ public:
 	{ //FIXME
 		const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(clumpBody->shape));
 		if (clump->members.size() == 1) {
-			Clump::del(clumpBody, memberBody); //phD was not commented out
-			for (unsigned i = 0; i < clump->ids.size(); i++) {
-				if (clump->ids[i] == memberBody->getId()) { clump->ids.erase(clump->ids.begin() + i); }
-			}
+			Clump::del(clumpBody, memberBody);
 			proxee->erase(memberBody->getId(), false);
 			proxee->erase(clumpBody->getId(), false);
 
 		} else {
-			Clump::del(clumpBody, memberBody); //pHD was not commented out
-			for (unsigned i = 0; i < clump->ids.size(); i++) {
-				if (clump->ids[i] == memberBody->getId()) { clump->ids.erase(clump->ids.begin() + i); }
-			}
+			Clump::del(clumpBody, memberBody);
 			Clump::updatePropertiesNonSpherical(clumpBody, /*intersecting*/ false);
 			proxee->erase(memberBody->getId(), false);
 		}
@@ -204,24 +198,17 @@ public:
 	void deleteClumpBody(shared_ptr<Body> clumpBody)
 	{ //FIXME
 		const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(clumpBody->shape));
-
-		//if (clump->members.size()==0 ){
-		//	proxee->erase(clumpBody->getId());
-		//}else{
 		Scene* scene(Omega::instance().getScene().get());
-		int    totalNumber = clump->ids.size();
+		int    totalNumber = clump->members.size();
 		int    count       = 0;
 		while (count < totalNumber) {
-			//for (int i=0; i<clump->ids.size(); i++){
-			shared_ptr<Body> memberBody(YADE_PTR_CAST<Body>(Body::byId(clump->ids[/*i */ 0], scene)));
+			//each time we erase the first one (begin()), the next one becomes first
+			shared_ptr<Body> memberBody(YADE_PTR_CAST<Body>(Body::byId(clump->members.begin()->first, scene)));
 			deleteClumpMember(clumpBody, memberBody);
-			//clump->ids.erase(clump->ids.begin()+i);
-			//proxee->erase(memberBody->getId());
 			count++;
 		}
 
 		proxee->erase(clumpBody->getId(), true);
-		//}
 	}
 	void addToClump(vector<Body::id_t> bids, Body::id_t cid, unsigned int discretization)
 	{

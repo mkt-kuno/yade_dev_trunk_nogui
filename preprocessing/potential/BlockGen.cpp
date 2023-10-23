@@ -1616,7 +1616,6 @@ bool BlockGen::generate(string& /*message*/)
 				//Body::id_t clumpId=scene->bodies->insert(clumpBody); //std::cout<<"ok 1"<<endl;
 				for (unsigned int j = 0; j < memberId.size(); j++) {
 					Clump::addNonSpherical(clumpBody, /* body*/ Body::byId(memberId[j], scene)); //std::cout<<"ok 2"<<endl;
-					clump->ids.push_back(memberId[j]);                                           //std::cout<<"ok 3"<<endl;
 				}
 				Clump::updatePropertiesNonSpherical(clumpBody, /*intersecting*/ false, scene);
 				//std::cout<<"ok 4"<<endl;
