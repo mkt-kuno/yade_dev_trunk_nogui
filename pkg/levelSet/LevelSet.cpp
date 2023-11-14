@@ -418,28 +418,7 @@ Real LevelSet::distance(const Vector3r& pt, const bool& unbound) const
 	Real dist;
 
 	if(!unbound){ // Points outside the grid are NOT allowed.
-		if (xInd < 0 || yInd < 0 || zInd < 0) { // operators precedence OK in || vs <
-			LOG_ERROR("Can not compute the distance, returning NaN.");
-			return (NaN);
-		}
-		// Do grid interpolation.
-		Real                               f0yz(NaN), f1yz(NaN); // distance values at the same y and z as pt and for a x-value just before (resp. after) pt
-		std::array<Real, 2>                yzCoord = { pt[1], pt[2] };
-		std::array<Real, 2>                yExtr   = { lsGrid->gridPoint(xInd, yInd, zInd)[1], lsGrid->gridPoint(xInd, yInd + 1, zInd)[1] };
-		std::array<Real, 2>                zExtr   = { lsGrid->gridPoint(xInd, yInd, zInd)[2], lsGrid->gridPoint(xInd, yInd, zInd + 1)[2] };
-		std::array<std::array<Real, 2>, 2> knownValx0;
-		knownValx0[0][0] = distField[xInd][yInd][zInd];
-		knownValx0[0][1] = distField[xInd][yInd][zInd + 1];
-		knownValx0[1][0] = distField[xInd][yInd + 1][zInd];
-		knownValx0[1][1] = distField[xInd][yInd + 1][zInd + 1];
-		std::array<std::array<Real, 2>, 2> knownValx1;
-		knownValx1[0][0] = distField[xInd + 1][yInd][zInd];
-		knownValx1[0][1] = distField[xInd + 1][yInd][zInd + 1];
-		knownValx1[1][0] = distField[xInd + 1][yInd + 1][zInd];
-		knownValx1[1][1] = distField[xInd + 1][yInd + 1][zInd + 1];
-		f0yz             = ShopLS::biInterpolate(yzCoord, yExtr, zExtr, knownValx0);
-		f1yz             = ShopLS::biInterpolate(yzCoord, yExtr, zExtr, knownValx1);
-		dist = (pt[0] - lsGrid->gridPoint(xInd, yInd, zInd)[0]) / lsGrid->spacing * (f1yz - f0yz) + f0yz;
+		dist = distanceInterpolation(pt,xInd,yInd,zInd);
 	}else{ // Points outside the grid are allowed
 		Vector3i gpPerAxis = lsGrid->nGP;
 		int nGPx(gpPerAxis[0]), nGPy(gpPerAxis[1]), nGPz(gpPerAxis[2]);
@@ -465,10 +444,36 @@ Real LevelSet::distance(const Vector3r& pt, const bool& unbound) const
 			Vector3r projectC = cornerC - distanceC*normalC; // Project corner onto the object surface.
 			dist = (projectC-pt).norm(); // Take the distance between the projected point and pt.
 		}
-		else dist = distance(pt,false); // fallback to classical grid interpolation for this inside point
+		else dist = distanceInterpolation(pt,xInd,yInd,zInd); // Fall back to classical grid interpolation for this inside point.
 	}
 
 	return dist;
+}
+
+Real LevelSet::distanceInterpolation(const Vector3r& pt, const int& xInd, const int& yInd, const int& zInd) const
+{
+	// Trilinear interpolation of distance value for pt being inside the (xInd,yInd,zInd) grid cell
+	if (xInd < 0 || yInd < 0 || zInd < 0) { // operators precedence OK in || vs <
+		LOG_ERROR("Can not compute the distance, returning NaN.");
+		return (NaN);
+	}
+	Real                               f0yz(NaN), f1yz(NaN); // distance values at the same y and z as pt and for a x-value just before (resp. after) pt
+	std::array<Real, 2>                yzCoord = { pt[1], pt[2] };
+	std::array<Real, 2>                yExtr   = { lsGrid->gridPoint(xInd, yInd, zInd)[1], lsGrid->gridPoint(xInd, yInd + 1, zInd)[1] };
+	std::array<Real, 2>                zExtr   = { lsGrid->gridPoint(xInd, yInd, zInd)[2], lsGrid->gridPoint(xInd, yInd, zInd + 1)[2] };
+	std::array<std::array<Real, 2>, 2> knownValx0;
+	knownValx0[0][0] = distField[xInd][yInd][zInd];
+	knownValx0[0][1] = distField[xInd][yInd][zInd + 1];
+	knownValx0[1][0] = distField[xInd][yInd + 1][zInd];
+	knownValx0[1][1] = distField[xInd][yInd + 1][zInd + 1];
+	std::array<std::array<Real, 2>, 2> knownValx1;
+	knownValx1[0][0] = distField[xInd + 1][yInd][zInd];
+	knownValx1[0][1] = distField[xInd + 1][yInd][zInd + 1];
+	knownValx1[1][0] = distField[xInd + 1][yInd + 1][zInd];
+	knownValx1[1][1] = distField[xInd + 1][yInd + 1][zInd + 1];
+	f0yz             = ShopLS::biInterpolate(yzCoord, yExtr, zExtr, knownValx0);
+	f1yz             = ShopLS::biInterpolate(yzCoord, yExtr, zExtr, knownValx1);
+	return (pt[0] - lsGrid->gridPoint(xInd, yInd, zInd)[0]) / lsGrid->spacing * (f1yz - f0yz) + f0yz;
 }
 
 Real LevelSet::getVolume()
