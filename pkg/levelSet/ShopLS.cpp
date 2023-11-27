@@ -247,7 +247,6 @@ ShopLS::lsSimpleShape(int shape, const AlignedBox3r& aabb, const Real& step, con
 		distFMM.phiIni = distIniSE((maxBod - minBod) / 2., epsilons, lsShape->lsGrid);
 		distanceVal    = distFMM.phi();
 	} else if (shape == 4) {
-		const auto ids = clump->ids_get();
 		FastMarchingMethod distFMM;
 		distFMM.grid   = lsShape->lsGrid;
 		distFMM.phiIni = distIniClump(clump, lsShape->lsGrid);
