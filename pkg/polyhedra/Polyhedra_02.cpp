@@ -193,7 +193,7 @@ void PolyhedraGeom::precompute(
 	normal = currentNormal;
 	//Precompute shear increment
 	Vector3r c1x              = (contactPoint - rbp1.pos);
-	Vector3r c2x              = (contactPoint - rbp2.pos + shift2);
+	Vector3r c2x              = (contactPoint - (rbp2.pos + shift2));
 	Vector3r relativeVelocity = (rbp2.vel + rbp2.angVel.cross(c2x)) - (rbp1.vel + rbp1.angVel.cross(c1x));
 	//keep the shear part only
 	relativeVelocity = relativeVelocity - normal.dot(relativeVelocity) * normal;
