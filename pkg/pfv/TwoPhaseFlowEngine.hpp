@@ -274,7 +274,7 @@ public:
 		#endif
 		,
 		.def("getPores",&PhaseCluster::getPores,"get the list of pores by index")
-		.def("getInterfaces",&PhaseCluster::getInterfaces,(boost::python::arg("CellId")=-1),"get the list of interfacial pore-throats associated to a cluster, listed as [id1,id2,area,index] where id2 is the neighbor pore outside the cluster and index is the position in the global cluster's list of interfaces. If CellId>=0 only the interfaces adjacent to the corresponding inner cell are returned.")
+		.def("getInterfaces",&PhaseCluster::getInterfaces,(boost::python::arg("cellId")=-1),"get the list of interfacial pore-throats associated to a cluster, listed as [id1,id2,area,index] where id2 is the neighbor pore outside the cluster and index is the position in the global cluster's list of interfaces. If cellId>=0 only the interfaces adjacent to the corresponding inner cell are returned.")
 		.def("getFlux",&PhaseCluster::getFlux,(boost::python::arg("interface")),"get flux at an interface (i.e. velocity of the menicus), the index to be used is the rank of the interface in the same order as in getInterfaces().")
 		.def("setCapPressure",&PhaseCluster::setCapPressure,(boost::python::arg("numf"),boost::python::arg("pCap")),"set local capillary pressure")
 		.def("getCapPressure",&PhaseCluster::getCapPressure,(boost::python::arg("numf")),"get local capillary pressure")
