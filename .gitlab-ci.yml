@@ -370,7 +370,8 @@ make_asan_HP:
   before_script:
     - export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"
     # it is expensive to run 5 ASAN tests. So instead run only one, but pick from available decimal places based on the job id.
-    - export TEST_DECIMAL_PLACES=$(case $(( $CI_BUILD_ID % 5 )) in
+    - echo $CI_JOB_ID
+    - export TEST_DECIMAL_PLACES=$(case $(( $CI_JOB_ID % 5 )) in
         "0") echo "18"  ;;
         "1") echo "33"  ;;
         "2") echo "45"  ;;
@@ -378,7 +379,7 @@ make_asan_HP:
         "4") echo "45"  ;;
         *)   echo "6"   ;;
       esac)
-    - export TEST_USE_MPFR=$(case $(( $CI_BUILD_ID % 5 )) in
+    - export TEST_USE_MPFR=$(case $(( $CI_JOB_ID % 5 )) in
         "0") echo "OFF" ;;
         "1") echo "OFF" ;;
         "2") echo "ON"  ;;
