@@ -88,6 +88,8 @@ if (('VTK' in features) and (not ppc64elLongDouble())):
 			verName += '.1'
 		else:
 			verName += '.2'  # let's hope that higher versions will produce output like ver 8.2
+	isFloat32 = False
+	dataTypes = ["Float64", "Int64", "Int32", "UInt8", "UInt16", "UInt32", "UInt64", "UnstructuredGrid", "PolyData"]
 	for fname in fileList:
 		print("checking file: ", vtkSaveDir + fname)
 		referenceFile = open(checksPath + '/data/vtk_reference_' + verName + '/' + fname, "r")
@@ -109,6 +111,13 @@ if (('VTK' in features) and (not ppc64elLongDouble())):
 					)
 			if (t1[0] == '<VTKFile type='):
 				isHeader = True  # various VTK versions have different headers.
+			# Float32 type has smaller precision, so compare the results with fewer digits
+			if(('type="Float32"' in line1) and ('type="Float32"' in line2)):
+				isFloat32 = True
+			else:
+				for tt in dataTypes:
+					if(('type="'+tt+'"' in line1) and ('type="'+tt+'"' in line2)):
+						isFloat32 = False
 			if ((line1 != line2) and (not isHeader)):  # we have some differences, check if they are acceptable
 				# flatten the list of lists. First they are split by space, then they are split by '"'
 				sp1 = [val for sublist in [i.split('"') for i in line1.split()] for val in sublist]
@@ -124,7 +133,10 @@ if (('VTK' in features) and (not ppc64elLongDouble())):
 						)
 					for s1, s2 in zip(sp1, sp2):
 						try:
-							if (abs(float(s1) - float(s2)) > 1e-8):
+							# there are some numbers like 1.8e-41 vs 1.1e-42 which have ratio of 10, or 1.1e-13 vs 0. This is just noisy zero, so skip them.
+							if ((abs(float(s1)) < 1e-10) and (abs(float(s2)) < 1e-10)):
+								pass
+							elif (abs((float(s1) - float(s2))/float(s1)) > (1e-5 if isFloat32 else 5e-10)):
 								raise YadeCheckError(
 								        "checkVTKRecorder failed float comparison in file " + fname + " line: " +
 								        str(lineCount) + " with inputs: '" + str(s1) + "' vs. '" + str(s2) + "'"
