@@ -47,7 +47,7 @@ regular :ref:`installation instructions <install-from-source-code>`. With extra 
 	1. either number of bits as ``REAL_PRECISION_BITS=……``,
 	2. or number of requested decimal places as ``REAL_DECIMAL_PLACES=……``, but not both
 	3. optionally to use MPFR specify ``ENABLE_MPFR=ON`` (is ``OFF`` by default).
-	4. optionally decide about using :ref:`quadruple, octuple or higher precisions<higher-hp-precision>` with ``-DENABLE_REAL_HP=ON`` (default). This feature is independent of selecting the precision of ``Real`` type (in point 1. or 2. above) and works even when ``Real`` is chosen as ``double`` (i.e. no special choice is made: the default settings).
+	4. optionally decide about using :ref:`quadruple, octuple or higher precisions<higher-hp-precision>` with ``-DENABLE_MULTI_REAL_HP=ON`` (default). This feature is independent of selecting the precision of ``Real`` type (in point 1. or 2. above) and works even when ``Real`` is chosen as ``double`` (i.e. no special choice is made: the default settings).
 
    The arbitrary precision (``mpfr`` or ``cpp_bin_float``) types are used only when more than 128 bits or more than 39 decimal places are requested. In such case if ``ENABLE_MPFR=OFF`` then
    the slower ``cpp_bin_float`` type is used. The difference in decimal places between 39 and 33 stems from the fact that `15 bits are used for exponent <https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format>`__. Note: a fast quad-double (debian package ``libqd-dev``) implementation with 62 decimal places is `in the works <https://github.com/boostorg/multiprecision/issues/184>`__ with boost multiprecision team.

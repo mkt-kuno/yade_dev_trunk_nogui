@@ -28,6 +28,10 @@
 #  ENABLE_MASK_ARBITRARY      : enable MASK_ARBITRARY option (OFF by default)
 #  ENABLE_MPFR                : use https://www.mpfr.org/ library, can be used for higher precision calculations or for CGAL exact predicates (OFF by default)
 #  ENABLE_MPI                 : Enable MPI communications in Yade. Used for Yade-OpenFOAM coupling.
+#  ENABLE_MULTI_REAL_HP       : allow using twice, quadruple or higher precisions of Real: RealHP<N> for N ∈ {1,2,3,4,8,10,20}
+#                               It is not advertised in yade.config.features because of frequent confusion
+#                               with output of yade.math.usesHP() as described in https://gitlab.com/yade-dev/trunk/-/issues/247
+#                               Please call yade.math.getRealHPCppDigits10() and yade.math.getRealHPPythonDigits10() instead.
 #  ENABLE_OAR                 : generate a script for oar-based task scheduler (OFF by default)
 #  ENABLE_OPENMP              : enable OpenMP-parallelizing option (ON by default)
 #  ENABLE_PARTIALSAT          : enable the partially saturated clay engine, under construction (OFF by default)
@@ -35,9 +39,6 @@
 #  ENABLE_POTENTIAL_BLOCKS    : enable potential blocks option (ON by default)
 #  ENABLE_POTENTIAL_PARTICLES : enable potential particles option (ON by default)
 #  ENABLE_PROFILING           : enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)
-#  ENABLE_REAL_HP             : allow using twice, quadruple or higher precisions of Real. It is not advertised in yade.config.features because of frequent confusion
-#                               with output of yade.math.usesHP() as described in https://gitlab.com/yade-dev/trunk/-/issues/247
-#                               Please call yade.math.getRealHPCppDigits10() and yade.math.getRealHPPythonDigits10() instead.
 #  ENABLE_SPH                 : enable SPH-option, Smoothed Particle Hydrodynamics (OFF by default)
 #  ENABLE_THERMAL             : enable thermal engine (ON by default, experimental)"
 #  ENABLE_TWOPHASEFLOW        : enable TWOPHASEFLOW-option, TwoPhaseFlowEngine (ON by default)
@@ -116,7 +117,7 @@ OPTION(ENABLE_PFVFLOW "Enable one-phase flow engines" ${DEFAULT_ON})
 OPTION(ENABLE_POTENTIAL_BLOCKS "Enable PotentialBlocks" ${DEFAULT_ON})
 OPTION(ENABLE_POTENTIAL_PARTICLES "Enable potential particles" ${DEFAULT_ON})
 OPTION(ENABLE_PROFILING "Enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)" ${DEFAULT_OFF})
-OPTION(ENABLE_REAL_HP "allow using twice, quadruple or higher precisions of Real" ${DEFAULT_ON})
+OPTION(ENABLE_MULTI_REAL_HP "allow using twice, quadruple or higher precisions of Real" ${DEFAULT_ON})
 OPTION(ENABLE_SPH "Enable SPH" ${DEFAULT_OFF})
 OPTION(ENABLE_THERMAL "Enable thermal engine (experimental)" ${DEFAULT_ON})
 OPTION(ENABLE_TWOPHASEFLOW "Enable two-phase flow engines" ${DEFAULT_ON})
@@ -613,7 +614,7 @@ ENDIF()
 
 # Detect if RealHP<N> is supported. Allow option to override this for testing.
 FIND_PACKAGE(Mpmath)
-IF(ENABLE_REAL_HP AND (
+IF(ENABLE_MULTI_REAL_HP AND (
     (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.2.1) OR ((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.3.0) AND (ENABLE_MPFR) AND (REAL_PRECISION_BITS GREATER 128)) OR (ALLOW_CRASHES)))
  IF(Boost_MAJOR_VERSION EQUAL 1 AND Boost_MINOR_VERSION LESS 67)
     SET(REAL_MULTI_HP "OFF")

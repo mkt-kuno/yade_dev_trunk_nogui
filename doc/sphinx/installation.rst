@@ -327,7 +327,7 @@ As a more precise alternative to the above ``DISABLE_*`` options, other ``cmake`
 	* ENABLE_POTENTIAL_BLOCKS: enable :yref:`PotentialBlock` shape description thanks for instance to the `COIN-OR <https://github.com/coin-or/Clp>`_ Linear Programming Solver, requires ``coinor-clp coinor-libclp-dev libopenblas-dev`` (ON by default)
 	* ENABLE_POTENTIAL_PARTICLES: enable :yref:`PotentialParticle` shape description, requires ``libopenblas-dev`` (ON by default)
 	* ENABLE_PROFILING: enable profiling, e.g., shows some more metrics, which can define bottlenecks of the code (OFF by default)
-	* ENABLE_REAL_HP: allow using twice, quadruple or higher precisions of ``Real`` as ``RealHP<2>``, ``RealHP<4>`` or ``RealHP<N>`` in computationally demanding sections of ``C++`` code. See :ref:`high precision documentation<highPrecisionReal>` for additional details (ON by default).
+	* ENABLE_MULTI_REAL_HP: allow using twice, quadruple or higher precisions of ``Real`` as ``RealHP<2>``, ``RealHP<4>`` or ``RealHP<N>`` in computationally demanding sections of ``C++`` code. See :ref:`high precision documentation<highPrecisionReal>` for additional details (ON by default).
 	* ENABLE_SPH: enable Smoothed Particle Hydrodynamics (OFF by default)
 	* ENABLE_THERMAL : enable :yref:`ThermalEngine` (ON by default, experimental)
 	* ENABLE_TWOPHASEFLOW: enable :yref:`TwoPhaseFlowEngine` (ON by default)
