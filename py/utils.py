@@ -425,7 +425,7 @@ def levelSetBody(
 			extents = Vector3(extents[0], extents[1], extents[2])
 		b.shape = lsSimpleShape(3, AlignedBox3(-extents, extents), epsilons=epsilons, step=spacing, smearCoeff=smearCoeff)
 	elif len(distField):
-		b.shape = LevelSet(lsGrid=grid, distField=distField, smearCoeff=smearCoeff)
+		b.shape = LevelSet(lsGrid=grid, distField=distField, smearCoeff=smearCoeff) # NB: we could pass twoD = sthg here, function of distField size
 	if clump != None:
 		if not isinstance(clump, Clump):
 			raise ValueError("Please give a Clump instance as a clump attribute, instead of ", clump)

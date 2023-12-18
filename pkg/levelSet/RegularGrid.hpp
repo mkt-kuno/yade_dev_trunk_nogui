@@ -22,7 +22,7 @@ public:
 	Vector3r max() const;
 
 	// clang-format off
-  YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(RegularGrid,Serializable,"A rectilinear (aka uniform or regular) grid, for :yref:`LevelSet` shapes or other purposes. A cubic regular grid extending from a :yref:`min<RegularGrid.min>` = (m,m,m) to a max at (M,M,M), with :yref:`nGP<RegularGrid.nGP>` = (n,n,n) ie a :yref:`spacing<RegularGrid.spacing>` = (M-m)/(n-1), can be conveniently obtained from RegularGrid(m,M,n)",
+  YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(RegularGrid,Serializable,"A rectilinear (aka uniform or regular) grid, for :yref:`LevelSet` shapes or other purposes. A cubic regular grid extending from a :yref:`min<RegularGrid.min>` = (m,m,m) to a max at (M,M,M), with :yref:`nGP<RegularGrid.nGP>` = (n,n,n) ie a :yref:`spacing<RegularGrid.spacing>` = (M-m)/(n-1), can be conveniently obtained from RegularGrid(m,M,n). For more general cases, minimum point :yref:`min<RegularGrid.min>`, :yref:`spacing<RegularGrid.spacing>` and :yref:`nGP<RegularGrid.nGP>` have to be passed as such at instantiation.",
 		((Vector3r,min,Vector3r(NaN,NaN,NaN),Attr::readonly,"The minimum corner of the grid."))
 		((Vector3i,nGP,Vector3i::Zero(),Attr::readonly,"The number of grid points along the three axes as a Vector3i."))
 		((Real,spacing,-1,Attr::readonly,"The (uniform and isotropic) grid spacing between two axis-consecutive grid points."))
