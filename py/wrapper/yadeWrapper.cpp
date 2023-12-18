@@ -1474,7 +1474,7 @@ try {
 	                "e.g. ``O.interactions[23,65]``\n#. iteraction over the whole container::\n\n\tfor i in O.interactions: print i.id1,i.id2\n\n.. "
 	                "note::\n\tIteration silently skips interactions that are not :yref:`real<Interaction.isReal>`.")
 	        .add_property("materials", &pyOmega::materials_get, "Shared materials; they can be accessed by id or by label")
-	        .add_property("forces", &pyOmega::forces_get, ":yref:`ForceContainer` (forces, torques, displacements) in the current simulation.")
+	        .add_property("forces", &pyOmega::forces_get, ":yref:`ForceContainer` (forces, torques) in the current simulation.")
 	        .add_property(
 	                "energy",
 	                &pyOmega::energy_get,
