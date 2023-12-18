@@ -94,7 +94,7 @@ public:
 	boost::posix_time::ptime prevTime; //Time value on the previous step
 
 	// clang-format off
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Scene,Serializable,"Object comprising the whole simulation.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Scene,Serializable,"Object comprising a stand-alone simulation.",
 		((Real,dt,1e-8,,"Current timestep for integration."))
 		((long,iter,0,Attr::readonly,"Current iteration (computational step) number"))
 		((bool,subStepping,false,,"Whether we currently advance by one engine in every step (rather than by single run through all engines)."))

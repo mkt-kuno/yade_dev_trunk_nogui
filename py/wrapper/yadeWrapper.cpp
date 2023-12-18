@@ -1345,7 +1345,7 @@ try {
 	        .value("triggerPostLoad", yade::Attr::triggerPostLoad)
 	        .value("noResize", yade::Attr::noResize);
 
-	py::class_<pyOmega>("Omega")
+	py::class_<"pyOmega>"("Omega","The whole YADE model, possibly made of several independent :yref:`scene<Scene>` serving as independent simulations. Python-accessed as just `O`, e.g., `O.bodies`")
 	        .add_property("iter", &pyOmega::iter, "Get current step number")
 	        .add_property(
 	                "subStep",
@@ -1501,7 +1501,7 @@ try {
 	                "Counter for number of syncs in ForceContainer, for profiling purposes.")
 	        .add_property("numThreads", &pyOmega::numThreads_get /* ,&pyOmega::numThreads_set*/, "Get maximum number of threads openMP can use.")
 	        .add_property("cell", &pyOmega::cell_get, "Periodic :yref:`Cell` of the current scene (None if the scene is aperiodic).")
-	        .add_property("periodic", &pyOmega::periodic_get, &pyOmega::periodic_set, "Get/set whether the scene is periodic or not (True/False).")
+	        .add_property("periodic", &pyOmega::periodic_get, &pyOmega::periodic_set, "Get/set whether the current :yref:`scene is periodic<Scene.isPeriodic>` or not (True/False).")
 	        .def("exitNoBacktrace",
 	             &pyOmega::exitNoBacktrace,
 	             (py::arg("status") = 0),
