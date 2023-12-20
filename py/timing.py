@@ -2,7 +2,7 @@
 # 2008 © Václav Šmilauer <eudoxos@arcig.cz>
 """Functions for accessing timing information stored in engines and functors.
 
-See :ref:`timing` section of the programmer's manual, `wiki page <http://yade-dem.org/index.php/Speed_profiling_using_TimingInfo_and_TimingDeltas_classes>`_ for some examples.
+See :ref:`timing` section of the programmer's manual for some examples.
 
 """
 from __future__ import print_function
