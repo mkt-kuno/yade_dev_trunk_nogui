@@ -851,8 +851,8 @@ try {
 	py::def("calm",
 	        Shop__calm,
 	        (py::arg("mask") = -1),
-	        "Set translational and rotational velocities of bodies to zero. Applied to all bodies by default. To calm only some bodies, use mask "
-	        "parameter, it will calm only bodies with groupMask compatible to given value");
+	        "Set translational and rotational velocities of bodies to zero. Applied to all :yref:`dynamic<Body.dynamic>` bodies by default. To calm only "
+	        "some of them, use mask parameter, it will calm only dynamic bodies with groupMask compatible to given value");
 	py::def("setNewVerticesOfFacet",
 	        setNewVerticesOfFacet,
 	        (py::arg("b"), py::arg("v1"), py::arg("v2"), py::arg("v3")),
