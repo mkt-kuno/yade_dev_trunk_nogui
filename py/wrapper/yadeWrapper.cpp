@@ -1345,7 +1345,7 @@ try {
 	        .value("triggerPostLoad", yade::Attr::triggerPostLoad)
 	        .value("noResize", yade::Attr::noResize);
 
-	py::class_<"pyOmega>"("Omega","The whole YADE model, possibly made of several independent :yref:`scene<Scene>` serving as independent simulations. Python-accessed as just `O`, e.g., `O.bodies`")
+	py::class_<pyOmega>("Omega","The whole YADE model, possibly made of several independent :yref:`scenes<Scene>` serving as independent simulations. Python-accessed as just `O`, e.g., `O.bodies`")
 	        .add_property("iter", &pyOmega::iter, "Get current step number")
 	        .add_property(
 	                "subStep",
