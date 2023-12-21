@@ -115,6 +115,8 @@ bool Law2_ScGeom6D_CohFrictPhys_CohesionMoment::checkPlasticity(ScGeom6D* geom, 
 	// Update thresholds and compute again, with some recursive calls in section 1. Max recursion depth is 1.
 
 	//  1. ____________________ Compare force components to their max value  _________________
+	if (phys->cohesionBroken and Fn<0) return false; // lost contact
+	
 	const bool brittle = phys->fragile and not phys->cohesionBroken;
 	Real       Fs = 0, maxFs = 0, scalarRoll = 0, maxRoll = 0, scalarTwist = 0, maxTwist = 0;
 
