@@ -70,12 +70,13 @@ void BoundDispatcher::processBody(const shared_ptr<Body>& b)
 	if (targetInterv > 0 and scene->iter > b->bound->lastUpdateIter) { //at iteration zero checking displacement makes no sense
 		Vector3r disp = b->state->pos - b->bound->refPos;
 		Real     dist = max(math::abs(disp[0]), max(math::abs(disp[1]), math::abs(disp[2])));
-		if (dist) {
+		if (dist or b->state->vel!=Vector3r::Zero()) {
 			Real newLength = dist * targetInterv / (scene->iter - b->bound->lastUpdateIter);
 			newLength      = max(0.9 * sweepLength, newLength); //don't decrease size too fast to prevent time consuming oscillations
 			sweepLength    = max(minSweepDistFactor * sweepDist, min(newLength, sweepDist));
-		} else
+		} else {
 			sweepLength = 0;
+		}
 	} else
 		sweepLength = sweepDist;
 #ifdef YADE_MPI
