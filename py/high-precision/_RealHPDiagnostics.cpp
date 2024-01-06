@@ -237,6 +237,11 @@ template <int N> std::string getRawBits(const RealHP<N>& arg)
 	return out.str();
 }
 
+template <int N>::yade::RealHP<N> getFloatDistanceULP(const RealHP<N>& arg1, const RealHP<N>& arg2)
+{
+	return boost::math::float_distance(static_cast<const math::UnderlyingHP<RealHP<N>>&>(arg1), static_cast<const math::UnderlyingHP<RealHP<N>>&>(arg2));
+}
+
 template <int N>::yade::RealHP<N> fromBits(const std::string& str, int exp, int sign)
 {
 	std::vector<unsigned char> bits {};
@@ -295,7 +300,7 @@ template <int N, bool /*registerConverters*/> struct RegisterRealBitDebug {
 		        R"""(:return: ``string`` - the raw bits in memory representing this type. Be careful: it only checks the system endianness and either prints bytes in reverse order or not. Does not make any attempts to further interpret the bits of: sign, exponent or significand (on a typical x86 processor they are printed in that order), and different processors might store them differently. It is not useful for types which internally use a pointer because for them this function prints not the floating point number but a pointer. This is for debugging purposes.)""");
 
 		py::def("getFloatDistanceULP",
-		        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&boost::math::float_distance),
+		        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&getFloatDistanceULP<N>),
 		        R"""(:return: an integer value stored in ``RealHP<N>``, the `ULP distance <https://en.wikipedia.org/wiki/Unit_in_the_last_place>`__ calculated by `boost::math::float_distance <https://www.boost.org/doc/libs/1_73_0/libs/math/doc/html/math_toolkit/next_float/float_distance.html>`__, also see `Floating-point Comparison <https://www.boost.org/doc/libs/1_73_0/libs/math/doc/html/math_toolkit/float_comparison.html>`__ and `Prof. Kahan paper about this topic <https://people.eecs.berkeley.edu/~wkahan/Mindless.pdf>`__.
 
 .. warning::
@@ -403,8 +408,9 @@ public:
 		if (firstHighestN) { // store results for the highest N
 			reference[funcName] = static_cast<RealHP<maxN>>(funcValue);
 		} else if (math::isfinite(funcValue) and math::isfinite(reference[funcName])) {
-			auto ulpError
-			        = static_cast<RealHP<maxP>>(math::abs(boost::math::float_distance(static_cast<RealHP<testN>>(reference[funcName]), funcValue)));
+			auto ulpError = static_cast<RealHP<maxP>>(math::abs(boost::math::float_distance(
+			        static_cast<math::UnderlyingHP<RealHP<testN>>>(reference[funcName]),
+			        static_cast<math::UnderlyingHP<RealHP<testN>>>(funcValue))));
 			if (ulpError > results[funcName][testN].second) {
 				std::array<RealHP<maxP>, 3> usedArgs { 0, 0, 0 };
 				for (size_t i = 0; i < 3; ++i)

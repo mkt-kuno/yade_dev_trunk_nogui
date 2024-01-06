@@ -182,7 +182,7 @@ namespace math {
 		const ThinRealWrapper& operator+() const { return *this; }
 
 		// ordering operators
-		bool operator<(const ThinRealWrapper& rhs) const { return val < rhs.val; }
+		constexpr bool operator<(const ThinRealWrapper& rhs) const { return val < rhs.val; }
 #ifdef YADE_IGNORE_IEEE_INFINITY_NAN
 		bool operator==(const ThinRealWrapper& rhs) const { return val == rhs.val; }
 #else
