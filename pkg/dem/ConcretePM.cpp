@@ -128,10 +128,10 @@ Real CpmPhys::solveBeta(const Real c, const Real N)
 #ifdef YADE_DEBUG
 		cummBetaIter++;
 #endif
-		Real aux = c * exp(N * ret) + exp(ret);
+		const auto aux = c * exp(N * ret) + exp(ret);
 		f        = log(aux);
-		if (math::abs(f) < maxError) return ret;
-		Real df = (c * N * exp(N * ret) + exp(ret)) / aux;
+		if (math::abs(f) < maxError) return Real(ret);
+		const auto df = (c * N * exp(N * ret) + exp(ret)) / aux;
 		ret -= f / df;
 	}
 	LOG_FATAL("No convergence after " << maxIter << " iters; c=" << c << ", N=" << N << ", ret=" << ret << ", f=" << f);
