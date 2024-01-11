@@ -174,7 +174,7 @@ public:
 			((OpenMPAccumulator<Real>,shearEnergy,,Attr::noSave,"Shear elastic potential energy"))
 			((OpenMPAccumulator<Real>,normDampDissip,,Attr::noSave,"Energy dissipated by normal damping"))
 			((OpenMPAccumulator<Real>,shearDampDissip,,Attr::noSave,"Energy dissipated by tangential damping"))
-			, /* deprec */			
+			, /* deprec */
 			((preventGranularRatcheting, nothing,"this value is no longer used, don't define it."))
 			, /* init */
 			, /* ctor */

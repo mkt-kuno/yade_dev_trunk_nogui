@@ -778,10 +778,32 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 			Sphere* s2=YADE_CAST<Sphere*> ( sph2->shape.get() );
 			const Real& r1 = s1->radius;
 			const Real& r2 = s2->radius;
-			Vector3r deltaV; Real deltaNormV; Vector3r deltaShearV;
-			Vector3r O1O2Vector; Real O1O2; Vector3r normal2; Real surfaceDist; Vector3r O1CVector; Vector3r O2CVector;Real meanRad ;Real Rh; Vector3r deltaAngVel; Vector3r deltaShearAngVel;
-			Vector3r shearLubF; Vector3r normaLubF; Vector3r pumpT; Vector3r deltaAngNormVel; Vector3r twistT; Vector3r angVel1; Vector3r angVel2;
-		//FIXME: if periodic and velGrad!=0, then deltaV should account for velGrad, not the case currently
+			Vector3r deltaV = Vector3r::Zero();
+			Real deltaNormV = 0;
+			Vector3r deltaShearV = Vector3r::Zero();
+			Vector3r O1O2Vector = Vector3r::Zero();
+
+			Real O1O2 = 0;
+			Vector3r normal2 = Vector3r::Zero();
+			Real surfaceDist = 0;
+
+			Vector3r O1CVector = Vector3r::Zero();
+			Vector3r O2CVector = Vector3r::Zero();
+
+			Real meanRad  = 0 ;
+			Real Rh = 0;
+
+			Vector3r deltaAngVel = Vector3r::Zero();
+			Vector3r deltaShearAngVel = Vector3r::Zero();
+
+			Vector3r shearLubF = Vector3r::Zero();
+			Vector3r normaLubF = Vector3r::Zero();
+			Vector3r pumpT = Vector3r::Zero();
+			Vector3r deltaAngNormVel = Vector3r::Zero();
+			Vector3r twistT = Vector3r::Zero();
+			Vector3r angVel1 = Vector3r::Zero();
+			Vector3r angVel2 = Vector3r::Zero();
+					//FIXME: if periodic and velGrad!=0, then deltaV should account for velGrad, not the case currently
 			if ( !hasFictious ){
 				O1O2Vector = sph2->state->pos + makeVector3r(vi2.ghostShift()) - sph1->state->pos - makeVector3r(vi1.ghostShift());
 				O1O2 = O1O2Vector.norm();

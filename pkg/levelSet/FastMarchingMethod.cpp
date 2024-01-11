@@ -165,7 +165,7 @@ std::pair<vector<Real>, Real> FastMarchingMethod::surroundings(int i, int j, int
 	for (int cpt = 0; cpt < 3; cpt++) {
 		if (math::isfinite(neigh[cpt])) knownSurrVal.push_back(neigh[cpt]);
 	}
-	Real deltaPr;
+	Real deltaPr = 0;
 	switch (knownSurrVal.size()) {
 		case 1:
 			deltaPr = -1; // no need for a discriminant in 1D propagation anyway

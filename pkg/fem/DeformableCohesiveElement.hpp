@@ -19,7 +19,7 @@
 /* Before starting the implementation of the deformable element, I am really dissappointed that deformableelement's algorithm relies on its shape.
 Shape means "shape" and I think it should not contain any other physical meaning or anything else.
 
-With respect to this view; The deformable element class is derived from the body and knows the information of 
+With respect to this view; The deformable element class is derived from the body and knows the information of
 its members that are node shaped bodies.
 
 */

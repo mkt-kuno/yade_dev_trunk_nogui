@@ -26,8 +26,6 @@
 #include <pkg/dem/STLImporter.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/archive/codecvt_null.hpp>
-#include <boost/bind.hpp>
-#include <boost/lambda/bind.hpp>
 #include <boost/math/special_functions/nonfinite_num_facets.hpp>
 #include <boost/python/raw_function.hpp>
 #include <boost/random/linear_congruential.hpp>

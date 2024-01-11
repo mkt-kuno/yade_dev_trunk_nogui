@@ -423,8 +423,8 @@ bool Ig2_Sphere_Polyhedra_ScGeom::go(
 	bool            isInside = true; // if center is inside polyhedron
 	const Vector3r& p0       = se31.position;
 	const Vector3r& center   = p0;
-	Vector3r        closest;           // closest point to be found
-	Real            dst2min = DBL_MAX; // minimal squared distance (large number initially)
+	Vector3r        closest  = Vector3r::Zero(); // closest point to be found
+	Real            dst2min  = DBL_MAX;          // minimal squared distance (large number initially)
 	// auxiliary value
 	Vector3r p1, p2, p3, e1, e2, e3, e, n, p0a, p10, p20, p30, v1, v2, v3, pa, pb, r, p0aa, pp, ppp;
 	pp = Vector3r::Zero();

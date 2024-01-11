@@ -10,7 +10,7 @@
 #include "ThreadWorker.hpp"
 #include <lib/base/Logging.hpp>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/thread/thread.hpp>
 

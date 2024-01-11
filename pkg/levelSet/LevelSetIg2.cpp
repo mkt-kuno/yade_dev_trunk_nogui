@@ -212,13 +212,15 @@ bool Ig2_LevelSet_LevelSet_ScGeom::go(
 	        ;
 	const int nNodes(shS->surfNodes.size());
 	if (!nNodes) LOG_ERROR("We have one level-set body without boundary nodes for contact detection. Will probably crash");
-	Real distToNode, // one distance value, for one node
-	        prevDistToNode(std::numeric_limits<Real>::infinity()), maxOverlap(-1);
-	Vector3r minLSgrid(shB->lsGrid->min), maxLSgrid(shB->lsGrid->max()), nodeOfS // some node of smaller Body, in current configuration
-	        ,
-	        nodeOfSinB // mapped into initial configuration of larger Body
-	        ,
-	        normal, contactNode;
+	Real     distToNode     = 0; // one distance value, for one node
+	Real     prevDistToNode = std::numeric_limits<Real>::infinity();
+	Real     maxOverlap     = -1;
+	Vector3r minLSgrid      = shB->lsGrid->min;
+	Vector3r maxLSgrid      = shB->lsGrid->max();
+	Vector3r nodeOfS        = Vector3r::Zero(); // some node of smaller Body, in current configuration
+	Vector3r nodeOfSinB     = Vector3r::Zero(); // mapped into initial configuration of larger Body
+	Vector3r normal         = Vector3r::Zero();
+	Vector3r contactNode    = Vector3r::Zero();
 
 	// 2.2 Actual loop over surface nodes:
 	for (int node = 0; node < nNodes; node++) {

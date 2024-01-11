@@ -181,16 +181,17 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene, Body::id_t selectio
 	highlightEmission0[0] = highlightEmission0[1] = highlightEmission0[2] = ((blinkHighlight == BlinkHighlight::WEAK) ? 0.2 : 0.8) * normSquare(now, 1);
 	highlightEmission1[0] = highlightEmission1[1] = highlightEmission1[2] = ((blinkHighlight == BlinkHighlight::WEAK) ? 0.2 : 0.6) * normSaw(now, 2);
 
-	// clipping
+	// clipping planes
 	assert(clipPlaneNormals.size() == (size_t)numClipPlanes);
-	for (size_t i = 0; i < (size_t)numClipPlanes; i++) {
+	for (size_t i = 0; i < numClipPlanes; ++i) {
+
 		// someone could have modified those from python and truncate the vectors; fill those here in that case
-		if (i == clipPlaneSe3.size()) clipPlaneSe3.push_back(Se3r(Vector3r::Zero(), Quaternionr::Identity()));
-		if (i == clipPlaneActive.size()) clipPlaneActive.push_back(static_cast<int>(false));
-		if (i == clipPlaneNormals.size()) clipPlaneNormals.push_back(Vector3r::UnitX());
+		if (i == clipPlaneSe3.size()) clipPlaneSe3.emplace_back(Se3r(Vector3r::Zero(), Quaternionr::Identity()));
+		if (i == clipPlaneActive.size()) clipPlaneActive.emplace_back(0);
+		if (i == clipPlaneNormals.size()) clipPlaneNormals.emplace_back(Vector3r::UnitX());
+
 		// end filling stuff modified from python
 		if (clipPlaneActive[i]) clipPlaneNormals[i] = clipPlaneSe3[i].orientation * Vector3r(0, 0, 1);
-		/* glBegin(GL_LINES);glVertex3v(clipPlaneSe3[i].position);glVertex3v(clipPlaneSe3[i].position+clipPlaneNormals[i]);glEnd(); */
 	}
 	// set displayed Se3 of body (scaling) and isDisplayed (clipping)
 	setBodiesDispInfo();
@@ -342,7 +343,7 @@ void OpenGLRenderer::renderIPhys()
 			shared_ptr<IPhys> ip(I->phys);
 			if (!ip) continue;
 			const auto b1 = Body::byId(I->getId1(), scene), b2 = Body::byId(I->getId2(), scene);
-			Body::id_t             id1 = I->getId1(), id2 = I->getId2();
+			Body::id_t id1 = I->getId1(), id2 = I->getId2();
 			if (!(bodyDisp[id1].isDisplayed || bodyDisp[id2].isDisplayed)) continue;
 			glPushMatrix();
 			physDispatcher(ip, I, b1, b2, intrWire);

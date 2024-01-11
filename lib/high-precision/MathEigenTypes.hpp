@@ -134,8 +134,8 @@ using MatrixXcr = MatrixXcrHP<1>;
 
 template <class Scalar> class Se3 {
 public:
-	Vector3<Scalar>           position;
-	Eigen::Quaternion<Scalar> orientation;
+	Vector3<Scalar>           position = Vector3<Scalar>::Zero();
+	Eigen::Quaternion<Scalar> orientation = Eigen::Quaternion<Scalar>::Identity();
 	Se3() {};
 	Se3(Vector3<Scalar> rkP, Eigen::Quaternion<Scalar> qR)
 	{
