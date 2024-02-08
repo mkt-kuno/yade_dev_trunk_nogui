@@ -1,4 +1,121 @@
 ==================================================
+yade-2024.01a
+Sun, Jan 21 16:05:00 2024 +0100
+
+Short summary of 2024.01a release:
+short title (Merge Request count, until !1003)
+
+Documentation / Comments              (16 MRs)
+Bug fixes                             (14 MRs)
+Small improvements                    ( 8 MRs)
+Packaging improvements & building     ( 7 MRs)
+Tests & checks & CI                   ( 6 MRs)
+LevelSet & Vol. Interacting LevelSet  ( 5 MRs)
+High precision RealHP<N> ComplexHP<N> ( 4 MRs)
+Clumps                                ( 2 MRs)
+Fluid & thermal & particle saturation ( 1 MRs)
+Polyhedra / Facets                    ( 1 MRs)
+Alpha shapes                          ( 0 MRs)
+Examples                              ( 0 MRs)
+GUI                                   ( 0 MRs)
+OpenMPI calculations                  ( 0 MRs)
+PotentialParticles / Blocks           ( 0 MRs)
+clang-format & reorganize             ( 0 MRs)
+----------------------------------------------
+Total                                 (61 MRs)
+
+Documentation / Comments              (14 MRs)
+  Add documentation to clump breakage functions in 'bf'  module (!934)
+  Updates in doc instructions (!939)
+  build doc on ubuntu 22.04 (!946)
+  Python3 way of print in SpherePack doc (!953)
+  Change libvtk*-dev source installation instructions  (!959)
+  New publications (!970)
+  New publications: corrections after merge request !970 (!971)
+  New publications: title format corrections (!972)
+  Small YADE ENUM doc update (!968)
+  chore: replace launchpad links with yade-dev/answers  links (!978)
+  -1 Launchpad (!979)
+  Correcting subdomain boundfunctor doc (!985)
+  Added article (!997)
+  Doc: extending and clarifying Omega vs Scene + cleaning  (!999)
+  Update Reference to SPIRAL efficient algorithm (!1007)
+  Update Changelog for YADE release 2024.02a (!1004)
+
+Bug fixes                             (14 MRs)
+  fix regex to detect suitesprse 7.0+ (!935)
+  Try  QtWebEngineWidgets when failed to import QtWebKit  (!938)
+  Remove old benchmark scripts (!937)
+  Mask tesselation wrapper (!940)
+  Fix compilation error with GCC-13 (ArchLinux now) (!952)
+  Correction to Rotational Kinetic Energy Calculation  (!954)
+  fix: color warning (!960)
+  Solve the yade.config import issue when enabling  `NOSUFFIX` option (!956)
+  Fix #319 (!981) CGAL 5.6 high-precision build error
+  fix attribute name mismatch (!990)
+  Collider small fix (!995)
+  delete interactions correctly when unpMax<0 and  fragile=True (!1000)
+  Fix GCC-13 crash #328 (!1002)
+  Fix some compilation warnings, make the code more  reliable (!1003)
+
+Small improvements                    ( 7 MRs)
+  Add viscoelastic boundary conditions (engine) and its  documentation. (!951)
+  remove debug message about harmless corner case (!958)
+  Add hertzian attribute for box-sphere interactions (!955)
+  New Rotation Integration  Algorithm, an Improvement from the Previous One (!944)
+  turn createDistantMeniscii false after one action()  (!969)
+  Add viscous damping model of [Brilliantov1996] and  [Mueller2011] for velocity-dependent CoR in the Hertz-Mindlin contact model  (!977)
+  extend cohesive-frictional model (!962)
+  Move away from python3-future (!1005)
+
+Packaging improvements & building     ( 7 MRs)
+  Add supported python3.11 (!931)
+  update repository and dependent packages for  opensuse 15.4 in branch suse15 (!6)
+  Dropping i386 from CI pipeline (!948)
+  Two archlinux fixes: Skip MPI checks for MPI ver.4.1.5 -  workaround #309; use builtins min/max (!964)
+  Build for trixie. #316 (!980)
+  Fix #325: rename $CI_BUILD_ID to $CI_JOB_ID (!994)
+  Fix #326 - fix the master pipeline - relax the check a  little bit for VTK Float32 data type (!996)
+
+Tests & checks & CI                   ( 6 MRs)
+  Add benchmark tests of Chung and Ooi (2011) (!933)
+  Skip capillarityEngine check tests if input file is  missing. (!941)
+  Small archlinux screenshot update (!949)
+  Remove "from numpy import *" in checks (!965)
+  get silo mesh from yade-dem.org (!974)
+  Fix #320 (!982) - Need to prepare new GUI screenshots for debian trixie.
+
+LevelSet & Vol. Interacting LevelSet  ( 5 MRs)
+  VLS-DEM: Implementation of Volume-interacting Level-Set DEM (1/n) (!961)
+  Enabling correct unbound use of LevelSet::distance for  in-grid points (!986)
+  Avoiding double function call in level set distance  computation (!992)
+  LevelSet: -1 useless line (!993)
+  LevelSet doc and code comment update (!998)
+
+High precision RealHP<N> ComplexHP<N> ( 4 MRs)
+  Fix #313 setPermF, setPermT in High Precision.  (!963)
+  Allow using (when wanted) MPFR for g++ version >  12.0.0 (upstream fixed the bug) (!983)
+  Ready: clarification for the paper: Rename ENABLE_REAL_HP → ENABLE_MULTI_REAL_HP which enables RealHP<N> for N ∈ {1,2,3,4,8,10,20}, fix #247 (!989)
+  Small long double fix for boost 1.83 (!1001)
+
+Clumps                                ( 2 MRs)
+  Making it clearer that discretization > 0 in clump  functions requires spherical members (!945)
+  FIX #311 (!987) - Clump.members.keys()
+
+Fluid & thermal & particle saturation ( 1 MRs)
+  various fixes for TesselationWrapper (!943)
+
+Polyhedra / Facets                    ( 1 MRs)
+  Fixing PBC bug in polyhedra (!991)
+
+Alpha shapes                          ( 0 MRs)
+Examples                              ( 0 MRs)
+GUI                                   ( 0 MRs)
+OpenMPI calculations                  ( 0 MRs)
+PotentialParticles / Blocks           ( 0 MRs)
+clang-format & reorganize             ( 0 MRs)
+
+==================================================
 yade-2023.02a
 
 Short summary of 2023.02a release:
@@ -20,6 +137,8 @@ Alpha shapes                          ( 2 MRs)
 clang-format & reorganize             ( 7 MRs)
 OpenMPI calculations                  ( 0 MRs)
 GUI                                   ( 0 MRs)
+----------------------------------------------
+Total                                (103 MRs)
 
 
 Documentation / Comments              (26 MRs)
@@ -178,6 +297,8 @@ OpenMPI calculations                  ( 4 MRs)
 GUI                                   ( 3 MRs)
 Polyhedra                             ( 1 MRs)
 Alpha shapes                          ( 1 MRs)
+----------------------------------------------
+Total                                (171 MRs)
 
 
 Documentation (40 MRs)
@@ -396,6 +517,8 @@ OpenMPI calculations                  (13 MRs)
 clang-format in the pipeline          ( 7 MRs)
 Packaging improvements                ( 7 MRs)
 GUI                                   ( 3 MRs)
+----------------------------------------------
+Total                                (202 MRs)
 
 
 Documentation (41 MRs):
