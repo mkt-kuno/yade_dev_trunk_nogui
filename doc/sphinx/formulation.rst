@@ -505,7 +505,7 @@ For a given particle, we know
 * $\pprev{\vec{L}}$ mid-step angular momentum; this is an auxiliary variable needed in Fincham's algorithm. It will be zero in the initial step.
 
 
-del Valle et al. Algorithm
+SPIRAL Algorithm ([delValle2023]_)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Our goal is to compute new values of the latter three, that is, $\nnext{\vec{L}}$, $\next{q}$, $\nnext{\vec{\omega}}$. We first estimate the current angular velocity:
