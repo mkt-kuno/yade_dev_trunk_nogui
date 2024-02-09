@@ -5,8 +5,8 @@
 
 # definition of a predicate for use of randomDensePack() function
 
-from __future__ import print_function
-from past.builtins import execfile
+from yade.yexecfile import execfile
+
 from yade import pack
 dimModele = 10.0
 pred = pack.inAlignedBox((0, 0, 0), (dimModele, dimModele, dimModele))

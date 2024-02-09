@@ -1,8 +1,8 @@
 # encoding: utf-8
 # 2011 © Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
-from __future__ import print_function
-from past.builtins import execfile
+
 import yade
+from yade.yexecfile import execfile
 import math
 import os
 import sys

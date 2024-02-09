@@ -11,10 +11,6 @@ It loads yade plugins and injects c++ class constructors to the __builtins__
 (that might change in the future, though) namespace, making them available
 everywhere.
 """
-from __future__ import print_function
-
-from future import standard_library
-standard_library.install_aliases()
 import ctypes,sys,os
 
 if os.getenv('OMPI_COMM_WORLD_RANK')==None: #else decrease verbosity

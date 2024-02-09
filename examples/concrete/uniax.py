@@ -1,9 +1,4 @@
 # -*- encoding=utf-8 -*-
-from __future__ import division
-from __future__ import print_function
-
-from future import standard_library
-standard_library.install_aliases()
 from yade import plot, pack, timing
 import time, sys, os, copy
 

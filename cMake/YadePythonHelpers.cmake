@@ -94,7 +94,7 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 		RETURN()
 	ENDIF(NOT NUMPY_FOUND)
 
-	FOREACH(PYTHON_MODULE IPython matplotlib pygraphviz Xlib future past)
+	FOREACH(PYTHON_MODULE IPython matplotlib pygraphviz Xlib)
 		FIND_PYTHON_MODULE(${PYTHON_MODULE} QUIET)
 		IF( NOT ${PYTHON_MODULE}_FOUND )
 			MESSAGE(${fail_message} ${PYTHON_MODULE})

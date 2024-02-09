@@ -5,12 +5,6 @@ Remote connections to yade: authenticated python command-line over telnet and an
 
 These classes are used internally in gui/py/PythonUI_rc.py and are not intended for direct use.
 """
-from __future__ import print_function
-
-from future import standard_library
-standard_library.install_aliases()
-
-from builtins import object
 import socketserver, xmlrpc.client, socket
 import sys, time, os, math
 

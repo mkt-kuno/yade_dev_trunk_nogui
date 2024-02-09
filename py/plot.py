@@ -4,14 +4,7 @@
 Module containing utility functions for plotting inside yade. See :ysrc:`examples/simple-scene/simple-scene-plot.py` or :ysrc:`examples/concrete/uniax.py` for example of usage.
 
 """
-from __future__ import print_function
-
 ## all exported names
-from future import standard_library
-standard_library.install_aliases()
-
-from builtins import range
-from builtins import object
 __all__ = [
         'data', 'plots', 'labels', 'live', 'liveInterval', 'setLiveForceAlwaysUpdate', 'autozoom', 'plot', 'reset', 'resetData', 'splitData', 'reverseData',
         'addData', 'addAutoData', 'saveGnuplot', 'saveDataTxt', 'savePlotSequence'

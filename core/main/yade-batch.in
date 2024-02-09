@@ -4,12 +4,6 @@
 # vim: syntax=python
 # portions © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-
-from builtins import range
-from builtins import object
 import os, sys, _thread, time, logging, pipes, socket, xmlrpc.client, re, shutil, random
 
 # Add search path for yade Python-modules

@@ -21,11 +21,6 @@
 ##
 ## http://docutils.sourceforge.net/docs/howto/rst-roles.html
 
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-
-from builtins import range
 import sys, os, re
 from docutils import nodes
 from sphinx import addnodes

@@ -4,8 +4,8 @@
 # jerome.duriez@3sr-grenoble.fr
 
 # Mechanical properties of rock matrix and rock joint :
-from __future__ import print_function
-from past.builtins import execfile
+
+from yade.yexecfile import execfile
 
 
 def mat():

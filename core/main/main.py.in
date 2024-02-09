@@ -2,9 +2,6 @@
 # encoding: utf-8
 # syntax:python
 
-from __future__ import print_function
-from past.builtins import execfile
-
 import sys,os,os.path,time
 try:
 	import _io
@@ -150,6 +147,7 @@ if __name__ == "__main__" and not opts.mpi_mode: # do not print this while impor
 # initialization and c++ plugins import
 import yade
 # other parts we will need soon
+from yade.yexecfile import execfile
 import yade.config
 import yade.wrapper
 import yade.log

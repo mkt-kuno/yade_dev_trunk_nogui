@@ -7,13 +7,6 @@
 
 Devs: please DO NOT ADD more functions here, it is getting too crowded!
 """
-from __future__ import print_function
-
-from future import standard_library
-standard_library.install_aliases()
-
-from builtins import range
-from builtins import object
 import math, random, doctest, numpy
 from yade import *
 import yade.math
