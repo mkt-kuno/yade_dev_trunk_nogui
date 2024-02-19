@@ -59,7 +59,7 @@ void LevelSet::rayTrace(const Vector3r& ray)
 		diffSign = false;
 		for (unsigned int gp = 0; gp < 8; gp++) { // passing through 8 cell gridpoints to check whether they all have the same distance sign
 			xInd   = (gp % 2 ? indices[0] + 1
-			                 : indices[0]); // better put parenthesis: "=" and ternary have same precedence, let s not look at associativity
+                                       : indices[0]); // better put parenthesis: "=" and ternary have same precedence, let s not look at associativity
 			yInd   = ((gp & 2) / 2 ? indices[1] + 1 : indices[1]);
 			zInd   = ((gp & 4) / 4 ? indices[2] + 1 : indices[2]);
 			gpDist = distField[xInd][yInd][zInd]; // distance value for current gp
@@ -158,21 +158,25 @@ bool LevelSet::rayTraceInCell(const Vector3r& ray, const Vector3r& pointP, const
 	        << coeffs[0] << " " << coeffs[1] << " " << coeffs[2] << " " << coeffs[3]);
 	// Then, solving for the 1st root given by Boost root finding algorithm boost::math::tools::newton_raphson_iterate, in a concise syntax thanks to C++11 lambda notation, that replaces going through e.g. an operator() of some struct (whose instance may depend on coeffs)
 	Real root(std::numeric_limits<Real>::max());
-	try{
-	  root=boost::math::tools::newton_raphson_iterate(
-	        [coeffs](Real k) {
-		        return std::make_tuple( // (only ?) problematic part for High Precision (HP) compatibility and REAL_* cmake options different than 64
-		                coeffs[0] + coeffs[1] * k + coeffs[2] * k * k + coeffs[3] * k * k * k,
-		                coeffs[1] + 2 * coeffs[2] * k + 3 * coeffs[3] * k * k);
-	        },
-	        0.,
-	        -sqrt(3.),
-	        sqrt(3.),
-	        std::numeric_limits<Real>::
-		        digits); // doc https://www.boost.org/doc/libs/1_75_0/libs/math/doc/html/math_toolkit/roots_deriv.html suggests to use 0.6 * std::numeric_limits<Real>::digits for the last "digits" argument. With std::numeric_limits<double>::digits = 53, as per standard for the significand
-	}
-	catch(const std::exception& e) // starting from somewhere between boost 1.71.0 and 1.74.0, a boost::math::evaluation_error is thrown if no root is found, which can be catched as a std::exception
-	  {LOG_INFO("No root actually found");};
+	try {
+		root = boost::math::tools::newton_raphson_iterate(
+		        [coeffs](Real k) {
+			        return std::
+			                make_tuple( // (only ?) problematic part for High Precision (HP) compatibility and REAL_* cmake options different than 64
+			                        coeffs[0] + coeffs[1] * k + coeffs[2] * k * k + coeffs[3] * k * k * k,
+			                        coeffs[1] + 2 * coeffs[2] * k + 3 * coeffs[3] * k * k);
+		        },
+		        0.,
+		        -sqrt(3.),
+		        sqrt(3.),
+		        std::numeric_limits<Real>::
+		                digits); // doc https://www.boost.org/doc/libs/1_75_0/libs/math/doc/html/math_toolkit/roots_deriv.html suggests to use 0.6 * std::numeric_limits<Real>::digits for the last "digits" argument. With std::numeric_limits<double>::digits = 53, as per standard for the significand
+	} catch (
+	        const std::exception&
+	                e) // starting from somewhere between boost 1.71.0 and 1.74.0, a boost::math::evaluation_error is thrown if no root is found, which can be catched as a std::exception
+	{
+		LOG_INFO("No root actually found");
+	};
 	LOG_INFO(
 	        "N-R root = " << root << " , leading to a dimensionless distance (through the ray cubic polynom) = "
 	                      << coeffs[0] + coeffs[1] * root + coeffs[2] * root * root + coeffs[3] * root * root * root
@@ -220,7 +224,7 @@ Vector3r LevelSet::normal(const Vector3r& pt, const bool& unbound) const
 {
 	// Returns the normal vector at pt from distance gradient
 	// Checking which cell we're in:
-	Vector3i indices = lsGrid->closestCorner(pt,unbound);
+	Vector3i indices = lsGrid->closestCorner(pt, unbound);
 	int      xInd(indices[0]), yInd(indices[1]), zInd(indices[2]);
 
 	if (xInd < 0 || yInd < 0 || zInd < 0) { // operators precedence OK in || vs <
@@ -231,9 +235,8 @@ Vector3r LevelSet::normal(const Vector3r& pt, const bool& unbound) const
 	Real     spac   = lsGrid->spacing;
 	Vector3r corner = lsGrid->gridPoint(xInd, yInd, zInd);
 	// Then, the reduced coordinates in one cell, i.e. dimensionless x,y,z expected to be in [0;1] (3., top p. 4 Kawamoto2016). Actually capped into [0;1] even for out-of-the grid points (VLS-DEM wants normal = normal(corresponding edge grid corner) in such a case):
-	Real xRed = math::max(math::min((pt[0] - corner[0]) / spac, 1.0), 0.0),
-		yRed = math::max(math::min((pt[1] - corner[1]) / spac, 1.0), 0.0),
-		zRed = math::max(math::min((pt[2] - corner[2]) / spac, 1.0), 0.0);
+	Real xRed = math::max(math::min((pt[0] - corner[0]) / spac, 1.0), 0.0), yRed = math::max(math::min((pt[1] - corner[1]) / spac, 1.0), 0.0),
+	     zRed = math::max(math::min((pt[2] - corner[2]) / spac, 1.0), 0.0);
 	Real nx(0), ny(0), nz(0); // The x, y, z components of normal, computed below
 	// Computing normal as the gradient of trilinear interpolation (e.g. Eq. (2) Kawamoto2016):
 	for (int indA = 0; indA < 2; indA++) {
@@ -413,21 +416,21 @@ void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, bo
 Real LevelSet::distance(const Vector3r& pt, const bool& unbound) const
 {
 	// We work here in the "reference configuration" or local axes
-	Vector3i indices = lsGrid->closestCorner(pt,unbound);
-	int xInd(indices[0]), yInd(indices[1]), zInd(indices[2]);
-	Real dist;
+	Vector3i indices = lsGrid->closestCorner(pt, unbound);
+	int      xInd(indices[0]), yInd(indices[1]), zInd(indices[2]);
+	Real     dist;
 
-	if(!unbound){ // Points outside the grid are NOT allowed.
-		dist = distanceInterpolation(pt,xInd,yInd,zInd);
-	}else{ // Points outside the grid are allowed
+	if (!unbound) { // Points outside the grid are NOT allowed.
+		dist = distanceInterpolation(pt, xInd, yInd, zInd);
+	} else { // Points outside the grid are allowed
 		Vector3i gpPerAxis = lsGrid->nGP;
-		int nGPx(gpPerAxis[0]), nGPy(gpPerAxis[1]), nGPz(gpPerAxis[2]);
+		int      nGPx(gpPerAxis[0]), nGPy(gpPerAxis[1]), nGPz(gpPerAxis[2]);
 		// Check if we pass either the lower or upper bound of the grid
-		if (xInd == 0 || yInd == 0 || zInd == 0 || xInd == (nGPx-2) || yInd == (nGPy-2) || zInd == (nGPz-2)){ 
+		if (xInd == 0 || yInd == 0 || zInd == 0 || xInd == (nGPx - 2) || yInd == (nGPy - 2) || zInd == (nGPz - 2)) {
 			// Do grid extrapolation.
 			Vector3r cornerC = lsGrid->gridPoint(xInd, yInd, zInd); // Get the closest point on the grid.
-			Real nx(0), ny(0), nz(0);	// The x, y, z components of normal, computed below
-			// Faster version of LevelSet::normal() for points exactly on the grid, 
+			Real     nx(0), ny(0), nz(0);                           // The x, y, z components of normal, computed below
+			// Faster version of LevelSet::normal() for points exactly on the grid,
 			// the dimensionless x, y, z of top p. 4 Kawamoto2016 are all zero here.
 			for (int indA = 0; indA < 2; indA++) {
 				for (int indB = 0; indB < 2; indB++) {
@@ -439,12 +442,12 @@ Real LevelSet::distance(const Vector3r& pt, const bool& unbound) const
 					}
 				}
 			}
-			Vector3r normalC = Vector3r(nx, ny, nz).normalized();
-			Real distanceC = distField[xInd][yInd][zInd];
-			Vector3r projectC = cornerC - distanceC*normalC; // Project corner onto the object surface.
-			dist = (projectC-pt).norm(); // Take the distance between the projected point and pt.
-		}
-		else dist = distanceInterpolation(pt,xInd,yInd,zInd); // Fall back to classical grid interpolation for this inside point.
+			Vector3r normalC   = Vector3r(nx, ny, nz).normalized();
+			Real     distanceC = distField[xInd][yInd][zInd];
+			Vector3r projectC  = cornerC - distanceC * normalC; // Project corner onto the object surface.
+			dist               = (projectC - pt).norm();        // Take the distance between the projected point and pt.
+		} else
+			dist = distanceInterpolation(pt, xInd, yInd, zInd); // Fall back to classical grid interpolation for this inside point.
 	}
 
 	return dist;

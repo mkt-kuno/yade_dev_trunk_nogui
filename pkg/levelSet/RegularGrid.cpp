@@ -38,13 +38,17 @@ Vector3i RegularGrid::closestCorner(const Vector3r& pt, const bool& unbound) con
 		bool prob(false);
 		//	Checking first whether pt lies within the x-, y- and z-extents of the RegularGrid. Using Mathr::EPSILON (scaled) is necessary to face true-story situations where a pt with -0.1 y coordinate is detected to be outside a grid starting at y=-0.1 (because of the loss in precision in the C++ <-> Python crossing ?)
 		prob = prob
-		        || ((pt[0] > gridMax[0] + epsilonScaled) or (pt[0] < gridMin[0] - epsilonScaled)) // ||= does not exist because of short-circuit feature of || see https://stackoverflow.com/a/11156602. 
-		        || ((pt[1] > gridMax[1] + epsilonScaled) or (pt[1] < gridMin[1] - epsilonScaled)) // We could use |= (there is no difference between || and | here) but short-circuiting is nice in this case.
+		        || ((pt[0] > gridMax[0] + epsilonScaled)
+		            or (pt[0] < gridMin[0]
+		                        - epsilonScaled)) // ||= does not exist because of short-circuit feature of || see https://stackoverflow.com/a/11156602.
+		        || ((pt[1] > gridMax[1] + epsilonScaled)
+		            or (pt[1] < gridMin[1]
+		                        - epsilonScaled)) // We could use |= (there is no difference between || and | here) but short-circuiting is nice in this case.
 		        || ((pt[2] > gridMax[2] + epsilonScaled) or (pt[2] < gridMin[2] - epsilonScaled));
 		if (prob) {
 			LOG_ERROR(
-			        "You're asking for the closest grid point to a pt " << pt << 
-			        " which is outside the grid. Returning negative indices, it may crash in few seconds.");
+			        "You're asking for the closest grid point to a pt "
+			        << pt << " which is outside the grid. Returning negative indices, it may crash in few seconds.");
 			return Vector3i(-1, -1, -1);
 		}
 	}
@@ -56,19 +60,19 @@ Vector3i RegularGrid::closestCorner(const Vector3r& pt, const bool& unbound) con
 		if (retIndices[index] >= nGP[index] - 1) {
 			if (!unbound && retIndices[index] > nGP[index] - 1) // Should have triggered the above prob.
 				LOG_ERROR(
-					"The closest corner to " << pt << " is said to be at index = " << retIndices[index]
-					<< " along axis " << index << " while unbound is " << unbound << "." << endl);
+				        "The closest corner to " << pt << " is said to be at index = " << retIndices[index] << " along axis " << index
+				                                 << " while unbound is " << unbound << "." << endl);
 			retIndices[index] = nGP[index] - 2;
 		}
 		if (retIndices[index] < 0) {
 			if (unbound // Out-of-grid points are allowed but index needs to be limited or
-				|| (!unbound && (math::abs(pt[index] - gridMin[index]) < epsilonScaled)) // the problem is just a matter of numeric precision
+			    || (!unbound && (math::abs(pt[index] - gridMin[index]) < epsilonScaled)) // the problem is just a matter of numeric precision
 			)
 				retIndices[index] = 0; // and we are right to change retIndices to 0 (we are at the minimum boundary).
 			else {
 				LOG_ERROR(
-					"The closest corner to " << pt << " is said to be at index = " << retIndices[index]
-					<< " along axis " << index << " while unbound is " << unbound << "." << endl);
+				        "The closest corner to " << pt << " is said to be at index = " << retIndices[index] << " along axis " << index
+				                                 << " while unbound is " << unbound << "." << endl);
 			}
 		}
 	}
