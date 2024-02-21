@@ -692,6 +692,41 @@ test_18_foam:
     - pwd
     - scripts/checks-and-tests/testOpenFoam.sh
 
+test_18_foam1906:
+  <<: *platforms_definition
+  <<: *gitlab_runner_retry_definition
+  <<: *skip_WIP
+  stage: test
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_foam1906
+  dependencies:
+    - make_18_04
+  needs: ["make_18_04"]
+  timeout: 25 minutes
+  script:
+    - export PYTHONUNBUFFERED=1
+    - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - pwd
+    - scripts/checks-and-tests/testOpenFoam.sh
+
+test_22_foam1912:
+  <<: *platforms_definition
+  <<: *gitlab_runner_retry_definition
+  <<: *skip_WIP
+  stage: test
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam1912
+  dependencies:
+    - make_22_04
+  needs: ["make_18_04"]
+  timeout: 25 minutes
+  script:
+    - export PYTHONUNBUFFERED=1
+    - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - pwd
+    - scripts/checks-and-tests/testOpenFoam.sh
+
+
 test_18_04_nogui:
   <<: *test_definition
   <<: *skip_GUI_TEST
