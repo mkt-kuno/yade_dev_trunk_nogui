@@ -1,7 +1,7 @@
 #! /bin/bash
 
-ls -la /root/OpenFOAM/OpenFOAM-6/etc/bashrc
-source  /root/OpenFOAM/OpenFOAM-6/etc/bashrc
+ls -la /root/OpenFOAM/openfoam/etc/bashrc
+source  /root/OpenFOAM/openfoam/etc/bashrc
 
 cd ..
 rm -rf Yade-OpenFOAM-coupling
