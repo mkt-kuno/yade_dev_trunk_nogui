@@ -717,7 +717,7 @@ test_22_foam1912:
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam1912
   dependencies:
     - make_22_04
-  needs: ["make_18_04"]
+  needs: ["make_22_04"]
   timeout: 25 minutes
   script:
     - export PYTHONUNBUFFERED=1
