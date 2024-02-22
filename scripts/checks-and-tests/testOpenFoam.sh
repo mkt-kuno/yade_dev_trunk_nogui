@@ -11,7 +11,7 @@ else
 	git clone -b supportOFoam1906 https://gitlab.com/yade-dev/Yade-OpenFOAM-coupling.git
 fi
 cd Yade-OpenFOAM-coupling
-git checkout yadeTestPar
+# git checkout yadeTestPar #why?
 ./Allclean
 ./Allwmake
 
