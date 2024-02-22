@@ -214,6 +214,7 @@ variables:
 make_16_04:
   <<: *make_definition
   <<: *artifacts_definition
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04
 
 make_18_04:
@@ -229,6 +230,7 @@ make_18_04:
 make_20_04:
   <<: *make_definition
   <<: *artifacts_definition
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
 
 make_22_04:
@@ -244,31 +246,36 @@ make_22_04:
 make_stretch:
   <<: *make_definition
   <<: *artifacts_definition
-  <<: *skip_WIP
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
 
 make_buster:
   <<: *make_definition
+  <<: *skip_WIP_and_Draft
   <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
 
 make_bullseye:
   <<: *make_definition
+  <<: *skip_WIP_and_Draft
   <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 
 make_bookworm:
   <<: *make_definition
+  <<: *skip_WIP_and_Draft
   <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bookworm
 
 make_trixie:
   <<: *make_definition
+  <<: *skip_WIP_and_Draft
   <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
 
 make_archlinux:
   <<: *make_definition
+  <<: *skip_WIP_and_Draft
   <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:archlinux-current
 
@@ -349,7 +356,7 @@ make_debug:
 
 make_asan:
   <<: *make_definition
-  <<: *skip_WIP
+  <<: *skip_WIP_and_Draft
   before_script:
     # there can be only one before_script:, so the line below cannot be in a separate template
     - export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"
@@ -415,7 +422,7 @@ make_minimal:
 make_opposite:
   <<: *make_definition
   <<: *artifacts_definition
-  <<: *skip_WIP
+  <<: *skip_WIP_and_Draft
   before_script:
     - export EXTRA_CMAKE_ARGS="-DENABLE_LOGGER=OFF -DENABLE_MASK_ARBITRARY=ON -DENABLE_COMPLEX_MP=OFF -DENABLE_OPENMP=OFF -DENABLE_LIQMIGRATION=ON -DENABLE_PROFILING=ON -DENABLE_SPH=ON -DENABLE_DEFORM=ON $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
@@ -424,7 +431,7 @@ make_opposite:
 make_suse15:
   <<: *make_definition
   <<: *artifacts_definition
-  <<: *skip_WIP
+  <<: *skip_WIP_and_Draft
   before_script:
     - export CXXFLAGS="-Wno-int-in-bool-context -Wno-comment $CXXFLAGS"
     - echo $CXXFLAGS
@@ -442,7 +449,7 @@ make_18_04_nogui:
 make_clang:
   <<: *make_definition
   <<: *artifacts_definition
-  <<: *skip_WIP
+  <<: *skip_WIP_and_Draft
   before_script:
     - export CC="/usr/bin/clang-11"
     - export CXX="/usr/bin/clang++-11"
@@ -464,6 +471,7 @@ mkHP_float:
 mkHP_long_double:
   <<: *make_definition
   <<: *artifacts_definition
+  <<: *skip_WIP_and_Draft
   before_script:
     - export EXTRA_CMAKE_ARGS="-DREAL_DECIMAL_PLACES=18 $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
@@ -472,7 +480,7 @@ mkHP_long_double:
 mkHP_float128:
   <<: *make_definition
   <<: *artifacts_definition
-  <<: *skip_WIP
+  <<: *skip_WIP_and_Draft
   before_script:
     - export EXTRA_CMAKE_ARGS="-DREAL_DECIMAL_PLACES=33 $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
@@ -595,6 +603,7 @@ test_trixie:
 
 test_archlinux:
   <<: *test_definition
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:archlinux-current
   dependencies:
     - make_archlinux
@@ -660,7 +669,7 @@ test_minimal:
 
 test_opposite:
   <<: *test_definition
-  <<: *skip_WIP
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_opposite
@@ -670,6 +679,7 @@ test_suse15:
   <<: *test_definition
   <<: *skip_GUI_TEST
   <<: *skip_WIP
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
   dependencies:
     - make_suse15
@@ -738,7 +748,7 @@ test_18_04_nogui:
 
 test_clang:
   <<: *test_definition
-  <<: *skip_WIP
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_clang
@@ -748,6 +758,7 @@ test_clang:
 
 tstHP_long_double:
   <<: *test_definition
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - mkHP_long_double
@@ -756,7 +767,7 @@ tstHP_long_double:
 
 tstHP_float128:
   <<: *test_definition
-  <<: *skip_WIP
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - mkHP_float128
@@ -815,6 +826,7 @@ test_SSE:
 
 check_16_04:
   <<: *check_definition
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04
   dependencies:
     - make_16_04
@@ -822,7 +834,7 @@ check_16_04:
 
 check_18_04:
   <<: *check_definition
-  <<: *skip_WIP
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
   dependencies:
     - make_18_04
@@ -830,6 +842,7 @@ check_18_04:
 
 check_20_04:
   <<: *check_definition
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
   dependencies:
     - make_20_04
@@ -844,7 +857,7 @@ check_22_04:
 
 check_stretch:
   <<: *check_definition
-  <<: *skip_WIP
+  <<: *skip_WIP_and_Draft
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
   dependencies:
     - make_stretch
@@ -852,6 +865,7 @@ check_stretch:
 
 check_buster:
   <<: *check_definition
+  <<: *skip_WIP_and_Draft
   before_script:
     - export OMPI_MCA_rmaps_base_oversubscribe=1
     - export OMPI_MCA_btl_vader_single_copy_mechanism=none
@@ -863,6 +877,7 @@ check_buster:
 
 check_bullseye:
   <<: *check_definition
+  <<: *skip_WIP_and_Draft
   before_script:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
@@ -871,6 +886,7 @@ check_bullseye:
 
 check_bookworm:
   <<: *check_definition
+  <<: *skip_WIP_and_Draft
   before_script:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bookworm
   dependencies:
@@ -879,6 +895,7 @@ check_bookworm:
 
 check_trixie:
   <<: *check_definition
+  <<: *skip_WIP_and_Draft
   before_script:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
   dependencies:
@@ -887,6 +904,7 @@ check_trixie:
 
 check_archlinux:
   <<: *check_definition
+  <<: *skip_WIP_and_Draft
   before_script:
   image: registry.gitlab.com/yade-dev/docker-yade:archlinux-current
   dependencies:
