@@ -18,12 +18,21 @@ void Foam::FoamYade::printMsg(const std::string& msg){
 void Foam::FoamYade::getRankSize(){
 	if (!rankSizeSet){
 		// get local rank and size 
+#ifdef OFOAM6// OFOAM6
 		MPI_Comm_rank(PstreamGlobals::MPI_COMM_FOAM, &localRank); 
 		MPI_Comm_size(PstreamGlobals::MPI_COMM_FOAM, &localCommSize);
+#else	// OFOAM1906
+		MPI_Comm_rank(PstreamGlobals::MPICommunicators_[1], &localRank); 
+		MPI_Comm_size(PstreamGlobals::MPICommunicators_[1], &localCommSize);
+#endif
 		// world comm and size 
+#ifdef OFOAM6
 		MPI_Comm_rank(MPI_COMM_WORLD, &worldRank); 
 		MPI_Comm_size(MPI_COMM_WORLD, &worldCommSize); 
-		
+#else	// OFOAM1906
+		MPI_Comm_rank(PstreamGlobals::MPICommunicators_[0], &worldRank); 
+		MPI_Comm_size(PstreamGlobals::MPICommunicators_[0], &worldCommSize); 
+#endif
 		// diff in comm size 
 		commSzDff = abs(worldCommSize-localCommSize);
 		rankSizeSet = true; 
@@ -544,7 +553,11 @@ void Foam::FoamYade::exchangeDT(){
 			MPI_Recv(&yadeDT, 1, MPI_DOUBLE, 0, TAG_YADE_DT, MPI_COMM_WORLD, &status);  
 		}
 		// broadcast recvd yadeDt from localRank = 0. 
+#ifdef OFOAM6
 		MPI_Bcast(&yadeDT,1, MPI_DOUBLE, 0, PstreamGlobals::MPI_COMM_FOAM); 
+#else	// assume OFOAM1906
+		MPI_Bcast(&yadeDT,1, MPI_DOUBLE, 0, PstreamGlobals::MPICommunicators_[1]);
+#endif
 	} else {
 		MPI_Bcast(&yadeDT,1, MPI_DOUBLE, 0, MPI_COMM_WORLD); 
 	}
