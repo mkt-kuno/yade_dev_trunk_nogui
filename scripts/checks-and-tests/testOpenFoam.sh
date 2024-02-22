@@ -5,7 +5,11 @@ source  /root/OpenFOAM/openfoam/etc/bashrc
 
 cd ..
 rm -rf Yade-OpenFOAM-coupling
-git clone https://github.com/dpkn31/Yade-OpenFOAM-coupling.git
+if [-v OFOAM6]; then
+	git clone https://github.com/dpkn31/Yade-OpenFOAM-coupling.git
+else
+	git clone -b supportOFoam1906 https://gitlab.com/yade-dev/Yade-OpenFOAM-coupling.git
+fi
 cd Yade-OpenFOAM-coupling
 git checkout yadeTestPar
 ./Allclean
