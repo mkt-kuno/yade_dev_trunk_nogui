@@ -6,7 +6,6 @@
 # checkGravityRungeKuttaCashKarp54.py Checks the correctness of RungeKuttaCashKarp54Integrator and GravityEngine
 
 ## Omega
-from __future__ import print_function
 o = Omega()
 
 ## PhysicalParameters

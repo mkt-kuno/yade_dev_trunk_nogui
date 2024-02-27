@@ -1,7 +1,5 @@
 # -*- encoding=utf-8 -*-
 
-from __future__ import print_function
-from builtins import range
 from yade import ymport
 
 sphereRadius = 0.05

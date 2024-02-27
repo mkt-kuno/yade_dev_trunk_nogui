@@ -1,4 +1,3 @@
-from __future__ import print_function
 
 __author__ = "Ning Guo, ceguo@connect.ust.hk"
 __supervisor__ = "Jidong Zhao, jzhao@ust.hk"

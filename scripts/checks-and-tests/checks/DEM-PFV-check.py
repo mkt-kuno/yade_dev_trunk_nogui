@@ -2,7 +2,6 @@
 # Here, we are testing bulk modulus, then permeability, then the consolidation of a specimen.
 # the test is based on examples/FluidCouplingPFV/oedometer.py, only slightly simplified and using less particles
 
-from __future__ import print_function
 if ('PFVFLOW' in features):
 	errors = 0
 	errMsg = ""

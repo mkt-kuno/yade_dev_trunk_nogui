@@ -14,7 +14,6 @@
 # The only tunable sign places the sphere either on the top ot at the bottom of the facet
 # and sets gravity accordingly. It can be +1 or -1
 #
-from __future__ import print_function
 sign = -1
 #
 

@@ -1,9 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
 from testGuiHelper import TestGUIHelper
-from builtins import range
 
 scr = TestGUIHelper("Billiard")
 

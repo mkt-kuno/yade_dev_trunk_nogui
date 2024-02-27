@@ -2,9 +2,7 @@
 """Script that shrinks the periodic cell progressively.
 It prints strain and average stress (computed from total volume force)
 once in a while."""
-from __future__ import print_function
 
-from builtins import range
 from yade import timing
 O.engines = [
         ForceResetter(),

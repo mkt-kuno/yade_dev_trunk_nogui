@@ -1,8 +1,6 @@
 # -*- encoding=utf-8 -*-
 '''This example shows usage of addToClump() and appendClumped().'''
-from __future__ import print_function
 
-from builtins import range
 from yade import pack, export, qt
 
 #define material for all bodies:

@@ -3,7 +3,6 @@
 # This example shows, how matchmaker can be used to
 # set the parameters of ViscoElastic model.
 
-from __future__ import print_function
 from yade import utils, plot
 o = Omega()
 fr = 0.5

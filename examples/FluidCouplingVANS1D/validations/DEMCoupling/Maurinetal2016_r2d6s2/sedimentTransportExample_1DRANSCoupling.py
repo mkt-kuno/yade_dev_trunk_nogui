@@ -1,5 +1,4 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 24/11/2017
@@ -17,7 +16,6 @@ from __future__ import print_function
 
 #Import libraries
 
-from builtins import range
 from yade import pack, plot
 import math
 import random as rand

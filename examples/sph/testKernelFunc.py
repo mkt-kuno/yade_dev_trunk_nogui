@@ -1,7 +1,6 @@
 # -*- encoding=utf-8 -*-
 
 # This example allows to test different kernel functions
-from __future__ import print_function
 from yade import utils, plot, qt
 o = Omega()
 

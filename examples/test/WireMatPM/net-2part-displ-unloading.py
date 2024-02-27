@@ -1,6 +1,4 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
-from builtins import input
 from yade import ymport, qt, plot
 
 ## definition of some colors for colored text output in terminal

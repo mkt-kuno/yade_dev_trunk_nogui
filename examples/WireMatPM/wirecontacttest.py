@@ -1,5 +1,4 @@
 # -*- encoding=utf-8 -*-
-from builtins import range
 from yade import plot, qt
 
 #### define parameters for the net

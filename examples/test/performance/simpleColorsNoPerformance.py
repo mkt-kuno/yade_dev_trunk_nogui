@@ -3,7 +3,6 @@
 # This is the same simulation as examples/test/performance/checkPerf.py, but does not perform a benchmark.
 # It can be used to see the --stdbenchmark simulation in the 3D view.
 
-from builtins import range
 from yade import pack, export, geom, timing, bodiesHandling, math
 from yade.math import Real
 import time, numpy

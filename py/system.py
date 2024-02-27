@@ -3,8 +3,6 @@
 """
 Functions for accessing yade's internals; only used internally.
 """
-from __future__ import print_function
-from builtins import object
 import sys
 from yade import wrapper
 from yade._customConverters import *

@@ -14,7 +14,6 @@
 	
 	Buoyancy is included with an additional force 
 	F_buo = -volumeOfDisplacedWater*fluidDensity*gravityAcceleration.'''
-from __future__ import print_function
 
 #define material properties:
 shearModulus = 3.2e10

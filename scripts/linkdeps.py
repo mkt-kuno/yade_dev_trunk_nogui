@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-from __future__ import print_function
 from sys import *
 import os, re
 from string import *

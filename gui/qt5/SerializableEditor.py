@@ -1,8 +1,4 @@
 # encoding: utf-8
-from builtins import zip
-
-from builtins import range
-from builtins import object
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5 import QtGui
@@ -78,7 +74,7 @@ def serializableHref(ser, attr=None, text=None):
 	return makeWrapperHref(text, klass.__name__, attr, static=(attr and getattr(klass, attr) == getattr(ser, attr)))
 
 
-class AttrEditor(object):
+class AttrEditor:
 	"""Abstract base class handing some aspects common to all attribute editors.
 	Holds exacly one attribute which is updated whenever it changes."""
 
@@ -521,11 +517,11 @@ class AttrEditor_QComboBox(AttrEditor, QComboBox):
 		pass
 
 
-class EnumDropDownMenu(object):
+class EnumDropDownMenu:
 	pass
 
 
-class Se3FakeType(object):
+class Se3FakeType:
 	pass
 
 
@@ -599,7 +595,7 @@ class SerializableEditor(QFrame):
 	import logging
 
 	# each attribute has one entry associated with itself
-	class EntryData(object):
+	class EntryData:
 
 		def __init__(self, name, T, flags=0):
 			self.name, self.T, self.flags = name, T, flags

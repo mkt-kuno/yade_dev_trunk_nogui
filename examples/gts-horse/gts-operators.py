@@ -12,7 +12,6 @@ Note that GTS only moves references to surfaces around, therefore e.g. translati
 surface that is part of the union will move also the part of the united surface.
 Therefore, we use the copy() method for deep copy here.
 """
-from __future__ import print_function
 
 from yade import pack, qt
 import gts, locale

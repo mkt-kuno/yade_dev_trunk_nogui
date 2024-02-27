@@ -3,7 +3,6 @@
 Engine applying the linear motion of bicycle pedal e.g. moving points around the axis without rotation
 """
 
-from builtins import range
 import time
 
 ## PhysicalParameters

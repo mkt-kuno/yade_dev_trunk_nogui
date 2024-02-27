@@ -4,7 +4,6 @@
 # Modified Oedometric Test
 # The reference paper [Haustein2017]
 
-from __future__ import print_function
 from yade import utils, plot, timing
 from yade import pack
 

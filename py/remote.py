@@ -221,10 +221,7 @@ def runServers():
 	#info=GenericTCPServer(handler=yade.remote.InfoSocketProvider,title='TCP info provider',cookie=False,minPort=21000)
 	## XMPRPC server for general information:
 
-	if (sys.version_info[0] < 3):
-		from SimpleXMLRPCServer import SimpleXMLRPCServer
-	else:
-		from xmlrpc.server import SimpleXMLRPCServer
+	from xmlrpc.server import SimpleXMLRPCServer
 	port, maxPort = 21000, 65535  # minimum port number
 	while port < maxPort:
 		try:

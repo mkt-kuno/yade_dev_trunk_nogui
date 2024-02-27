@@ -24,17 +24,13 @@ Usage 1: generate simple-scene.py formatted for wiki
 
 Usasge 2: generate SimpleScene.cpp formatted for wiki with comments from simple-scene.py
 
-   ./py2wiki simple-scene.py ../extra/SimpleScene.cpp 
+   ./py2wiki simple-scene.py ../extra/SimpleScene.cpp
 """
-from __future__ import print_function
 
-from builtins import range
-from builtins import object
 import sys, re
 
 
-class Text(object):
-
+class Text:
 	def __init__(self, txt):
 		self.text = [txt]
 

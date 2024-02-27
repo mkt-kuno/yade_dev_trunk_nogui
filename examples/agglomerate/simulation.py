@@ -1,5 +1,4 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
 ######################################################################
 # Gravity deposition as a simple simulation illustrating creation of
 # cohesive contacts and deleting the unwanted between different
@@ -7,8 +6,6 @@ from __future__ import print_function
 #
 # Using CpmMat, but the same procedure can be used with any material
 ######################################################################
-from builtins import zip
-from builtins import range
 from yade import ymport
 
 wall = O.bodies.append(wall((0, 0, 3), 2))

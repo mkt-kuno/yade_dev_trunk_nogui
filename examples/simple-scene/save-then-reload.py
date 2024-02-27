@@ -9,7 +9,6 @@
 ## but it is not a requirement.
 ## Comments on the simulation itself can be found in script-session1.py
 
-from __future__ import print_function
 
 nRead = readParamsFromTable(num_spheres=1001, compFricDegree=30, key='_triax_base_', unknownOk=True)
 from yade.params import table

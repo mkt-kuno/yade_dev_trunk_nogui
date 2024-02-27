@@ -100,7 +100,6 @@
 #       should change the solver settings such as timestep, under relaxation factors, linear solver settings etc.
 #----------------------------------------------------------------------------------------------------------------#
 
-from __future__ import print_function
 import sys
 from yadeimport import *
 from yade.utils import *

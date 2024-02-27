@@ -3,7 +3,6 @@
 # A script to check the PotentialBlockVTKRecorder and PotentialParticleVTKRecorder engines.
 # This script was written based on the existing check-script: checkVTKRecorder.py.
 
-from __future__ import print_function
 import os, tempfile
 
 if ((opts.threads != None and opts.threads != 1) or (opts.cores != None and opts.cores != '1')):

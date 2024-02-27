@@ -1,10 +1,8 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
 #--- bruno.chareyre@grenoble-inp.fr ---
 
 # Experiment beam-like behaviour with chained cylinders + CohFrict connexions
 
-from builtins import range
 from yade import pack
 from yade.gridpfacet import *
 

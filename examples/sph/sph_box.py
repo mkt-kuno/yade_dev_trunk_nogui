@@ -3,7 +3,6 @@
 # This script demonstrates SPH-engine in Yade
 # !!! Very experimental at the moment!!!
 
-from __future__ import print_function
 from yade import utils, plot, qt
 o = Omega()
 

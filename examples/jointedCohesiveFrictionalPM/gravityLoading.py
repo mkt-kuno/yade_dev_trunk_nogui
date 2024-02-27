@@ -1,6 +1,5 @@
 # -*- encoding=utf-8 -*-
 
-from __future__ import print_function
 O = Omega()
 from yade import plot, pack, utils, ymport
 

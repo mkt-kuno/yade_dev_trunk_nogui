@@ -22,7 +22,6 @@
 # and the stage is done.
 #
 
-from __future__ import print_function
 sigmaIso = -1e5
 
 #import matplotlib

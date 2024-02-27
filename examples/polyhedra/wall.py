@@ -1,6 +1,4 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
-from builtins import range
 from yade import qt
 import numpy as np
 import random

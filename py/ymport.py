@@ -2,8 +2,6 @@
 Import geometry from various formats ('import' is python keyword, hence the name 'ymport').
 """
 
-from builtins import range
-from builtins import object
 from yade.wrapper import *
 from yade import utils
 from yade._ymport import *

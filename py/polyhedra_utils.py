@@ -4,7 +4,6 @@
 Auxiliary functions for polyhedra
 """
 
-from builtins import range
 import math, random, doctest, geom, numpy
 from yade import Vector3
 from yade.wrapper import *

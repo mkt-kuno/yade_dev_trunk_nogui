@@ -10,7 +10,6 @@ First let's import the libraries and set some parameters for future tweaking:
 
 .. code-block:: python
 
-    from builtins import range
     from yade import pack
 
     num_spheres = 1000  # number of spheres

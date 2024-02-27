@@ -2,9 +2,7 @@
 """ NOTE
 Needs yade compiled with CGAL feature
 """
-from __future__ import print_function
 
-from builtins import range
 O.engines = [
         ForceResetter(),
         InsertionSortCollider([Bo1_Sphere_Aabb(), Bo1_Box_Aabb(), Bo1_Facet_Aabb()]),

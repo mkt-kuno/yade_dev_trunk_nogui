@@ -1,5 +1,4 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
 # see https://yade-dem.org/doc/user.html#batch-execution-on-job-based-clusters-oar
 
 readParamsFromTable(unknownOk=True, important=6, unimportant='foo', this=-1, notInTable='notInTable')

@@ -1,7 +1,6 @@
 # -*- encoding=utf-8 -*-
 # 2017 Bruno Chareyre <bruno.chareyre~a~grenoble-inp.fr>
 "Demonstrate cell flipping in periodic boundary conditions"
-from __future__ import print_function
 from yade import pack, qt, plot
 
 O.periodic = True

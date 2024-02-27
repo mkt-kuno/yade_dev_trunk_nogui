@@ -10,7 +10,6 @@ Traceback (most recent call last):
     Se3Interpolator(ids=[0],goal=(Vector3(10,10,0),Quaternion(0,0,1,pi)),startIter=10,goalIter=1010,goalHook='print "Finished moving the thing!"; O.pause()'),                                                                                                            
 NameError: name 'Se3Interpolator' is not defined  
 """
-from __future__ import print_function
 
 O.bodies.append([
         sphere([0, 0, 0], radius=.5),

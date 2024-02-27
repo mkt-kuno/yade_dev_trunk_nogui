@@ -1,5 +1,4 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
 #
 # script for testing ScGeom shear computation
 # Runs the same 2-sphere setup for useShear=False and for useShear=True

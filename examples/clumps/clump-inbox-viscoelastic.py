@@ -1,6 +1,5 @@
 # -*- encoding=utf-8 -*-
 
-from builtins import range
 from yade import pack, export, qt, geom
 import gts, os, random, itertools
 from numpy import *

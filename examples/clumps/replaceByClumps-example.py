@@ -1,6 +1,5 @@
 # -*- encoding=utf-8 -*-
 '''This example shows usage of clumpTemplate(), replaceByClumps() and getRoundness().'''
-from __future__ import print_function
 
 #define material for all bodies:
 id_Mat = O.materials.append(FrictMat(young=1e7, poisson=0.3, density=1000, frictionAngle=1))

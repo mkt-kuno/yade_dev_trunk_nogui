@@ -1,7 +1,6 @@
 # -*- encoding=utf-8 -*-
 "An example showing various bending beams."
 
-from builtins import range
 from yade.gridpfacet import *
 
 #### Parameter ####

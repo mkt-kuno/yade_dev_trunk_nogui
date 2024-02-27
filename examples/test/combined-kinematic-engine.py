@@ -1,5 +1,4 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
 box = geom.facetBox(center=(0, 0, 0), extents=(1, 2, 3), color=(0, 1, 0))
 O.bodies.append(box)
 ids = [b.id for b in box]

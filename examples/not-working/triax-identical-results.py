@@ -19,7 +19,6 @@ Traceback (most recent call last):
     spheresToFile(inSph)                                                                                                       
 AttributeError: 'module' object has no attribute 'spheresToFile' 
 """
-from __future__ import print_function
 
 from os.path import exists
 sph = 'triax-identical-results'

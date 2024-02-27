@@ -476,10 +476,7 @@ def _memoizePacking(memoizeDb, sp, radius, rRelFuzz, wantPeri, fullDim, noPrint=
 		        'create table packings (radius real, rRelFuzz real, dimx real, dimy real, dimz real, N integer, timestamp real, periodic integer, pack blob)'
 		)
 	c = conn.cursor()
-	if (sys.version_info[0] < 3):
-		packBlob = buffer(pickle.dumps(sp.toList(), pickle.HIGHEST_PROTOCOL))
-	else:
-		packBlob = memoryview(pickle.dumps(sp.toList(), pickle.HIGHEST_PROTOCOL))
+	packBlob = memoryview(pickle.dumps(sp.toList(), pickle.HIGHEST_PROTOCOL))
 	packDim = sp.cellSize if wantPeri else fullDim
 	c.execute(
 	        'insert into packings values (?,?,?,?,?,?,?,?,?)', (

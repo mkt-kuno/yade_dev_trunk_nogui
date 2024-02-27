@@ -3,7 +3,6 @@
 # Modefied Oedometric Test for particle deformation under const. volume
 # The reference paper [Haustein2017]
 
-from __future__ import print_function
 from yade import utils, plot, timing
 from yade import pack
 

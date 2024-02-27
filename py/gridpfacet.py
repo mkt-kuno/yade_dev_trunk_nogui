@@ -22,8 +22,6 @@ For examples using :yref:`PFacets<PFacet>`, see
 
 """
 
-from builtins import zip
-from builtins import range
 import math, random, doctest, geom, numpy
 from yade.wrapper import *
 try:  # use psyco if available
