@@ -1,4 +1,3 @@
-from __future__ import print_function
 #
 # Test script for OpenGL from python (and from other threads in general)
 # With GL locking, 1 view seems to work reliably, not two views, though.

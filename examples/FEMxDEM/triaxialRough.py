@@ -12,7 +12,6 @@ How to run this script:
 Please amend these instructions if you find that they do not work.
 """
 
-from builtins import range
 from esys.escript import *
 from esys.finley import Brick
 from esys.weipa import saveVTK

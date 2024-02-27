@@ -1,5 +1,4 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
 ################################################################################
 #
 # Triaxial test. Axial strain rate is prescribed and transverse prestress.
@@ -7,7 +6,6 @@ from __future__ import print_function
 # An independent c++ engine may be created from this script in the future.
 #
 ################################################################################
-from builtins import range
 from yade import pack, plot
 import os
 

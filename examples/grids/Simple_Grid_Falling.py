@@ -1,6 +1,5 @@
 # -*- encoding=utf-8 -*-
 
-from builtins import range
 from yade import pack, geom, qt
 from yade.gridpfacet import *
 from pylab import *

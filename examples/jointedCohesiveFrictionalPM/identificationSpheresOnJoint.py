@@ -1,6 +1,5 @@
 # -*- encoding=utf-8 -*-
 
-from __future__ import print_function
 from yade import pack, utils, ymport, export
 
 packing = 'parallellepiped_10'

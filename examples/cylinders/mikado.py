@@ -1,7 +1,6 @@
 # -*- encoding=utf-8 -*-
 "An example showing how two create cylinders with random length."
 
-from builtins import range
 from yade.gridpfacet import *
 
 #### Parameters ####

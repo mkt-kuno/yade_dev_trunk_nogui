@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from __future__ import print_function
 import os, re, sys, os.path
 
 if not os.path.exists('SConstruct'):

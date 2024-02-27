@@ -4,7 +4,6 @@
 ## It holds the entire simulation (MetaBody), takes care of loading/saving,
 ## starting/stopping the simulation, loads plugins and more.
 
-from __future__ import print_function
 o = Omega()  # for advaned folks: this creates default MetaBody as well
 
 ## Engines are called consecutively at each iteration. Their order matters.

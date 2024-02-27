@@ -1,5 +1,3 @@
-from builtins import range
-from builtins import object
 __contributor__ = "Lisandro Dalcín"
 """ MPIPool wrapped using mpi4py """
 #import mpi4py
@@ -7,7 +5,7 @@ __contributor__ = "Lisandro Dalcín"
 from mpi4py import MPI
 
 
-class MPIPool(object):
+class MPIPool:
 
 	def __init__(self, comm=None, master=0):
 		self.comm = MPI.COMM_WORLD if comm is None else comm

@@ -3,7 +3,6 @@
 # Testing facet-sphere interaction in periodic case.
 # Pass, if the sphere is rolling from left to right through the period.
 
-from builtins import range
 sphereRadius = 0.1
 tc = 0.001  # collision time
 en = 0.3  # normal restitution coefficient

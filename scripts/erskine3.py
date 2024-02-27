@@ -6,11 +6,7 @@ This program should really be run by the erskine3-apply.sh script
 Erskine is Watt's colleague in the house of Mr. Nutting.
 
 """
-from __future__ import print_function
 
-from builtins import filter
-from builtins import map
-from builtins import range
 import sys, pprint, string, os
 from logging import *
 from os.path import *

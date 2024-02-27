@@ -5,7 +5,6 @@
 See :ref:`timing` section of the programmer's manual for some examples (https://yade-dem.org/doc/prog.html#timing).
 
 """
-from __future__ import print_function
 
 from yade.wrapper import *
 

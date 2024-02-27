@@ -7,7 +7,6 @@
 # Thanks to Bettina Suhr for providing the
 # minimal test script.
 
-from __future__ import print_function
 
 from yade import pack
 import time

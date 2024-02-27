@@ -12,7 +12,6 @@
 #
 
 # setup the periodic boundary
-from __future__ import print_function
 O.periodic = True
 O.cell.hSize = Matrix3(2, 0, 0, 0, 2, 0, 0, 0, 2)
 

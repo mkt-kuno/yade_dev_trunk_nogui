@@ -1,5 +1,4 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
 from yade import pack
 
 O.materials.append(FrictMat(young=6.e8, poisson=.8, frictionAngle=.0))

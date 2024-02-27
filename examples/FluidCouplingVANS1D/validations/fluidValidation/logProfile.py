@@ -1,4 +1,3 @@
-from __future__ import print_function
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 22/11/2017
@@ -16,7 +15,6 @@ from __future__ import print_function
 # as the analytical solution does not account for its presence.
 #
 #########################################################################################################################################################################
-from builtins import range
 import numpy as np
 
 ################################

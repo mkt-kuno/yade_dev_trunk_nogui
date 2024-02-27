@@ -3,7 +3,6 @@
 # 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 # 2011 ©Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
 "Test and demonstrate use of PeriTriaxController."
-from __future__ import print_function
 from yade import pack, qt
 
 O.periodic = True

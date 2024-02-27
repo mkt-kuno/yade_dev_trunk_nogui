@@ -1,4 +1,3 @@
-from __future__ import print_function
 # J. Duriez (jerome.duriez@inrae.fr)
 
 # to import with yade/python/ipython solveLiqBridge.py, or with execfile('solveLiqBridge.py',globals()) once inside a yade/python/ipython session
@@ -8,7 +7,6 @@ from __future__ import print_function
 # from math import sin,pi,cos,sqrt,tan
 # --- End of "ipython necessary imports" ---
 
-from builtins import range
 import scipy  # for root finding function (see below), requires installing python3-scipy package
 from scipy import optimize
 

@@ -2,7 +2,6 @@
 # 2011 © Klaus Thoeni <klaus.thoeni@gmail.com>
 # Check test version for WirePM tensile test
 
-from __future__ import print_function
 tolerance = 0.01
 errors = 0
 

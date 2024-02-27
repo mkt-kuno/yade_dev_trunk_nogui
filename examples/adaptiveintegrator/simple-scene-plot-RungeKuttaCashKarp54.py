@@ -5,7 +5,6 @@
 #	Mechanical Engineering Department
 #	Bursa Technical University
 #
-from __future__ import print_function
 import matplotlib
 matplotlib.use('Qt5Agg')
 

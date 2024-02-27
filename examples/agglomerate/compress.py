@@ -1,11 +1,8 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
 ######################################################################
 # Compress the loose packing into dense packing. Each agglomerate is
 # considered as clump in this stage
 ######################################################################
-from builtins import zip
-from builtins import range
 from yade import export, ymport
 import random
 random.seed(1)

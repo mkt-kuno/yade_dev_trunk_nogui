@@ -2,7 +2,6 @@
 # 2012 ©Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
 # This variant of triax-basic.py shows the usage of cohesive contact laws and moments at contacts
 
-from __future__ import print_function
 from yade import pack
 
 sp = pack.SpherePack()

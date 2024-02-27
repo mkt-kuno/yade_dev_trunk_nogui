@@ -1,4 +1,3 @@
-from __future__ import print_function
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 22/11/2017
@@ -12,7 +11,6 @@ from __future__ import print_function
 # The obtained 1D fluid velocity profile (vxFluid) is compared to the analytical solution in the figure "figPoiseuille.png"
 #
 #########################################################################################################################################################################
-from builtins import range
 import numpy as np
 
 ################################

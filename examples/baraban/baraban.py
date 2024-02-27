@@ -1,5 +1,4 @@
 # -*- encoding=utf-8 -*-
-from builtins import range
 import time
 
 ## PhysicalParameters

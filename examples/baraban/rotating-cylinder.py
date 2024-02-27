@@ -1,6 +1,5 @@
 # -*- encoding=utf-8 -*-
 
-from __future__ import print_function
 cylHt, cylRd = 1, .2
 nSpheres = 2e4
 

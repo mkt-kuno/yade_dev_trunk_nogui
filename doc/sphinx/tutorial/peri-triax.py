@@ -1,4 +1,3 @@
-from __future__ import print_function
 from yade import pack, plot
 sp = pack.SpherePack()
 rMean = .05

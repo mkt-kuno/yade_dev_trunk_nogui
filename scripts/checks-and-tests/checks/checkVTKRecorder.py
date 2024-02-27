@@ -1,5 +1,4 @@
 # encoding: utf-8
-from __future__ import print_function
 
 from yade import pack, export, plot
 import math, os, sys, shutil, subprocess, tempfile

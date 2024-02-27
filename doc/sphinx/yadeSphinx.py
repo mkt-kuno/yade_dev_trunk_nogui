@@ -4,17 +4,9 @@
 # module documentation
 #
 
-from builtins import range
 import sys, os, os.path
-try:  #for python 3.4+
-	from importlib import reload
-except:
-	pass
+from importlib import reload
 reload(sys)
-try:  #for python2
-	sys.setdefaultencoding('utf8')
-except:
-	pass
 
 writer = sys.argv[1]
 print("Running yadeSphinx.py with writer ==", writer)

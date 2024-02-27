@@ -3,7 +3,6 @@
 Miscellaneous functions, which are useful for handling bodies.
 """
 
-from builtins import range
 from yade.wrapper import *
 import utils, math, numpy
 

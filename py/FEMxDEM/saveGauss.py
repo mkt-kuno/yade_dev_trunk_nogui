@@ -3,8 +3,6 @@
 Author: Ning Guo <ceguo@connect.ust.hk>
 """
 
-from builtins import range
-
 
 def saveGauss2D(name='', pos=(), **kwargs):
 	fout = file(name, 'w')

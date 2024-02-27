@@ -2,12 +2,7 @@
 """
 Export (not only) geometry to various formats.
 """
-from __future__ import print_function
 
-from builtins import zip
-
-from builtins import range
-from builtins import object
 from yade.wrapper import *
 from yade import utils, Matrix3, Vector3
 

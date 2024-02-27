@@ -4,7 +4,6 @@
 Auxiliary functions for the Potential Blocks
 """
 
-from builtins import range
 import math, random, doctest, geom, numpy
 from yade import Vector3, Quaternion, utils
 from yade.wrapper import *

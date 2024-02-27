@@ -1,5 +1,4 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
 ################################################################################
 #
 # Python script to test tetra-tetra contact detection for different possible

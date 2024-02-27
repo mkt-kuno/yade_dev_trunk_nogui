@@ -1,5 +1,4 @@
 # encoding: utf-8
-from __future__ import print_function
 
 # This is based on https://answers.launchpad.net/yade/+question/682290 script by Jan Stránský and Bruno Chareyre
 print('testing collider.avoidSelfInteractionMask')

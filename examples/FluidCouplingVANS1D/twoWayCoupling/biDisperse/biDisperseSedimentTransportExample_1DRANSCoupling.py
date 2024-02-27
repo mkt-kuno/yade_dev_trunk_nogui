@@ -1,5 +1,4 @@
 # -*- encoding=utf-8 -*-
-from __future__ import print_function
 #########################################################################################################################################################################
 # Authors: 	Remi Chassagne, remi.chassagne@univ-grenoble-alpes.fr
 #		Raphael Maurin, raphael.maurin@imft.fr
@@ -12,9 +11,6 @@ from __future__ import print_function
 # Data can be saved (hdf5 format), to be further plotted with the file postProcess.py
 #
 ############################################################################################################################################################################
-
-#Import libraries
-from builtins import range
 
 #Import libraries
 from yade import pack, plot

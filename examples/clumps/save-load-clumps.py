@@ -1,8 +1,6 @@
 # -*- encoding=utf-8 -*-
 '''This example shows usage of save and load clumps.'''
-from __future__ import print_function
 
-from builtins import range
 from yade import pack, export, qt, ymport
 
 #define material for all bodies:

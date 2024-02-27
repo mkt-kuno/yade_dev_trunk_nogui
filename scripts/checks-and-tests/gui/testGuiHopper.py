@@ -1,9 +1,7 @@
 # -*- encoding=utf-8 -*-
 
-from __future__ import print_function
 from testGuiHelper import TestGUIHelper
 from yade import qt
-from builtins import range
 from yade import pack, export, qt, geom
 import itertools
 from numpy import *

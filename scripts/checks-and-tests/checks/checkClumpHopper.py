@@ -2,8 +2,6 @@
 # This script is used in --check to keep the functionality of adding/removal
 # of particles and clumps functional
 
-from __future__ import print_function
-from builtins import range
 import itertools
 
 kinEnergyMax = 100000

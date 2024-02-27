@@ -5,7 +5,6 @@
 ############################################
 # Cundall non-viscous damping
 # try zero damping and watch total energy...
-from __future__ import print_function
 damping = 0.2
 # initial angular velocity
 angVel = 3.0

@@ -21,8 +21,6 @@
 ## See triax-tutorial/script-session1.py for more detailed explanations of the packing generation procedure.
 
 ## ______________   First section, similar to triax-tutorial/script-session1.py  _________________
-from __future__ import print_function
-from builtins import range
 from yade import pack
 
 num_spheres = 1000  # number of spheres

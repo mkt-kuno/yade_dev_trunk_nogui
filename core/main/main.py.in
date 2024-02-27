@@ -3,10 +3,7 @@
 # syntax:python
 
 import sys,os,os.path,time
-try:
-	import _io
-except ImportError:
-	import io
+import io
 
 # Add search path for yade Python-modules
 # It allows to use both Yade-versions (packaged and self-compiled one).
@@ -35,10 +32,7 @@ if not (os.path.exists(libDir+'/py/yade/__init__.py')):
 	raise RuntimeError('Libraries are not found! ('+libDir+'/py/yade/__init__.py, /py/yade/__init__.py)')
 
 # handle command-line options first
-try:
-	import argparse
-except ImportError: # argparse not present, print error message
-	raise RuntimeError("\n\nPlease install 'python-argparse' package.\n")
+import argparse
 prog = os.path.basename(sys.argv[0])
 par=argparse.ArgumentParser(usage='%s [options] [ simulation.xml[.bz2] | script.py [script options]]'%prog,
   prog=prog,description="Yade: open-source platform for dynamic computations. It\
@@ -92,13 +86,6 @@ if opts.script:
 # If yade is run with mpiexec prefix all processes will be in mpi_mode.
 # If non-mpiexec'd yade spawns workers only workers will be in mpi_mode
 opts.mpi_mode = os.getenv('OMPI_COMM_WORLD_RANK')!=None
-
-## remove later
-## python2.5 relative module imports workaround
-v=sys.version_info
-if v[0]==2 and v[1]<=5:
-	for submodule in ('yade','gts','yade/tests'):
-		sys.path.append(os.path.join(libDir,'py',submodule))
 
 sys.path.append(os.path.join(libDir,'py'))
 

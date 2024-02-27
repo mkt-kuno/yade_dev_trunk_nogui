@@ -3,7 +3,6 @@
 """
 Core functionality (Scene in c++), such as accessing bodies, materials, interactions. Specific functionality tests should go to engines.py or elsewhere, not here.
 """
-from builtins import range
 import unittest
 import random
 from yade.wrapper import *

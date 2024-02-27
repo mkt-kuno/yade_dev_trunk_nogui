@@ -3,7 +3,6 @@
 #This script is designed to show the "circleView" features, which allow to display circles instead of spheres for 2D simulations.
 #/!\ this is just a DISPLAY FEATURE, computed particles still are SPHERICAL.
 
-from builtins import range
 from yade import qt
 X = 1
 Y = 1

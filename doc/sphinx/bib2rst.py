@@ -1,5 +1,4 @@
 # encoding: utf-8
-from __future__ import print_function
 try:
 	import bibtexparser
 except ImportError:

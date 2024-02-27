@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os, re
 for root, dirs, files in os.walk('.'):
 	for name in files:
