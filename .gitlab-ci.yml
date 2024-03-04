@@ -182,7 +182,7 @@ variables:
         *) echo "4";;
         esac)
     - echo $JOBSNUM
-    - touch ~/.ccache/ccache.conf #temporary workaround for nova2 outage
+    # Don't touch ~/.ccache/ccache.conf , edit them locally on the server.
     # Check that it's correct:
     - cat ~/.ccache/ccache.conf
     - ccache -s
