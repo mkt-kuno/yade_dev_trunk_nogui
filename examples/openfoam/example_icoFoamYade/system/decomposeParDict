@@ -11,13 +11,12 @@ FoamFile
 numberOfSubdomains 2;
 
 method          scotch;
-strategies
-{
-  
-  optional;
-
-}
-
+//strategies
+//{
+//  
+//  optional
+//
+//}
 
 //simpleCoeffs
 //{

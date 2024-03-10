@@ -96,18 +96,16 @@
 #       should change the solver settings such as timestep, under relaxation factors, linear solver settings etc.
 #----------------------------------------------------------------------------------------------------------------#
 
-from __future__ import print_function
+from mpi4py import MPI
 import sys
 from yadeimport import *
 from yade.utils import *
 
-initMPI()  #Initialize the mpi environment, always required.
+## FIXME : THE SERIAL COUPLING FAILS! DON'T USE AT THE MOMENT...
+
+#initMPI()  #Initialize the mpi environment, always required.
 fluidCoupling = yade.FoamCoupling()
-#Initialize the engine
-fluidCoupling.getRank()
-
-#part of Initialization.
-
+fluidCoupling.comm = MPI.COMM_WORLD
 
 #example of spheres in shear flow : two-way point force coupling
 class simulation():
@@ -161,6 +159,7 @@ class simulation():
 		fluidCoupling.setNumParticles(len(sphereIDs))
 		fluidCoupling.setIdList(sphereIDs)
 		fluidCoupling.isGaussianInterp = False
+		fluidCoupling.SetOpenFoamSolver('/root/OpenFOAM/-v1906/platforms/linux64GccDPInt32Opt/bin/icoFoamYade', 2)
 		#use pimpleFoamYade for gaussianInterp
 
 		# Integrator
@@ -169,7 +168,7 @@ class simulation():
 
 		O.engines = [
 		        ForceResetter(),
-		        InsertionSortCollider([Bo1_Sphere_Aabb(), Bo1_Facet_Aabb()], allowBiggerThanPeriod=True),
+		        InsertionSortCollider([Bo1_Sphere_Aabb(), Bo1_Facet_Aabb(), Bo1_FluidDomainBbox_Aabb()], allowBiggerThanPeriod=True),
 		        InteractionLoop(
 		                [Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()], [Ip2_FrictMat_FrictMat_FrictPhys()],
 		                [Law2_ScGeom_FrictPhys_CundallStrack()]

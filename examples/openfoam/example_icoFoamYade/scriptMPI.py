@@ -49,13 +49,16 @@ O.bodies.append(box(center=yplus, extents=(maxval, minval, maxval), fixed=True))
 
 #zplus = 0.25*(v4+v7+v6+v5)
 #O.bodies.append(box(center=zplus,extents=(maxval, maxval, minval), fixed=True))
-
+# setup the openfoam coupling, more stuff is done in mpy.py
 fluidCoupling = FoamCoupling()
 fluidCoupling.couplingModeParallel = True
 fluidCoupling.isGaussianInterp = True
 #use pimpleFoamYade for gaussianInterp (only in serial mode)
 sphereIDs = [b.id for b in O.bodies if type(b.shape) == Sphere]
 
+'''The yade specific (icoFoamYade, pimpleFoamYade) OpenFOAM solver can be found in $FOAM_USER_APPBIN, (
+#I think we have to give the full path here,  The scond argument, 2 is the number of FoamProcs. '''
+fluidCoupling.SetOpenFoamSolver('/root/OpenFOAM/-v1906/platforms/linux64GccDPInt32Opt/bin/icoFoamYade', 2) 
 # Integrator
 # add small damping in case of stability issues.. ~ 0.1 max, also note : If gravity is needed, set it in constant/g dir.
 

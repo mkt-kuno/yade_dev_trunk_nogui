@@ -37,9 +37,9 @@ void initMPI()
 	std::cout << "myrank = " << rank << std::endl;
 	MPI_Comm_size(MPI_COMM_WORLD, &commSize);
 	std::cout << "commSize = " << commSize << endl;
-	int      color = 2; //Foam uses 1
-	MPI_Comm yadeComm;  // dummy communicator;
-	MPI_Comm_split(MPI_COMM_WORLD, color, rank, &yadeComm);
+	// int      color = 2; //Foam uses 1
+	// MPI_Comm yadeComm;  // dummy communicator;
+	// MPI_Comm_split(MPI_COMM_WORLD, color, rank, &yadeComm);
 }
 
 #else

@@ -1102,6 +1102,7 @@ def splitScene():
 			fluidCoupling.comm = comm
 			fluidCoupling.setIdList(fluidBodies)
 			fluidCoupling.couplingModeParallel = True
+			print("YADE MPY DONE SETTING ID LIST")
 
 		O._sceneObj.subdomain = rank
 		O.subD.comm = comm  #make sure the c++ uses the merged intracommunicator
@@ -1359,9 +1360,7 @@ def mpirun(nSteps, np=None, withMerge=False):
 	if FLUID_COUPLING:
 		fluidCoupling = typedEngine("FoamCoupling")
 		fluidCoupling.comm = comm
-		fluidCoupling.getFluidDomainBbox(
-		)  #triggers the communication between yade procs and Yales2/openfoam procs, get's fluid domain bounding boxes from all fluid procs.
-
+		
 	# split if needed
 	initStep = O.iter
 	if not O.splitted:
