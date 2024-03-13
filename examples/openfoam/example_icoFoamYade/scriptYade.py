@@ -103,9 +103,13 @@ from yade.utils import *
 
 ## FIXME : THE SERIAL COUPLING FAILS! DON'T USE AT THE MOMENT...
 
-#initMPI()  #Initialize the mpi environment, always required.
+initMPI()  #Initialize the mpi environment, always required.
 fluidCoupling = yade.FoamCoupling()
 fluidCoupling.comm = MPI.COMM_WORLD
+
+OFOAM_EXE = '/root/OpenFOAM/-v1906/platforms/linux64GccDPInt32Opt/bin/icoFoamYade'
+import os
+print("OFOAM executable? ",os.path.exists(OFOAM_EXE) )
 
 #example of spheres in shear flow : two-way point force coupling
 class simulation():
@@ -159,7 +163,7 @@ class simulation():
 		fluidCoupling.setNumParticles(len(sphereIDs))
 		fluidCoupling.setIdList(sphereIDs)
 		fluidCoupling.isGaussianInterp = False
-		fluidCoupling.SetOpenFoamSolver('/root/OpenFOAM/-v1906/platforms/linux64GccDPInt32Opt/bin/icoFoamYade', 2)
+		fluidCoupling.SetOpenFoamSolver(OFOAM_EXE, 2)
 		#use pimpleFoamYade for gaussianInterp
 
 		# Integrator
