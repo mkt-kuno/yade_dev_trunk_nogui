@@ -28,4 +28,6 @@ mkdir spheres
 # mpiexec --allow-run-as-root -n 1 python3 scriptYade.py : -n 2 icoFoamYade -parallel
 # mpiexec --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py : -n 2 icoFoamYade -parallel
 mpirun --allow-run-as-root -n 1 python3 scriptYade.py
+mpirun --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py
+../../../install/bin/yade-ci scriptMPI.py
 
