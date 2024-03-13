@@ -25,6 +25,13 @@ decomposePar
 mkdir yadep
 mkdir spheres
 
+if [ -f /root/OpenFOAM/-v1906/platforms/linux64GccDPInt32Opt/bin/icoFoamYade ]; then
+    echo 'File exists.'
+else
+    echo 'File does not exist.'
+fi
+
+
 # mpiexec --allow-run-as-root -n 1 python3 scriptYade.py : -n 2 icoFoamYade -parallel
 # mpiexec --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py : -n 2 icoFoamYade -parallel
 mpirun --allow-run-as-root -n 1 python3 scriptYade.py
