@@ -107,8 +107,9 @@ print("OFOAM executable? ",os.path.exists(OFOAM_EXE) )
 
 
 ## FIXME : THE SERIAL COUPLING FAILS! DON'T USE AT THE MOMENT...
-
-initMPI()  #Initialize the mpi environment, always required.
+#print("initMPI()")
+#initMPI()  #Initialize the mpi environment, always required.
+print("yade.FoamCoupling()")
 fluidCoupling = yade.FoamCoupling()
 fluidCoupling.comm = MPI.COMM_WORLD
 
