@@ -39,7 +39,7 @@ fi
 #mpirun --allow-run-as-root -n 1 python3 scriptYade.py
 echo "_____ RUNING mpirun --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py"
 sleep 2
-mpirun --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py
+mpirun --allow-run-as-root -n 4 ../../../install/bin/yade-ci -nx scriptMPI.py
 echo "_____ RUNING ../../../install/bin/yade-ci scriptMPI.py"
 sleep 2
 ../../../install/bin/yade-ci scriptMPI.py
