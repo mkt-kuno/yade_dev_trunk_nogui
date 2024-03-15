@@ -36,7 +36,7 @@ fi
 # mpiexec --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py : -n 2 icoFoamYade -parallel
 # echo "_____ RUNING mpirun --allow-run-as-root -n 1 python3 scriptYade.py"
 # sleep 2
-mpirun --allow-run-as-root -n 1 python3 scriptYade.py
+#mpirun --allow-run-as-root -n 1 python3 scriptYade.py
 echo "_____ RUNING mpirun --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py"
 sleep 2
 mpirun --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py
