@@ -90,8 +90,6 @@ mp.fluidBodies = sphereIDs
 mp.DOMAIN_DECOMPOSITION = True
 mp.mpirun(NSTEPS)
 mp.mprint("RUN FINISH")
-fluidCoupling.killMPI()
 exit()
-#mp.MPI.Finalize()
 #mp.mergeScene()
 #if mp.rank == 0: O.save('mergedScene.yade')
