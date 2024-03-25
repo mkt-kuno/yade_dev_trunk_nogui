@@ -156,7 +156,7 @@ class FoamCoupling : public GlobalEngine {
     .def("getNumBodies", &FoamCoupling::getNumBodies, "get the number of bodies in the coupling") 
     .def("getIdList", &FoamCoupling::getIdList, "get the ids of bodies in coupling")
     .def("getFluidDomainBbox", &FoamCoupling::getFluidDomainBbox, "get the fluid domain bounding boxes, called once during simulation initialization. ")
-	.def("SetOpenFoamSolver", &FoamCoupling::SetFoamSolver,boost::python::arg("OpenFOAMSolverName"), boost::python::arg("numOpenFOAMProcesses"),"Starts the Yade coupled OpenFOAM solver with the requested number of processes")
+	.def("SetOpenFoamSolver", &FoamCoupling::SetFoamSolver,(boost::python::arg("OpenFOAMSolverName"), boost::python::arg("numOpenFOAMProcesses")),"Starts the Yade coupled OpenFOAM solver with the requested number of processes")
 	.def("StartFoamSolver",&FoamCoupling::StartFoamSolver,"Starts the OpenFOAM solver")
    
     .def_readonly("foamDeltaT", &FoamCoupling::foamDeltaT, "timestep in openfoam solver from  :yref:`exchangeDeltaT <FoamCoupling::exchangeDeltaT>` ") 
