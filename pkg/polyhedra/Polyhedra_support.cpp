@@ -168,6 +168,8 @@ bool do_intersect(Polyhedron A, Polyhedron B, std::vector<int>& sep_plane)
 	bool found;
 	//check previous separation plane
 	switch (sep_plane[0]) {
+		case 0: //no prior information about separation plane
+			break;
 		case 1: //separation plane was previously determined as sep_plane[2]-th plane of A polyhedron
 		{
 			if (unlikely((unsigned)sep_plane[2] >= A.size_of_facets())) break;
