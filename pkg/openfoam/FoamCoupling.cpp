@@ -56,7 +56,7 @@ void FoamCoupling::StartFoamSolver()
 	if (localRank == 0 ) std::cout << "Starting OpenFOAM solver --> " << foamSolverName << "  with number of processes = " << numFoamProcs << "\n";
 	std::string  par = "-parallel";
 
-	char **argVs = new char*[1]; 
+	char **argVs = new char*[2];
 	argVs[0] = const_cast<char*>(par.c_str()); 
 	argVs[1] = NULL;  
 
