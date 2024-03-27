@@ -298,12 +298,12 @@ test_18_foam1906:
     - pwd
     - scripts/checks-and-tests/testOpenFoam.sh
 
-test_22_foam1912:
+test_22_foam2312:
   <<: *platforms_definition
   <<: *gitlab_runner_retry_definition
   <<: *skip_WIP
   stage: test
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam1912
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam2312
   dependencies:
     - make_22_04
   needs: ["make_22_04"]
