@@ -58,7 +58,7 @@ sphereIDs = [b.id for b in O.bodies if type(b.shape) == Sphere]
 
 '''The yade specific (icoFoamYade, pimpleFoamYade) OpenFOAM solver can be found in $FOAM_USER_APPBIN, (
 #I think we have to give the full path here,  The scond argument, 2 is the number of FoamProcs. '''
-fluidCoupling.SetOpenFoamSolver('/root/OpenFOAM/-v1906/platforms/linux64GccDPInt32Opt/bin/icoFoamYade', 2) 
+fluidCoupling.SetOpenFoamSolver(os.environ.get('FOAM_USER_APPBIN')+'/icoFoamYade', 2)
 # Integrator
 # add small damping in case of stability issues.. ~ 0.1 max, also note : If gravity is needed, set it in constant/g dir.
 
@@ -77,7 +77,7 @@ O.engines = [
         GlobalStiffnessTimeStepper(timestepSafetyCoefficient=0.7, timeStepUpdateInterval=200, parallelMode=True, label="ts"),
         fluidCoupling,  #to be called after timestepper
         NewtonIntegrator(damping=0.0, label='newton', gravity=(0, 0.0, 0)),
-        VTKRecorder(fileName='spheres/3d-vtk-', recorders=['all'], parallelMode=True, iterPeriod=1000)
+        #VTKRecorder(fileName='spheres/3d-vtk-', recorders=['all'], parallelMode=True, iterPeriod=1000)
 ]
 collider.verletDist = 0.00075
 mp.YADE_TIMING = False
