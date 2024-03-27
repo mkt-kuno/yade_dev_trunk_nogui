@@ -60,7 +60,7 @@ sphereIDs = [b.id for b in O.bodies if type(b.shape) == Sphere]
 # full path here, the scond argument, 2 is the number of FoamProcs. '''
 # fluidCoupling.SetOpenFoamSolver(os.environ.get('FOAM_USER_APPBIN')+'/icoFoamYade', 2)
 # it also work without path after sourcing OFoam's bashrc
-fluidCoupling.SetOpenFoamSolver(icoFoamYade, 2)
+fluidCoupling.SetOpenFoamSolver("icoFoamYade", 2)
 
 # Integrator
 # add small damping in case of stability issues.. ~ 0.1 max, also note : If gravity is needed, set it in constant/g dir.
