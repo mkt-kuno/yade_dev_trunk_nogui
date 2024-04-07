@@ -136,18 +136,10 @@ void Foam::FoamYade::recvYadeIntrs(){
 // 	}
   
 	for (auto& yProc : yadeProcs){
-		MPI_Request request; 
-		MPI_Irecv(&yProc.numParticlesProc.front(), localCommSize, MPI_INT, yProc.yRank, TAG_SZ_BUFF, interComm, &request); 
-		reqVec.push_back(request);
+		MPI_Status status; 
+		MPI_Recv(&yProc.numParticlesProc.front(), localCommSize, MPI_INT, yProc.yRank, TAG_SZ_BUFF, interComm, &status); 
 	}
 	
-	for (auto rq : reqVec){
-		MPI_Status status; 
-		MPI_Wait(&rq, &status);
-	}
-
-
-
 	// those yade procs intersecting current grid. 
 	for (auto& yProc : yadeProcs) {
 		if (yProc.numParticlesProc[localRank] > 0 ){
