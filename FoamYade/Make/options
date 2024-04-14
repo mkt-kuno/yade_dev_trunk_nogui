@@ -16,4 +16,4 @@ LIB_LIBS = \
     -L$(FOAM_USER_LIBBIN) \
     -lMeshTree  \
     -L$(FOAM_LIBBIN)/$(FOAM_MPI)/lPstream \
-    $(PLIBS)  
+    $(PLIBS)

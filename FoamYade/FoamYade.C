@@ -21,11 +21,19 @@ void Foam::FoamYade::InitializeCoupling(){
 		std::cout << "FOAM: Starting intialization " << std::endl; 
 		// get local rank and size 
 
-#ifdef OFOAM6// OFOAM6
+#if FOUNDATION// OFOAM6
 		MPI_Comm_rank(PstreamGlobals::MPI_COMM_FOAM, &localRank); 
 		MPI_Comm_size(PstreamGlobals::MPI_COMM_FOAM, &localCommSize);
-		MPI_Comm_rank(MPI_COMM_WORLD, &worldRank);
-		MPI_Comm_size(MPI_COMM_WORLD, &worldCommSize);
+		MPI_Comm subParentComm; 
+		// get the unsplit comm.
+		MPI_Comm_get_parent(&subParentComm);
+		// the spawner comm. (not very sure about this...)
+		MPI_Comm_get_parent(&parentComm);
+		std::cout << "FOAM: Parent communicator set." << std::endl;
+		MPI_Intercomm_merge(parentComm, 1, &interComm);
+		std::cout << "FOAM: intracommunicator has been made" << std::endl;
+		// world comm (intra communicator size) // or just get the remote size?
+		MPI_Comm_size(interComm, &worldCommSize);
 #else	// OFOAM1906
 		MPI_Comm_rank(PstreamGlobals::MPICommunicators_[0], &localRank);
 		MPI_Comm_size(PstreamGlobals::MPICommunicators_[0], &localCommSize);
@@ -82,7 +90,7 @@ void Foam::FoamYade::initFields(){
 		
 	}
 	alpha = 1.0; 
-	interpRange = 1.0*std::pow(mesh.V()[0], 1.0/3.0);
+	interpRange = 3.0*std::pow(mesh.V()[0], 1.0/3.0);
 	//sigmaInterp = interpRange*0.42460; // interp_range/(2sqrt(2ln(2))) filter width half maximum;
 	//interpRangeCu = std::pow(interpRange, 3.0); 
 	sigmaPi = 1.0/(std::pow(M_PI*interpRange*interpRange, 1.5));   
@@ -394,7 +402,7 @@ void Foam::FoamYade::setCellVolFraction(){
 		const double& pVol = iv.second.first/mesh.V()[cellId]; 
 		const vector& pVel = iv.second.second/mesh.V()[cellId]; 
 		const double& vfrc = 1.0 - pVol; 
-		alpha[cellId] = (vfrc > 0.20 && vfrc < 1.0 ) ? vfrc : 0.20; 
+		alpha[cellId] = (vfrc > 0.10 && vfrc < 1.0 ) ? vfrc : 0.10; 
 		uParticle[cellId] = pVel/(1.0 - alpha[cellId]); 
 		
 	}
@@ -416,7 +424,11 @@ void Foam::FoamYade::calcInterpWeightGaussian(std::vector<std::shared_ptr<YadePa
 			const double& ds2 = mesh.C()[prt->cellIds[i]].y() - prt-> pos.y();
 			const double& ds3 = mesh.C()[prt->cellIds[i]].z() - prt-> pos.z();
 			distsq = (ds1*ds1)+ (ds2*ds2) + (ds3*ds3); 
-			double weight = exp(-distsq/(2*std::pow(sigmaInterp, 2)))*interpRangeCu*sigmaPi;
+			// std::cout << "distsq = " << distsq << std::endl; 
+			// std::cout << "sigmaInterp = " << sigmaInterp << std::endl; 
+			// std::cout << "sigmaPi = " << sigmaPi << std::endl;
+			double weight = exp(-distsq/(2*std::pow(interpRange, 2)))*sigmaPi;
+			// std::cout << "weight = " << weight << std::endl;
 			allwt += weight; 
 			prt -> interpCellWeight.push_back(std::make_pair(prt->cellIds[i], weight)); 
 		}
@@ -575,14 +587,9 @@ void Foam::FoamYade::updateSources() {
 	for (const auto& iv : pVolcontrib) {
 		const int& cellId = iv.first;
 		const double alphaf = alpha[cellId]; const double alphap = 1-alpha[cellId]; 
-		Pout << "Ucell = " << U[cellId] << endl; 
-		Pout << "uInterp = " << uInterp[cellId] << endl; 
-		Pout << "uParticle = " << uParticle[cellId] << endl;  
 		uCoeff[cellId] = mag(U[cellId]) > small ? (U[cellId] & uInterp[cellId])/(mag(U[cellId])) : 0.0;  
 		uSourceDrag[cellId] = uSourceDrag[cellId]/(alphap*alphaf);
 		uCoeff[cellId] = uCoeff[cellId]*uSourceDrag[cellId];  
-		Pout << "ucoeff = "  << uCoeff[cellId] << endl; 
-		Pout << "uDrag = "  << uSourceDrag[cellId] << endl; 
 	}
 /*	
 	for (const auto& cellC : cellCount) {
@@ -647,7 +654,7 @@ void Foam::FoamYade::exchangeDT(){
 			MPI_Recv(&yadeDT, 1, MPI_DOUBLE, 0, TAG_YADE_DT, interComm, &status);  
 		}
 		// broadcast recvd yadeDt from localRank = 0. 
-#ifdef OFOAM6
+#ifdef FOUNDATION
 		MPI_Bcast(&yadeDT,1, MPI_DOUBLE, 0, PstreamGlobals::MPI_COMM_FOAM); 
 #else	// assume OFOAM1906
 		MPI_Bcast(&yadeDT,1, MPI_DOUBLE, 0, PstreamGlobals::MPICommunicators_[0]);
@@ -736,7 +743,7 @@ void Foam::FoamYade::setParticleAction(double dt) {
 		}
 	} else {
 		if (inCommProcs.size()){
-			for (const auto yProc : inCommProcs){
+			for (const auto &yProc : inCommProcs){
 				calcHydroForce(yProc.get());
 				calcHydroTorque(yProc.get());
 			}
