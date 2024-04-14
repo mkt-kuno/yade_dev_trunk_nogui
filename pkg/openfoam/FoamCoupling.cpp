@@ -368,8 +368,8 @@ void FoamCoupling::sendBodyData(){
 
 void FoamCoupling::verifyParticleDetection() {
   
-	/* check if the sent particles are located on the fluid procs, verify all particles (in fluid coupling) owned by the yade process has been accounted for. Some particles may intersect the 
-	 fluid domains bounding box but may not be actually inside the fluid mesh. 
+	/* check if the sent particles are located on the fluid procs, verify all particles (in fluid coupling) owned by the yade process has been accounted for. 
+	Some particles may intersect the  fluid domains bounding box but may not be actually inside the fluid mesh. 
 	 Method : Everty fluid proc sents a vector of it's search result. if found res = 1, else res =0, for each particle. 
 	 each yade rank receives this vector from intersecting fluid ranks, looks through the vector to find the fails. 
 	 if fail is found : see if this id is a sharedid. if not this particle has been 'lost'. if shared id :  check the vector of verifyTracking of the intersecting fluid domain till found in 

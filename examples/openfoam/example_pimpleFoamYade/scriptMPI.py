@@ -9,7 +9,7 @@ O.cell.setBox(1.005, 1.005, 1.005)
 numspheres = 2000
 young = 5e6
 density = 1000
-NSTEPS = 15000
+NSTEPS = 5000
 
 O.materials.append(FrictMat(young=young, poisson=0.5, frictionAngle=radians(15), density=density, label='spheremat'))
 O.materials.append(FrictMat(young=young * 100, poisson=0.5, frictionAngle=0, density=0, label='wallmat'))
@@ -27,7 +27,7 @@ v5 = Vector3(maxval, minval, maxval)
 v6 = Vector3(maxval, maxval, maxval)
 v7 = Vector3(minval, maxval, maxval)
 
-mn, mx = Vector3(5e-08, 5e-08, 5e-08), Vector3(0.99, 0.99, 0.99)
+mn, mx = Vector3(2e-08, 2e-08, 2e-08), Vector3(1.0 - 2e-08, 1.0 - 2e-08, 1.0 - 2e-08)
 sp = pack.SpherePack()
 sp.makeCloud(mn, mx, rMean=0.0075, rRelFuzz=0.0, num=numspheres)
 O.bodies.append([sphere(center, rad, material='spheremat') for center, rad in sp])
@@ -62,6 +62,13 @@ sphereIDs = [b.id for b in O.bodies if type(b.shape) == Sphere]
 # add small damping in case of stability issues.. ~ 0.1 max, also note : If gravity is needed, set it in constant/g dir.
 
 
+'''The yade specific (icoFoamYade, pimpleFoamYade) OpenFOAM solver can be found in $FOAM_USER_APPBIN, (
+# full path here, the scond argument, 2 is the number of FoamProcs. '''
+# fluidCoupling.SetOpenFoamSolver(os.environ.get('FOAM_USER_APPBIN')+'/icoFoamYade', 2)
+# it also work without path after sourcing OFoam's bashrc
+fluidCoupling.SetOpenFoamSolver("pimpleFoamYade", 2)
+
+
 def printStep():
 	print("step = ", O.iter)
 
@@ -78,7 +85,7 @@ O.engines = [
         NewtonIntegrator(damping=0.0, label='newton', gravity=(0, 0.0, 0)),
         VTKRecorder(fileName='spheres/3d-vtk-', recorders=['all'], parallelMode=True, iterPeriod=1000)
 ]
-collider.verletDist = 0.0001
+collider.verletDist = 0.0075
 mp.YADE_TIMING = False
 mp.FLUID_COUPLING = True
 mp.VERBOSE_OUTPUT = False
@@ -86,11 +93,11 @@ mp.USE_CPP_INTERS = True
 mp.ERASE_REMOTE_MASTER = True
 mp.REALLOC_FREQUENCY = 0
 mp.fluidBodies = sphereIDs
-mp.commSplit = True
+#mp.commSplit = True
 mp.DOMAIN_DECOMPOSITION = True
 mp.mpirun(NSTEPS)
 mp.mprint("RUN FINISH")
-fluidCoupling.killMPI()
+#fluidCoupling.killMPI()
 exit()
 #mp.mergeScene()
 #if mp.rank == 0: O.save('mergedScene.yade')
