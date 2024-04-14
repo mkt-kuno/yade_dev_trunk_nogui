@@ -12,7 +12,7 @@ elif [ -f "/usr/lib/openfoam/openfoam2312/etc/bashrc" ]; then
     git clone -b supportOFoam1906 https://gitlab.com/yade-dev/Yade-OpenFOAM-coupling.git
 else #assume OFOAM6, use older coupling code
     bashrcPath=/root/OpenFOAM/OpenFOAM-6/etc/bashrc
-    git clone https://github.com/dpkn31/Yade-OpenFOAM-coupling.git
+    git clone -b supportOFoam1906 https://gitlab.com/yade-dev/Yade-OpenFOAM-coupling.git
 fi
 
 source $bashrcPath
