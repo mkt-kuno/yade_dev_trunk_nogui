@@ -8,6 +8,7 @@
 #pragma GCC diagnostic ignored "-Wsuggest-override"
 #pragma GCC diagnostic ignored "-Wcast-function-type"
 #include <mpi.h>
+#include <cstdlib>
 #pragma GCC diagnostic pop
 
 #include <pkg/common/Box.hpp>
@@ -670,6 +671,22 @@ void FoamCoupling::killMPI() {
 	castTerminate(); 
 	if (serialYade) MPI_Finalize();
 }
+
+void FoamCoupling::checkFoamVersion() {
+			const char* wmProjectDir = std::getenv("WM_PROJECT_DIR");
+			if (wmProjectDir != nullptr) {
+				foamPath = std::string(wmProjectDir);
+				string version(std::getenv("WM_PROJECT_VERSION"));
+				if (!version.empty() && version.front() == 'v') //remove the leading 'v'
+						version.erase(0, 1);
+				foamVersion = std::stoi(version);
+				std::cout<<"OFOAM v"<<foamVersion<<" in path"<< wmProjectDir <<std::endl;
+			} else {
+				// If WM_PROJECT_DIR was not found, print a message indicating this
+				std::cout << "WM_PROJECT_DIR environment variable not found." << std::endl;
+			}
+		}
+
 } // namespace yade
 
 #endif

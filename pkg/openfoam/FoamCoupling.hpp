@@ -127,7 +127,8 @@ class FoamCoupling : public GlobalEngine {
 		void buildSharedIdsMap(); 
 		int ifSharedIdMap(const Body::id_t& ); 
 		//bool couplingModeParallel = false; 
-		bool initDone = false; 
+		bool initDone = false;
+		void checkFoamVersion();
       
     YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(FoamCoupling,GlobalEngine, "An engine for coupling Yade with the finite volume fluid solver OpenFOAM in parallel." " \n Requirements : Yade compiled with MPI libs, OpenFOAM-6 (openfoam is not required for compilation)." "Yade is executed under MPI environment with OpenFOAM simultaneously, and using MPI communication  routines data is exchanged between the solvers."
    " \n \n 1. Yade broadcasts the particle data -> position, velocity, ang-velocity, radius to all the foam processes as in :yref:`castParticle <FoamCoupling::castParticle>` \n"
@@ -136,13 +137,15 @@ class FoamCoupling : public GlobalEngine {
   "In the case of Gaussian interpolation, contribution from every  process is summed using function :yref:`sumHydroForce <FoamCoupling::sumHydroForce>`. \n"
   "4. The interval (substepping) is set automatically (:yref:`FoamCoupling::dataExchangeInterval`) based on dtfoam/dtYade, calculated in function :yref:`exchangeDeltaT<FoamCoupling::exchangeDeltaT>`  ", 
     ((int,numParticles,1, , "number of particles in coupling."))
+	((int,foamVersion,-1,,"version of OpenFoam environment"))
+	((string,foamPath,"",,"path to OpenFoam"))
     ((double,particleDensity,1, , "particle Density")) //not needed  as this is set in foam  
     ((double,fluidDensity,1, ,"fluidDensity")) //not needed  as this is set in foam  
 //    ((bool,couplingModeParallel,false, ,"set true if Yade-MPI is being used. ")) 
-    ((std::vector<Body::id_t>,fluidDomains, std::vector<Body::id_t>(),,"list of fluid domain bounding fictitious fluid bodies that has the fluid mesh bounds")) 
+    ((std::vector<Body::id_t>,fluidDomains, std::vector<Body::id_t>(),,"list of fluid domain bounding fictitious fluid bodies that has the fluid mesh bounds"))
     ,
     ,
-
+    checkFoamVersion();
     ,
     //.add_property("couplingModeParallel",&FoamCoupling::setCouplingMode,&FoamCoupling::getCouplingMode,"coupling mode : if true, parllel coupling between Yade & YALES2") 
 //     .def("")
