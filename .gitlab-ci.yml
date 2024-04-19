@@ -350,7 +350,9 @@ test_22_foam2212:
     - export OMPI_MCA_btl_vader_single_copy_mechanism=none
     - pwd
     - apt-get update && apt-get install -y openfoam2212-default
+    - ls /usr/lib/openfoam/
     - source /usr/lib/openfoam/openfoam2212/etc/bashrc
+    - ls /usr/lib/openfoam/
     - scripts/checks-and-tests/testOpenFoam.sh
 
 test_22_foam2112:
@@ -369,7 +371,9 @@ test_22_foam2112:
     - export OMPI_MCA_btl_vader_single_copy_mechanism=none
     - pwd
     - apt-get update && apt-get install -y openfoam2112-default
+    - ls /usr/lib/openfoam/
     - source /usr/lib/openfoam/openfoam2112/etc/bashrc
+    - ls /usr/lib/openfoam/
     - scripts/checks-and-tests/testOpenFoam.sh
 
 
