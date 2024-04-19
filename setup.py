@@ -84,4 +84,14 @@ else :
     os.system('wclean')
     os.chdir(rootDir + '/Solvers/pimpleFoamYade')
 
+if isVersion2312 or not (currentFoamVersion in supportedFoamVersions): # for unsupported versions, try 2312 code
+    print("Compiling pimpleFoamYade solver")
+    os.chdir(rootDir + '/Solvers/pimpleFoamYadev2312')
+    os.system('wclean')
+    os.system('wmake')
+else :
+    print("Compiling pimpleFoamYade solver")
+    os.system('wclean')
+    os.chdir(rootDir + '/Solvers/pimpleFoamYade')
+
     
