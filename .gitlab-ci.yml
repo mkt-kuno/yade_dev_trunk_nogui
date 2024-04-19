@@ -331,8 +331,7 @@ test_22_foam2306:
     - export OMPI_MCA_btl_vader_single_copy_mechanism=none
     - pwd
     - apt-get update && apt-get install -y openfoam2306-default
-    - source /usr/lib/openfoam/openfoam2306/etc/bashrc
-    - scripts/checks-and-tests/testOpenFoam.sh
+    - source /usr/lib/openfoam/openfoam2306/etc/bashrc && scripts/checks-and-tests/testOpenFoam.sh
 
 test_22_foam2212:
   <<: *platforms_definition
@@ -366,15 +365,18 @@ test_22_foam2112:
     - make_22_04
   needs: ["make_22_04"]
   timeout: 25 minutes
+  before_script:
+    - export NO_GUI="NO_GUI"
+    - apt-get update && apt-get install -y openfoam2112-default
+    - source /usr/lib/openfoam/openfoam2112/etc/bashrc
   script:
     - export PYTHONUNBUFFERED=1
     - cat /etc/os-release
     - export OMPI_MCA_btl_vader_single_copy_mechanism=none
     - pwd
-    - apt-get update && apt-get install -y openfoam2112-default
-    - ls /usr/lib/openfoam/
-    - source /usr/lib/openfoam/openfoam2112/etc/bashrc
-    - ls /usr/lib/openfoam/
+    #- ls /usr/lib/openfoam/
+    #- source /usr/lib/openfoam/openfoam2112/etc/bashrc
+    #- ls /usr/lib/openfoam/
     - scripts/checks-and-tests/testOpenFoam.sh
 
 
