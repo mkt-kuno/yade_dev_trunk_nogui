@@ -22,9 +22,9 @@ if (currentFoamVersion == ''):
     print("Could not detect OpenFOAM version, have you sourced bashrc from $FOAM_SRC/etc/bashrc ?")
     exit() 
 
-if not currentFoamVersion in supportedFoamVersions: 
-    print("Error : The OpenFOAM version", currentFoamVersion, " is not supported")
-    exit() 
+#if not currentFoamVersion in supportedFoamVersions:
+    #print("Error : The OpenFOAM version", currentFoamVersion, " is not supported")
+    #exit()
 
 # check if we are dealing with the foundation or the .com version of OpenFOAM. For .com versions, $WM_PROJECT_DIR 
 # returns a string starting with 'v' followd by the year and month of release. For the foundation versions, the 
