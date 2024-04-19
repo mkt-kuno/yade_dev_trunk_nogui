@@ -41,7 +41,7 @@ fi
 
 mpirun --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py
 
-cd ../trunk/examples/openfoam/example_pimpleFoamYade
+cd ../example_pimpleFoamYade
 echo `pwd`
 blockMesh
 decomposePar
