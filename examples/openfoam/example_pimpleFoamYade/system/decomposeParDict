@@ -15,7 +15,7 @@ method          scotch;
 strategies
 {
   
-  optional
+  optional;
 
 }
 
