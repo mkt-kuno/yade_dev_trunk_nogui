@@ -380,7 +380,7 @@ test_22_foam2006:
   <<: *gitlab_runner_retry_definition
   <<: *skip_WIP
   stage: test
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam2006
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam2312
   dependencies:
     - make_22_04
   needs: ["make_22_04"]
