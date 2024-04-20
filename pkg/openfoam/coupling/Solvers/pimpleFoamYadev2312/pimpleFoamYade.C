@@ -33,9 +33,9 @@ Description
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "PhaseIncompressibleTurbulenceModel.H"
+#include "DPMIncompressibleTurbulenceModel.H"
 #include "pimpleControl.H"
-#include "FoamYade.H"
+#include "../../FoamYade/FoamYade.H"
 
 int main(int argc, char *argv[])
 {
@@ -53,7 +53,12 @@ int main(int argc, char *argv[])
     bool gaussianInterp = true;
     FoamYade yadeCoupling(mesh,Uc, gradP, vGrad, divT,ddtU_f,g,uSourceDrag,alphac, uSource, uParticle, uCoeff,uInterp, gaussianInterp);
     yadeCoupling.setScalarProperties(partDensity.value(), rhocValue.value(), nuValue.value());
-
+    
+    // A shear flow initialization, uncomment for testing. 
+    // forAll(Uc, cellI) 
+    // {
+    //   Uc[cellI].x() = (0.4*mesh.C()[cellI].y()) - 0.2; 
+    // }
 
     Info<< "\nStarting time loop\n" << endl;
 
@@ -70,7 +75,7 @@ int main(int argc, char *argv[])
         continuousPhaseTransport.correct();
         muc = rhoc*continuousPhaseTransport.nu();
 
-	ddtU_f = fvc::ddt(Uc)+fvc::div(phic, Uc);
+	    ddtU_f = fvc::ddt(Uc)+fvc::div(phic, Uc);
         gradP = fvc::grad(p);
         divT = 2*nuValue.value()*fvc::laplacian(alphac, Uc);
         vGrad = fvc::grad(Uc);
@@ -82,10 +87,10 @@ int main(int argc, char *argv[])
         // Update continuous phase volume fraction field
         alphac.correctBoundaryConditions();
         alphacf = fvc::interpolate(alphac);
-	alphaPhic = alphacf*phic;
-	
-	uSource.correctBoundaryConditions(); 
-	uSourceDrag.correctBoundaryConditions(); 
+        alphaPhic = alphacf * phic;
+        
+        uSource.correctBoundaryConditions(); 
+        uSourceDrag.correctBoundaryConditions(); 
 
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
@@ -106,7 +111,7 @@ int main(int argc, char *argv[])
 
         runTime.write();
 	
-	yadeCoupling.setSourceZero(); 
+	    yadeCoupling.setSourceZero(); 
 	
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

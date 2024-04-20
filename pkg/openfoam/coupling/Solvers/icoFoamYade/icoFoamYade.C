@@ -31,7 +31,7 @@ Description
 
 #include "fvCFD.H"
 #include "pisoControl.H"
-#include "FoamYade.H"
+#include "../../FoamYade/FoamYade.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
