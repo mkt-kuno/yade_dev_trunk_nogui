@@ -7,6 +7,7 @@
 #include <memory> 
 #include <algorithm> 
 #include <functional> 
+#include <map>
 
 #include "fvCFD.H" 
 #include "meshTree.H" 
