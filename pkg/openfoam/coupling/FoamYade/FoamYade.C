@@ -21,20 +21,6 @@ void Foam::FoamYade::InitializeCoupling(){
 		std::cout << "FOAM: Starting intialization " << std::endl; 
 		// get local rank and size 
 
-#if FOUNDATION// OFOAM6
-		MPI_Comm_rank(PstreamGlobals::MPI_COMM_FOAM, &localRank); 
-		MPI_Comm_size(PstreamGlobals::MPI_COMM_FOAM, &localCommSize);
-		MPI_Comm subParentComm; 
-		// get the unsplit comm.
-		MPI_Comm_get_parent(&subParentComm);
-		// the spawner comm. (not very sure about this...)
-		MPI_Comm_get_parent(&parentComm);
-		std::cout << "FOAM: Parent communicator set." << std::endl;
-		MPI_Intercomm_merge(parentComm, 1, &interComm);
-		std::cout << "FOAM: intracommunicator has been made" << std::endl;
-		// world comm (intra communicator size) // or just get the remote size?
-		MPI_Comm_size(interComm, &worldCommSize);
-#else	// OFOAM1906
 		MPI_Comm_rank(PstreamGlobals::MPICommunicators_[0], &localRank);
 		MPI_Comm_size(PstreamGlobals::MPICommunicators_[0], &localCommSize);
 
@@ -45,7 +31,7 @@ void Foam::FoamYade::InitializeCoupling(){
 		std::cout << "FOAM: intracommunicator has been made" << std::endl;
 		// world comm (intra communicator size) // or just get the remote size?
 		MPI_Comm_size(interComm, &worldCommSize);
-#endif
+
 		// diff in comm size 
 		commSzDff = abs(worldCommSize - localCommSize);
 		couplingIsInitialized = true; 
@@ -654,11 +640,8 @@ void Foam::FoamYade::exchangeDT(){
 			MPI_Recv(&yadeDT, 1, MPI_DOUBLE, 0, TAG_YADE_DT, interComm, &status);  
 		}
 		// broadcast recvd yadeDt from localRank = 0. 
-#ifdef FOUNDATION
-		MPI_Bcast(&yadeDT,1, MPI_DOUBLE, 0, PstreamGlobals::MPI_COMM_FOAM); 
-#else	// assume OFOAM1906
+
 		MPI_Bcast(&yadeDT,1, MPI_DOUBLE, 0, PstreamGlobals::MPICommunicators_[0]);
-#endif
 	} else {
 		MPI_Bcast(&yadeDT,1, MPI_DOUBLE, 0, interComm); 
 	}
