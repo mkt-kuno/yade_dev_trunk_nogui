@@ -55,10 +55,10 @@ int main(int argc, char *argv[])
     yadeCoupling.setScalarProperties(partDensity.value(), rhocValue.value(), nuValue.value());
     
     // A shear flow initialization, uncomment for testing. 
-    // forAll(Uc, cellI) 
-    // {
-    //   Uc[cellI].x() = (0.4*mesh.C()[cellI].y()) - 0.2; 
-    // }
+    forAll(Uc, cellI) 
+    {
+      Uc[cellI].x() = (0.4*mesh.C()[cellI].y()) - 0.2; 
+    }
 
     Info<< "\nStarting time loop\n" << endl;
 
