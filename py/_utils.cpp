@@ -817,9 +817,9 @@ try {
 	         py::args("nCell"),
 	         py::args("dz"),
 	         py::args("zRef"),
-	         py::args("activateCond"),
-	         py::args("radiusPy"),
-	         py::args("direction")),
+	         py::args("activateCond")=false,
+	         py::args("radiusPy")=0,
+	         py::args("direction")=2),
 	        "Compute and return the particle velocity and solid volume fraction (porosity) depth profile along the direction specified (default is z; "
 	        "0=>x,1=>y,2=>z). For each defined cell z, the k component of the average particle velocity reads: \n\n $<v_k>^z= \\sum_p V^p v_k^p/\\sum_p "
 	        "V^p$,\n\nwhere the sum is made over the particles contained in the cell, $v_k^p$ is the k component of the velocity associated to particle p, "
@@ -832,8 +832,43 @@ try {
 	        "activateCond is set to true, do the average only on particles of radius equal to radiusPy (input parameter)");
 	py::def("getDepthProfiles_center",
 	        Shop::getDepthProfiles_center,
-	        (py::args("volume"), py::args("nCell"), py::args("dz"), py::args("zRef"), py::args("activateCond"), py::args("radiusPy")),
+	        (py::args("volume"), py::args("nCell"), py::args("dz"), py::args("zRef"), py::args("activateCond")=false, py::args("radiusPy")=0),
 	        "Same as getDepthProfiles but taking into account particles as points located at the particle center.");
+	py::def("getSlicedProfiles",
+		Shop::getSlicedProfiles,
+		(py::args("vCell"),
+			py::args("nCell"),
+			py::args("dP"),
+			py::args("sliceCenters"),
+			py::args("sliceWidths"),
+			py::args("refP"),
+			py::args("refS"),
+			py::args("dirP")=2,
+			py::args("dirS")=1,
+			py::args("activateCond")=false,
+			py::args("radiusPy")=0,
+			py::args("nSimpson")=50),
+		"Compute and return the particle solid volume fraction (porosity) and velocity profiles along a specific direction dirP and for a given subdomain. "
+		"In the direction dirP, the subdomain is divided into nCell of size dP. For each cell, the averaged solid volume fraction reads: "
+		"\n\n$<\\phi>= \\frac{1}{V_{cell}}\\sum_p V^p$\n\n and the averaged particle velocity reads: \n\n $<v_k>= \\sum_p V^p v_k^p/\\sum_p V^p$,\n\n "
+		"where the sum is made over the particles p contained in the cell, $v_k^p$ is the k component of the velocity associated to particle p, $V^p$ is "
+		"the part of the volume of the particle p contained inside the cell, and $V_{cell}$ is the volume of the cell (all subdomain slices combined). "
+		"The volume of the sliced particle $V^p$ is computed analytically when the particle is not sliced by the subdomain boundaries. Otherwise, "
+		"$V^p$ is computed using a Simpson integration of the sliced area of the sliced sphere.\n"
+		"This function allows to define a discontinuous subdomain made of different slices in direction dirS. This can be useful to exclude specific zones "
+		"from the averaging procedure or to target similar zones like symmetric boundaries.\n\n"
+		"Arguments are:\n"
+		"vCell : volume of a cell, all slices combined. (e.g. dP*length*(slicewidth1+slicewidth2))\n"
+		"nCell : number of cells in the profile direction\n"
+		"dP : discretisation interval in the Profile direction,\n"
+		"sliceCenters : array containing the position of the center of each slice from refS in the S direction,\n"
+		"sliceWidths : array containing the width of each slice,\n"
+		"refP : reference position in the Profile direction,\n"
+		"refS : reference position in the slice direction,\n"
+		"dirP : direction of the profile (0:x, 1:y, 2:z), (default:2),\n"
+		"dirS : direction of the slices (0:x, 1:y, 2:z), must be different from dirP, (default:1),\n"
+		"activateCond : if true, will only consider particle of radius equal radiusPy, (default:false),\n"
+		"nSimpson : number of intervals per particle radius for the Simpson integration, (default:50),\n");  
 	py::def("getCapillaryStress",
 	        Shop::getCapillaryStress,
 	        (py::args("volume") = 0, py::args("mindlin") = false),

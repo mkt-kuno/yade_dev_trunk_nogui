@@ -782,6 +782,150 @@ py::tuple Shop::getDepthProfiles_center(Real vCell, int nCell, Real dz, Real zRe
 	return py::make_tuple(phiAverage, velAverageX, velAverageY, velAverageZ);
 }
 
+// Function which calculates the area of a section of sphere
+// where z is the position of the section relative to the center of the sphere,
+// R is the radius of the sphere, infS and supS are the boundaries of the slices
+// relative to the center of the sphere (slices are orthogonal to the section).
+Real Shop::getSphereSection(Real z, Real R, Real infS, Real supS)
+{
+	if (z >= R || z <= -R) return 0.0;
+	Real a = sqrt(pow(R,2) - pow(z,2));
+	if (infS > a || infS < -a){
+		if (infS >= 0.0) 
+			infS = a;
+		else 
+			infS = -a;
+	}
+	if (supS > a || supS < -a){
+		if (supS >= 0.0) 
+			supS = a;
+		else 
+			supS = -a;
+	}
+	return (pow(a,2) * (Mathr::PI - acos(-infS/a) - acos(supS/a))
+			- infS * sqrt(pow(a,2) - pow(infS,2))
+			+ supS * sqrt(pow(a,2) - pow(supS,2)));
+}
+
+// Same as getDepthProfile, but allows to specify the slices on which to average.
+// Unlike getDepthProfiles which returns all velocity components separately, getSlicedprofiles returns 
+// a velocity vector in the same manner as in hydroForceEngine.
+// "P" stands for "Profile" which refers to the direction of discretisation, with nCell number of cells.
+// "S" stands for "Slices" which are the subdomains in which we average the quantities.
+py::tuple Shop::getSlicedProfiles(
+        Real         vCell,
+        int          nCell,
+        Real         dP,
+        vector<Real> sliceCenters,
+        vector<Real> sliceWidths,
+        Real         refP,
+        Real         refS,
+        int          dirP,
+        int          dirS,
+        bool         activateCond,
+        Real         radiusPy,
+        Real         nSimpson)
+{
+	// Initialization and declaration of variables
+	Real             posP;    // particle position in the profile direction
+	Real             posS;    // particle position in the slice direction
+	int              Nmin;    // min layer number containing the particle
+	int              Nmax;    // max layer number containing the particle
+	Real             infP;    // inferior boundary in profile direction (from particle center)
+	Real             supP;    // superior boundary in profile direction (from particle center)
+	Real             infS;    /// inferior boundary in slice direction (from particle center)
+	Real             supS;    // superior boundary in slice direction (from particle center)
+	Real             R;       // Radius of the particle
+	Real             volPart; // computed volume of the slice of sphere
+	int              ndiv;    // number of intervals for the Simpson integration
+	Real             delta;   // size of the interval for the Simpson integration
+	vector<Vector3r> velAverage(nCell, Vector3r::Zero());
+	vector<Real>     phiAverage(nCell, 0.0);
+
+	//  Check for incorrect dirP or dirS
+	if (dirP == dirS) {
+		throw std::invalid_argument("dirP must not be equal to dirS");
+	}
+	if (dirP < 0 || dirP > 2 || dirS < 0 || dirS > 2) {
+		throw std::invalid_argument("dirP and dirS must be equal to 0, 1, or 2");
+	}
+	
+	// Loop over the particles
+	for (const auto& b : *Omega::instance().getScene()->bodies) {
+		shared_ptr<Sphere> s = YADE_PTR_DYN_CAST<Sphere>(b->shape);
+		if (!s) continue;
+		
+		// Get particle position and radius
+		posS = b->state->pos[dirS];
+		posP = b->state->pos[dirP];
+		R    = s->radius;
+		
+		// Check if the particle has the correct radius
+		if (activateCond == true && R != radiusPy) continue;
+		
+		// Loop over the different slices
+		for(unsigned n = 0; n < sliceCenters.size(); n++) {
+			// Define slice boundaries (position relative to particle center)
+			infS = refS + sliceCenters[n] - sliceWidths[n]/2 - posS;
+			supS = refS + sliceCenters[n] + sliceWidths[n]/2 - posS;
+			
+			// Check if the particle is in the slice
+			if (infS >= R || supS <= -R) continue;
+			
+			// Define the cells containing the particle:
+			// Cell 0 corresponding to [refP; refP+dP]. 
+			Nmin = int(math::floor((posP - refP - R) / dP));
+			Nmax = int(math::floor((posP - refP + R) / dP));
+
+			// Loop over the cells containing the particle
+			for (int N = Nmin; N <= Nmax; N++) {
+				if (N >= 0 && N < nCell) {  // Stay in the given cells
+					// Calculate cell boundaries (position relative to particle center)
+					infP = refP + N*dP - posP;
+					supP = refP + (N+1)*dP - posP;
+					if (infP < -R) infP = -R;
+					if (supP > R) supP = R;
+
+					if (infS <= -R && supS >= R){  
+						// analytical solution of the volume of a slice of sphere :
+						volPart = (Mathr::PI * pow(R, 2) * (supP - infP 
+								- (pow(supP, 3) - pow(infP, 3)) / (3 * pow(R, 2))));
+					} 
+					else {  
+						// Simpson integration to get the volume of a slice of slice :
+						ndiv = int(math::ceil((supP - infP) / (R / nSimpson)));
+						delta = (supP - infP) / ndiv; // recompute delta to match ndiv
+						volPart = 0;
+						for (int i = 0; i < ndiv; i++) {
+							volPart += (getSphereSection(infP + i*delta, R, infS, supS)
+										+ 4.*getSphereSection(infP + (i+0.5)*delta, R, infS, supS)
+										+ getSphereSection(infP + (i+1)*delta, R, infS, supS));
+						}
+						volPart *= delta / 6;
+					}
+
+					// Accumulate volume-weighted velocity and phi values
+					phiAverage[N] += volPart;
+					velAverage[N] += volPart * b->state->vel;
+				}
+			}
+		}
+	}
+
+	// Normalize the weighted velocity by the volume of particles contained inside the cell
+	for (int N = 0; N < nCell; N++) {
+		if (phiAverage[N] != 0) {
+			velAverage[N] /= phiAverage[N];
+			// Normalize the concentration afterward
+			phiAverage[N] /= vCell;
+		} else {
+			velAverage[N] = Vector3r::Zero();
+		}
+	}
+
+	return py::make_tuple(phiAverage, velAverage);
+}
+
 
 Matrix3r Shop::getCapillaryStress(Real volume, bool mindlin)
 {
