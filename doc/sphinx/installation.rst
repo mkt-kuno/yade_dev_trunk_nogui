@@ -285,7 +285,7 @@ In the above, note the ``cmake -DOPTION1=VALUE1 -DOPTION2=VALUE2`` syntax which 
 	* CMAKE_INSTALL_PREFIX: path where Yade should be installed (/usr/local by default)
 	* CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
 	* CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV, see :ref:`GPUacceleration` (OFF by default)
-	* DEBUG: compile in debug-mode (OFF by default)
+	* DEBUG: compile in debug-mode, enabling a more convenient debugging or profiling by the user and leading to a much (1 or 2 orders of magnitude) slower executable (OFF by default)
 	* DISABLE_ALL: for switching off all available boolean options, before possibly enabling explicitely just some of them, e.g. ``cmake -DDISABLE_ALL=ON -DENABLE_VTK=ON`` (OFF by default)
 	* DISABLE_PKGS: comma-separated list of disabled packages i.e. names of source subdirectories under `pkg`, `preprocessing` or `postprocessing`, e.g. ``cmake -DDISABLE_PKGS=fem,pfv,image``. If empty all packages will be built. The packages `common` and `dem` are required to run, but the project can be compiled without them. (EMPTY by default)
 	* ENABLE_ASAN: AddressSanitizer allows detection of memory errors, memory leaks, heap corruption errors and out-of-bounds accesses but it is slow (OFF by default)

@@ -103,7 +103,7 @@ Integrated Development Environment and other tools
 ---------------------------------------------------
 A frequently used IDE is Kdevelop. We recommend using this software for navigating 
 in the sources, compiling and debugging. Other useful tools for debugging and 
-profiling are Valgrind and KCachegrind. A series of wiki pages is dedicated to 
+profiling are `Valgrind <https://valgrind.org/>`__ and `KCachegrind <https://kcachegrind.github.io/html/Home.html>`__. A series of wiki pages is dedicated to 
 these tools in the `development section <https://yade-dem.org/wiki/Yade#Development>`__ of the wiki.
 
 Hosting and versioning
