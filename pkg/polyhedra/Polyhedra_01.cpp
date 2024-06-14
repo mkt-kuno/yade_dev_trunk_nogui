@@ -97,7 +97,7 @@ void Polyhedra::Initialize()
 
 	//compute centroid and volume
 	P_volume_centroid(P, &volume, &centroid);
-	//check vierd behavior of CGAL in tessalation
+	//check wierd behavior of CGAL in tessalation.
 	if (isRandom && volume * 1.75 < 4. / 3. * 3.14 * size[0] / 2. * size[1] / 2. * size[2] / 2.) {
 		v.clear();
 		seed = rand();
