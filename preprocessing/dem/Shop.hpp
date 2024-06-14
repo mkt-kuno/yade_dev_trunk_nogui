@@ -140,8 +140,14 @@ public:
 	static py::tuple getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef, bool activateCond = false, Real radiusPy = 0, int direction = 2);
 	//! Same, but taking into account point particles
 	static py::tuple getDepthProfiles_center(Real vCell, int nCell, Real dz, Real zRef, bool activateCond = false, Real radiusPy = 0);
-
-
+	// Same as getDepthProfile, but allows to specify the slices on which to average
+	static py::tuple getSlicedProfiles(Real vCell, int nCell, Real dP, vector<Real> sliceCenters, vector<Real> sliceWidths,  
+									Real refP, Real refS, int dirP=2, int dirS=1, 
+									bool activateCond=false, Real radiusPy=0, Real nSimpson=50);
+	
+	// Get section area of a sliced sphere
+	static Real getSphereSection(Real z, Real R, Real infS, Real supS);
+	
 	//! Compute overall ("macroscopic") stress of periodic cell, returning 2 tensors
 	//! (contribution of normal and shear forces)
 	static py::tuple normalShearStressTensors(bool compressionPositive = false, bool splitNormalTensor = false, Real thresholdForce = NaN);
