@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
+r"""
 Sphinx directive to support embedded IPython code.
 
 This directive allows pasting of entire interactive IPython sessions, prompts
@@ -976,8 +976,8 @@ def setup(app):
 
 	app.add_directive('ipython', IPythonDirective)
 	app.add_config_value('ipython_savefig_dir', None, 'env')
-	app.add_config_value('ipython_rgxin', re.compile('In \[(\d+)\]:\s?(.*)\s*'), 'env')
-	app.add_config_value('ipython_rgxout', re.compile('Out\[(\d+)\]:\s?(.*)\s*'), 'env')
+	app.add_config_value('ipython_rgxin', re.compile(r'In \[(\d+)\]:\s?(.*)\s*'), 'env')
+	app.add_config_value('ipython_rgxout', re.compile(r'Out\[(\d+)\]:\s?(.*)\s*'), 'env')
 	app.add_config_value('ipython_promptin', 'In [%d]:', 'env')
 	app.add_config_value('ipython_promptout', 'Out[%d]:', 'env')
 

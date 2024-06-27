@@ -43,7 +43,7 @@ class TestUtils(unittest.TestCase):
 		O.dynDt = False
 		O.step()
 		i = utils.createInteraction(0, 1)
-		self.assert_(i.iterBorn == 1 and i.iterMadeReal == 1)
+		self.assertTrue(i.iterBorn == 1 and i.iterMadeReal == 1)
 		j = utils.createInteraction(0, 2)
-		self.assert_(j.iterBorn == 1 and j.iterMadeReal == 1)
+		self.assertTrue(j.iterBorn == 1 and j.iterMadeReal == 1)
 		self.assertRaises(RuntimeError, lambda: utils.createInteraction(0, 3))

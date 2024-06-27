@@ -1,9 +1,9 @@
 """
 This example illustrates the use of the function `getSlicedProfiles` to get average
-profiles of particle volume fraction and particle velocity over a given time and along 
+profiles of particle volume fraction and particle velocity over a given time and along
 a specified axis.
 
-The configuration of this example is a gravity-driven dry mono-disperse granular 
+The configuration of this example is a gravity-driven dry mono-disperse granular
 flow in a flume (inclined plane with side walls).
 
 Three examples of profiles are given :
@@ -230,7 +230,7 @@ def saveProfiles():
 		axs[0].plot(phiPart2, zAxis, label="Example 2 : at the walls")
 		axs[1].plot(vxPart1, zAxis, label="Example 1 : at the center")
 		axs[1].plot(vxPart2, zAxis, label="Example 2 : at the walls")
-		axs[0].set_xlabel("$\phi$ [-]")
+		axs[0].set_xlabel(r"$\phi$ [-]")
 		axs[1].set_xlabel("$v_x$ [m/s]")
 		axs[0].set_ylabel("$z$ [diameters]")
 		axs[1].legend()
@@ -241,7 +241,7 @@ def saveProfiles():
 		fig.suptitle("y cross profiles (Example 3)")
 		axs[0].plot(phiPart3, yAxis)
 		axs[1].plot(vxPart3, yAxis)
-		axs[0].set_xlabel("$\phi$ [-]")
+		axs[0].set_xlabel(r"$\phi$ [-]")
 		axs[1].set_xlabel("$v_x$ [m/s]")
 		axs[0].set_ylabel("$y$ [diameters]")
 		fig.show()

@@ -89,7 +89,7 @@ class PythonConsoleSocketEmulator(socketserver.BaseRequestHandler):
 			self.server.authenticated += [self.client_address]
 			self.request.send(
 			        (
-			                """__   __    ____                 __  _____ ____ ____  
+			                r"""__   __    ____                 __  _____ ____ ____  
 \ \ / /_ _|  _ \  ___    ___   / / |_   _/ ___|  _ \ 
  \ V / _` | | | |/ _ \  / _ \ / /    | || |   | |_) |
   | | (_| | |_| |  __/ | (_) / /     | || |___|  __/ 

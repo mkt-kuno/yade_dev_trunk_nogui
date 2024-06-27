@@ -27,7 +27,7 @@ localVars = ['TEMPLATE', 'SUBDIRS', 'HEADERS', 'SOURCES', 'FORMS', 'LEXSOURCES',
 undefOK = ['CXXPATH', 'CXX', 'CXXFLAGS', 'INCPATH', 'IDL_COMPILER']
 # internal qmake variables that may be replace with the environment ones without warning
 replaceOK = ['YADECOMPILATIONPATH']
-discardedStatements = ['^isEmpty\s*\(\s*YADE_QMAKE_PATH\s*\).*$']
+discardedStatements = [r'^isEmpty\s*\(\s*YADE_QMAKE_PATH\s*\).*$']
 #discardedStatements=[]
 
 targetLangType = {'yade-lib-serialization-qt': 'qt3', 'QtGUI': 'qt3'}
@@ -63,7 +63,7 @@ def splitgroup(s, delims=' '):
 
 
 def parseProject(proFile, inheritedVariables={}):
-	"""Returns dictionary of variables defined in this qmake project, replacing variables, that may propagate from parent project.
+	r"""Returns dictionary of variables defined in this qmake project, replacing variables, that may propagate from parent project.
 	No functions, only a few conditionals are expanded.
 	
 	An important 'parser' difference is that qmake obviously allows \\ continuation _after_ #.

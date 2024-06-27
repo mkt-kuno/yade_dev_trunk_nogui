@@ -21,9 +21,9 @@ prompts ``Yade [1]:`` and ``-> [1]:``::
  id.fmtout=' ->  [%d]:'
 
  id.rc_override=dict(
-   prompt_in1="Yade [\#]:",
-   prompt_in2="     .\D..",
-   prompt_out=" ->  [\#]:"
+   prompt_in1=r"Yade [\#]:",
+   prompt_in2=r"     .\D..",
+   prompt_out=r" ->  [\#]:"
  )
  id.reconfig_shell()
 
@@ -97,7 +97,7 @@ rgxcont = re.compile('   \.+:\s?(.*)\s*')
 rgxout = re.compile('Out\[(\d+)\]:\s?(.*)\s*')
 fmtin = 'In [%d]:'
 fmtout = 'Out[%d]:'
-fmtcont = '   .\D.:'
+fmtcont = r'   .\D.:'
 
 
 #-----------------------------------------------------------------------------
@@ -309,7 +309,7 @@ class EmbeddedSphinxShell(object):
 				if not is_verbatim:
 					self.process_input_line(line)
 
-				formatted_line = fmtcont.replace('\D', '.' * len(str(lineno))) + line  #'%s %s'%(continuation, line)
+				formatted_line = fmtcont.replace(r'\D', '.' * len(str(lineno))) + line  #'%s %s'%(continuation, line)
 
 			if not is_suppress:
 				ret.append(formatted_line)

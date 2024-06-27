@@ -60,7 +60,7 @@ class TestPBC(unittest.TestCase):
 	def testSetBox(self):
 		"PBC: setBox modifies hSize correctly"
 		O.cell.setBox(2.55, 11, 45)
-		self.assert_(O.cell.hSize == Matrix3(2.55, 0, 0, 0, 11, 0, 0, 0, 45))
+		self.assertTrue(O.cell.hSize == Matrix3(2.55, 0, 0, 0, 11, 0, 0, 0, 45))
 
 	def testHomotheticResizeVel(self):
 		"PBC: homothetic cell deformation adjusts particle velocity "

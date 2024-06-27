@@ -52,7 +52,7 @@ def yaderef_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
 	id = rawtext.split(':', 2)[2][1:-1]
 	txt = id
 	explicitText = False
-	m = re.match('(.*)\s*<(.*)>\s*', id)
+	m = re.match(r'(.*)\s*<(.*)>\s*', id)
 	if m:
 		explicitText = True
 		txt, id = m.group(1), m.group(2)
@@ -78,7 +78,7 @@ def yadesrc_role(role, rawtext, lineno, inliner, options={}, content=[]):
 		# unfortunately sphinx ignores this one
 		#raise RuntimeError(":ysrc: error, doc/sphinx/conf.py")
 		sys.exit(1)
-	m = re.match('(.*)\s*<(.*)>\s*', id)
+	m = re.match(r'(.*)\s*<(.*)>\s*', id)
 	if m:
 		txt, id = m.group(1), m.group(2)
 	return [nodes.reference(rawtext, docutils.utils.unescape(txt),
@@ -89,7 +89,7 @@ def yadesrccommit_role(role, rawtext, lineno, inliner, options={}, content=[]):
 	"Handle the :ysrccommit:`` role, making hyperlink to git repository webpage with that path. Supports :ysrc:`Link text<commithash/file/name>` syntax, like usual hyperlinking roles. If target ends with ``/``, it is assumed to be a directory."
 	id = rawtext.split(':', 2)[2][1:-1]
 	txt = id
-	m = re.match('(.*)\s*<(.*)>\s*', id)
+	m = re.match(r'(.*)\s*<(.*)>\s*', id)
 	if m:
 		txt, id = m.group(1), m.group(2)
 	return [nodes.reference(rawtext, docutils.utils.unescape(txt),
@@ -200,9 +200,9 @@ def customExclude(app, what, name, obj, skip, options):
 		return True
 	#escape crash on non iterable __doc__ in some qt object
 	try:
-		iterableTest = isinstance(obj.__doc__, collections.Iterable) # before some Python version
+		iterableTest = isinstance(obj.__doc__, collections.Iterable)  # before some Python version
 	except AttributeError:
-		iterableTest = isinstance(obj.__doc__, collections.abc.Iterable) # after some Python version (3.3 minimum)
+		iterableTest = isinstance(obj.__doc__, collections.abc.Iterable)  # after some Python version (3.3 minimum)
 	if hasattr(obj, '__doc__') and obj.__doc__ and not iterableTest:
 		return True
 	if hasattr(obj, '__doc__') and obj.__doc__ and ('|ydeprecated|' in obj.__doc__ or '|yhidden|' in obj.__doc__):
@@ -482,15 +482,15 @@ if 1:
 	id.rgxcont = re.compile(r'(?:   +)\.\.+:\s?(.*)\s*')
 	id.fmtin = 'Yade [%d]:'
 	id.fmtout = ' ->  [%d]: '  # for some reason, out and cont must have the trailing space
-	id.fmtcont = '     .\D.: '
-	id.rc_override = dict(prompt_in1="Yade [\#]:", prompt_in2="     .\D.:", prompt_out=r" ->  [\#]: ")
+	id.fmtcont = r'     .\D.: '
+	id.rc_override = dict(prompt_in1=r"Yade [\#]:", prompt_in2=r"     .\D.:", prompt_out=r" ->  [\#]: ")
 	if yade.runtime.ipython_version < 12:
 		id.reconfig_shell()
 
 	import ipython_console_highlighting as ich
-	ich.IPythonConsoleLexer.input_prompt = re.compile("(Yade \[[0-9]+\]: )")
-	ich.IPythonConsoleLexer.output_prompt = re.compile("(( ->  |Out)|\[[0-9]+\]: )")
-	ich.IPythonConsoleLexer.continue_prompt = re.compile("\s+\.\.\.+:")
+	ich.IPythonConsoleLexer.input_prompt = re.compile(r"(Yade \[[0-9]+\]: )")
+	ich.IPythonConsoleLexer.output_prompt = re.compile(r"(( ->  |Out)|\[[0-9]+\]: )")
+	ich.IPythonConsoleLexer.continue_prompt = re.compile(r"\s+\.\.\.+:")
 
 extensions = [
         'sphinx.ext.autodoc',
@@ -577,7 +577,7 @@ my_latex_preamble = r'''
 \let\sig\sigma
 \let\eps\epsilon
 
-% variables at different points of time 
+% variables at different points of time
 \def\prev#1{#1^-}
 \def\pprev#1{#1^\ominus}
 \def\curr#1{#1^{\circ}}
@@ -703,9 +703,9 @@ html_theme = 'default'
 # documentation.
 html_theme_options = {'stickysidebar': 'true', 'collapsiblesidebar': 'true', 'rightsidebar': 'false'}
 
-if (yade.libVersions.getVersion('sphinx') >= (1,7,0)):
-    # 1.7 version set an inconvenient upper-limit to page width, unset it
-    html_theme_options['body_max_width']='none'
+if (yade.libVersions.getVersion('sphinx') >= (1, 7, 0)):
+	# 1.7 version set an inconvenient upper-limit to page width, unset it
+	html_theme_options['body_max_width'] = 'none'
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []

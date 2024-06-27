@@ -85,9 +85,9 @@ plot.labels = {
         'normal_Work': 'Normal work: W=kx^2/2',
         'shear_Work': 'Shear work: W=kx^2/2',
         'E_kin_translation': 'Translation energy: E_kin=m*V^2/2',
-        'E_kin_rotation': 'Rotation energy: E_kin=I*$\omega$^2/2',
+        'E_kin_rotation': r'Rotation energy: E_kin=I*$\omega$^2/2',
         'E_pot': 'Gravitational potential: E_pot=m*g*h',
-        'E_plastic': 'Plastic dissipation on shearing: E_pl=F*$\Delta$F/k',
+        'E_plastic': r'Plastic dissipation on shearing: E_pl=F*$\Delta$F/k',
         'total': 'total',
         'total_plus_damp': 'total + damping'
 }

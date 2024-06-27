@@ -106,8 +106,8 @@ class pPP:
 	add_b = [0.5, 0.0]
 	# Plot markers
 	markers = [
-	        "$\mathbf{H}$", "$\mathbf{G}$", "$\mathbf{F}$", "$\mathbf{E}$", "$\mathbf{D}$", "$\mathbf{C}$", "$\mathbf{B}$", "$\mathbf{A}$", "d", "*",
-	        r"$\mathbf{\gamma}$", r"$\mathbf{\lambda}$", r"$\mathbf{\delta}$"
+	        r"$\mathbf{H}$", r"$\mathbf{G}$", r"$\mathbf{F}$", r"$\mathbf{E}$", r"$\mathbf{D}$", r"$\mathbf{C}$", r"$\mathbf{B}$", r"$\mathbf{A}$", "d",
+	        "*", r"$\mathbf{\gamma}$", r"$\mathbf{\lambda}$", r"$\mathbf{\delta}$"
 	]
 	# Marker density
 	me = 0.05
