@@ -1,6 +1,5 @@
 # -*- encoding=utf-8 -*-
 
-
 from yade import pack, export, geom, timing, bodiesHandling
 import time, numpy
 

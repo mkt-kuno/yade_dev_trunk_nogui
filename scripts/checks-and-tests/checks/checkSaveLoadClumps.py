@@ -7,7 +7,6 @@
 # Thanks to Bettina Suhr for providing the
 # minimal test script.
 
-
 from yade import pack
 import time
 from tempfile import TemporaryDirectory

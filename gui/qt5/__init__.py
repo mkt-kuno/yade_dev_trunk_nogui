@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-
 import yade.runtime
 if not yade.runtime.hasDisplay:
 	msg = "Connecting to DISPLAY at Yade startup failed, unable to activate the qt5 interface."
@@ -19,7 +18,7 @@ try:
 	from PyQt5 import QtWebKit, QtWebKitWidgets
 except ImportError:
 	from PyQt5 import QtWebEngineWidgets
-	USE_QT_WEB_ENGINE=True
+	USE_QT_WEB_ENGINE = True
 
 from yade.qt.ui_controller import Ui_Controller
 

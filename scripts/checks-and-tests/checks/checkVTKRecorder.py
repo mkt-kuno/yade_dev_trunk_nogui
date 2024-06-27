@@ -111,11 +111,11 @@ if (('VTK' in features) and (not ppc64elLongDouble())):
 			if (t1[0] == '<VTKFile type='):
 				isHeader = True  # various VTK versions have different headers.
 			# Float32 type has smaller precision, so compare the results with fewer digits
-			if(('type="Float32"' in line1) and ('type="Float32"' in line2)):
+			if (('type="Float32"' in line1) and ('type="Float32"' in line2)):
 				isFloat32 = True
 			else:
 				for tt in dataTypes:
-					if(('type="'+tt+'"' in line1) and ('type="'+tt+'"' in line2)):
+					if (('type="' + tt + '"' in line1) and ('type="' + tt + '"' in line2)):
 						isFloat32 = False
 			if ((line1 != line2) and (not isHeader)):  # we have some differences, check if they are acceptable
 				# flatten the list of lists. First they are split by space, then they are split by '"'
@@ -135,7 +135,7 @@ if (('VTK' in features) and (not ppc64elLongDouble())):
 							# there are some numbers like 1.8e-41 vs 1.1e-42 which have ratio of 10, or 1.1e-13 vs 0. This is just noisy zero, so skip them.
 							if ((abs(float(s1)) < 1e-10) and (abs(float(s2)) < 1e-10)):
 								pass
-							elif (abs((float(s1) - float(s2))/float(s1)) > (1e-5 if isFloat32 else 5e-10)):
+							elif (abs((float(s1) - float(s2)) / float(s1)) > (1e-5 if isFloat32 else 5e-10)):
 								raise YadeCheckError(
 								        "checkVTKRecorder failed float comparison in file " + fname + " line: " +
 								        str(lineCount) + " with inputs: '" + str(s1) + "' vs. '" + str(s2) + "'"
