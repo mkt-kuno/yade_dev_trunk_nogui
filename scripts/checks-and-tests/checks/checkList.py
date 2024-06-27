@@ -45,7 +45,7 @@ def acceptOMPIVersion():  # filter out specific distros for MPI checks
 	if yade.libVersions.getAllVersionsCpp()['mpi'][0][0] == 2:
 		return False
 	if yade.libVersions.getAllVersionsCpp()['mpi'][1] == 'ompi:4.1.5':
-		return False # Open MPI 4.1.5 has a bug https://gitlab.com/yade-dev/trunk/-/issues/309  https://github.com/open-mpi/ompi/issues/11749
+		return False  # Open MPI 4.1.5 has a bug https://gitlab.com/yade-dev/trunk/-/issues/309  https://github.com/open-mpi/ompi/issues/11749
 	return True
 
 

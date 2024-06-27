@@ -19,27 +19,37 @@ if ('LS_DEM' in features):
 	###################################################
 	# sphere case:
 	lsSph = levelSetBody('sphere', radius=1, spacing=0.05, nodesPath=1)
-	def distSphereTh(pt,radius = 1):
+
+	def distSphereTh(pt, radius=1):
 		return Vector3(pt).norm() - radius
-	pts = [Vector3(0.11,0.02,0.08),2*Vector3.Ones, 100 * Vector3.Ones]
+
+	pts = [Vector3(0.11, 0.02, 0.08), 2 * Vector3.Ones, 100 * Vector3.Ones]
 	distVals = [distSphereTh(pt) for pt in pts]
-	normals = [pt/pt.norm() for pt in pts] # Normal of a sphere is c*(x,y,z) where c is the normalisation constant.
-	if not equalNbr(lsSph.shape.distance(pts[0]),distVals[0],5.e-3):
-		raise YadeCheckError("Incorrect distance value to a unit sphere for an inside point",pts[0],":", lsSph.shape.distance(pts[0]), "vs", distVals[0] , "expected.")
-	if not equalNbr(lsSph.shape.distance(pts[0],True),distVals[0],5.e-3):
-		raise YadeCheckError("When using unbound=True, incorrect distance value to a unit sphere for an inside point",pts[0],":", lsSph.shape.distance(pts[0]), "vs", distVals[0] , "expected.")
-	if not equalVectors(lsSph.shape.normal(pts[0]),normals[0],0.06):
-		raise YadeCheckError("Incorrect normal for a unit sphere for an inside point",pts[0],":", lsSph.shape.normal(pts[0]), "vs", normals[0] , "expected.")
-	for idx in [1,2]: # out-of-the grid points
-		dist = lsSph.shape.distance(pts[idx],True)
+	normals = [pt / pt.norm() for pt in pts]  # Normal of a sphere is c*(x,y,z) where c is the normalisation constant.
+	if not equalNbr(lsSph.shape.distance(pts[0]), distVals[0], 5.e-3):
+		raise YadeCheckError(
+		        "Incorrect distance value to a unit sphere for an inside point", pts[0], ":", lsSph.shape.distance(pts[0]), "vs", distVals[0],
+		        "expected."
+		)
+	if not equalNbr(lsSph.shape.distance(pts[0], True), distVals[0], 5.e-3):
+		raise YadeCheckError(
+		        "When using unbound=True, incorrect distance value to a unit sphere for an inside point", pts[0], ":", lsSph.shape.distance(pts[0]),
+		        "vs", distVals[0], "expected."
+		)
+	if not equalVectors(lsSph.shape.normal(pts[0]), normals[0], 0.06):
+		raise YadeCheckError(
+		        "Incorrect normal for a unit sphere for an inside point", pts[0], ":", lsSph.shape.normal(pts[0]), "vs", normals[0], "expected."
+		)
+	for idx in [1, 2]:  # out-of-the grid points
+		dist = lsSph.shape.distance(pts[idx], True)
 		distTh = distVals[idx]
-		if not equalNbr(dist,distTh,5.e-3):
-			raise YadeCheckError("Incorrect distance value to a unit sphere for an outside point",pts[idx],":", dist, "vs", distTh , "expected.")
-		normalCalc = lsSph.shape.normal(pts[idx],True)
+		if not equalNbr(dist, distTh, 5.e-3):
+			raise YadeCheckError("Incorrect distance value to a unit sphere for an outside point", pts[idx], ":", dist, "vs", distTh, "expected.")
+		normalCalc = lsSph.shape.normal(pts[idx], True)
 		normalTh = normals[idx]
-		if not equalVectors(normalCalc,normalTh,0.06):
-			raise YadeCheckError("Incorrect normal for a unit sphere for an outside point",pts[idx],":", normalCalc, "vs", normalTh , "expected.")
-	volTh = 4. / 3. * pi # expected volume
+		if not equalVectors(normalCalc, normalTh, 0.06):
+			raise YadeCheckError("Incorrect normal for a unit sphere for an outside point", pts[idx], ":", normalCalc, "vs", normalTh, "expected.")
+	volTh = 4. / 3. * pi  # expected volume
 	if not equalNbr(lsSph.shape.volume(), volTh, 4.e-3):
 		raise YadeCheckError("Failed because of an incorrect sphere volume in LS-DEM:", lsSph.shape.volume(), "vs", volTh, "expected")
 	lNorm = [nod.norm() for nod in lsSph.shape.surfNodes]
@@ -76,7 +86,7 @@ if ('LS_DEM' in features):
 	# Now looking at the relative movements of 2 spheres and 2 LevelSet-shaped twins
 	################################################################################
 
-	rad = 1 # the smallest sphere
+	rad = 1  # the smallest sphere
 	rRatio = 1.8  # rBig / rSmall
 	centrSmall, centrBig = (0, 0, 0), (0, 0, rad * (1 + rRatio))
 	prec = 80  # grid fineness
@@ -92,15 +102,15 @@ if ('LS_DEM' in features):
 	movLS = O.bodies[3]
 
 	O.engines = [
-		ForceResetter(),
-		InsertionSortCollider([Bo1_Sphere_Aabb(), Bo1_LevelSet_Aabb()]),
-		InteractionLoop(
-			[Ig2_Sphere_Sphere_ScGeom(avoidGranularRatcheting=False),
-			 Ig2_LevelSet_LevelSet_ScGeom()],
-			[Ip2_FrictMat_FrictMat_FrictPhys(kn=MatchMaker(algo='val', val=1.e7), ks=MatchMaker(algo='val', val=1.e7))],
-			[Law2_ScGeom_FrictPhys_CundallStrack(sphericalBodies=False)]
-		),
-		NewtonIntegrator()
+	        ForceResetter(),
+	        InsertionSortCollider([Bo1_Sphere_Aabb(), Bo1_LevelSet_Aabb()]),
+	        InteractionLoop(
+	                [Ig2_Sphere_Sphere_ScGeom(avoidGranularRatcheting=False),
+	                 Ig2_LevelSet_LevelSet_ScGeom()],
+	                [Ip2_FrictMat_FrictMat_FrictPhys(kn=MatchMaker(algo='val', val=1.e7), ks=MatchMaker(algo='val', val=1.e7))],
+	                [Law2_ScGeom_FrictPhys_CundallStrack(sphericalBodies=False)]
+	        ),
+	        NewtonIntegrator()
 	]
 	O.dt = 5.e-4
 
@@ -115,8 +125,8 @@ if ('LS_DEM' in features):
 
 	if not equalNbr(lsCont.geom.penetrationDepth, sphCont.geom.penetrationDepth, 1.e-12):  # 2.2e-13 is a feasible goal on that ideal case
 		raise YadeCheckError(
-			"Failed, normal overlap is too wrong in LS-DEM after first stage:", lsCont.geom.penetrationDepth, "vs", sphCont.geom.penetrationDepth,
-			"in DEM"
+		        "Failed, normal overlap is too wrong in LS-DEM after first stage:", lsCont.geom.penetrationDepth, "vs", sphCont.geom.penetrationDepth,
+		        "in DEM"
 		)
 
 	if not equalVectors(lsCont.geom.normal, sphCont.geom.normal):
@@ -136,15 +146,15 @@ if ('LS_DEM' in features):
 		sphShearDisp += sphCont.geom.shearInc
 
 	if not equalNbr(
-		lsCont.geom.penetrationDepth, sphCont.geom.penetrationDepth, 0.03
+	        lsCont.geom.penetrationDepth, sphCont.geom.penetrationDepth, 0.03
 	):  # 0.0284 error is expected here, would be eg 0.007 with 6402 nodes and grid precision 80
 		raise YadeCheckError(
-			"Failed, normal overlaps are too different after 2nd stage:", lsCont.geom.penetrationDepth, "vs", sphCont.geom.penetrationDepth
+		        "Failed, normal overlaps are too different after 2nd stage:", lsCont.geom.penetrationDepth, "vs", sphCont.geom.penetrationDepth
 		)
 	if not equalVectors(lsShearDisp, sphShearDisp):
 		raise YadeCheckError("Failed, the two shear displacements are too different after second stage:", sphShearDisp, "vs", lsShearDisp)
 	if not equalVectors(
-		lsCont.geom.normal, sphCont.geom.normal, 0.03
+	        lsCont.geom.normal, sphCont.geom.normal, 0.03
 	):  # allowing here 3 % of error. 6402 nodes and grid precision 80 would allow to go under 2 %
 		raise YadeCheckError("Failed, the two normals are too different after second stage:", sphCont.geom.normal, "vs", lsCont.geom.normal)
 	print('LS-DEM contact description as correct as expected')
@@ -153,7 +163,7 @@ if ('LS_DEM' in features):
 	#################################################
 	grid = RegularGrid(-1.1, 1.1, 23)  # a cubic grid from -1.1 to 1.1 with 23 gp ie a 0.1 step
 	fmm = FastMarchingMethod(
-		phiIni=distIniSE(radii=[1, 1, 1], epsilons=[1, 1], grid=grid), grid=grid
+	        phiIni=distIniSE(radii=[1, 1, 1], epsilons=[1, 1], grid=grid), grid=grid
 	)  # checking fast marching method when applied to the distance to the unit sphere
 	phiField = fmm.phi()
 	error = 0

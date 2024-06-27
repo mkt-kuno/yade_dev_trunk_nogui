@@ -31,6 +31,7 @@ import sys, re
 
 
 class Text:
+
 	def __init__(self, txt):
 		self.text = [txt]
 

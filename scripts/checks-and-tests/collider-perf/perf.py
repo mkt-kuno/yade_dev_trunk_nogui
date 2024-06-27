@@ -1,4 +1,3 @@
-
 utils.readParamsFromTable(nSpheres=8000, collider='InsertionSortCollider', noTableOk=True)
 # name of file containing sphere packing with given number of spheres
 spheresFile = "packing-%dk.spheres" % (nSpheres / 1000)

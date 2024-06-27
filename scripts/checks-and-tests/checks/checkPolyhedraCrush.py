@@ -1,4 +1,3 @@
-
 if ('CGAL' in features):
 	from yade import plot, polyhedra_utils, ymport, export
 	frictionIn = 0.0

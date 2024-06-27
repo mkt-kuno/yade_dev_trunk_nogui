@@ -1,6 +1,5 @@
 # -*- encoding=utf-8 -*-
 
-
 from yade import pack, export, ymport
 import gts, os.path, locale
 
