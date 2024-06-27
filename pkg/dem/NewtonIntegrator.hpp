@@ -25,14 +25,14 @@ namespace yade { // Cannot have #include directive inside.
 class State;
 
 class NewtonIntegrator : public FieldApplier {
-	inline void cundallDamp1st(Vector3r& force, const Vector3r& vel);
-	inline void cundallDamp2nd(const Real& dt, const Vector3r& vel, Vector3r& accel);
-	inline void leapfrogTranslate(State*, const Real& dt);                           // leap-frog translate
-	inline void leapfrogSphericalRotate(State*, const Real& dt);                     // leap-frog rotate of spherical body
-	inline void leapfrogAsphericalRotate(State*, const Real& dt, const Vector3r& M); // leap-frog rotate of aspherical body
-	inline void leapfrogAsphericalRotateOmelyan_1998(State*, const Real& dt, const Vector3r& M, int iter);
-	inline void leapfrogAsphericalRotateCarlos_2023(State* state, const Real& dt, const Vector3r& M, int iter);
-	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
+	inline void     cundallDamp1st(Vector3r& force, const Vector3r& vel);
+	inline void     cundallDamp2nd(const Real& dt, const Vector3r& vel, Vector3r& accel);
+	inline void     leapfrogTranslate(State*, const Real& dt);                           // leap-frog translate
+	inline void     leapfrogSphericalRotate(State*, const Real& dt);                     // leap-frog rotate of spherical body
+	inline void     leapfrogAsphericalRotate(State*, const Real& dt, const Vector3r& M); // leap-frog rotate of aspherical body
+	inline void     leapfrogAsphericalRotateOmelyan_1998(State*, const Real& dt, const Vector3r& M, int iter);
+	inline void     leapfrogAsphericalRotateCarlos_2023(State* state, const Real& dt, const Vector3r& M, int iter);
+	Quaternionr     DotQ(const Vector3r& angVel, const Quaternionr& Q);
 	inline Vector3r w_dot(const Vector3r w, const Vector3r M, const Vector3r II);
 
 	// compute linear and angular acceleration, respecting State::blockedDOFs
@@ -57,7 +57,7 @@ class NewtonIntegrator : public FieldApplier {
 	Vector3r addGravity(int blockedDOFs);
 
 public:
-	bool densityScaling;     // internal for density scaling
+	bool densityScaling; // internal for density scaling
 	enum class RotAlgorithm { delValle2023 = 1, Omelyan1998 = 2, Fincham1992 = 3 };
 	Real updatingDispFactor; //(experimental) Displacement factor used to trigger bound update: the bound is updated only if updatingDispFactor*disp>sweepDist when >0, else all bounds are updated.
 	// function to save maximum velocity, for the verlet-distance optimization

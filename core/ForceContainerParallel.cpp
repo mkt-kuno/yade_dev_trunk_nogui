@@ -214,7 +214,7 @@ void ForceContainer::reset(long iter, bool resetAll)
 #if (YADE_REAL_BIT <= 64)
 			memset(&_force[sdIds[k]], 0, sizeof(Vector3r));
 #else
-			_force[sdIds[k]] = Vector3r::Zero();
+			_force[sdIds[k]]  = Vector3r::Zero();
 #endif
 #pragma omp parallel for schedule(static)
 		for (unsigned long k = 0; k < currSize; k++) /*_torque[sdIds[k]]=Vector3r::Zero();*/

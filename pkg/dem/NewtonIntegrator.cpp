@@ -91,8 +91,8 @@ void NewtonIntegrator::updateEnergy(const shared_ptr<Body>& b, const State* stat
 	// rotational terms
 	if (b->isAspherical()) {
 		const Matrix3r mI = state->inertia.asDiagonal();
-		Matrix3r T = state->ori.toRotationMatrix();
-		Erot = .5 * b->state->angVel.dot((T * mI * T.transpose()) * b->state->angVel);
+		Matrix3r       T  = state->ori.toRotationMatrix();
+		Erot              = .5 * b->state->angVel.dot((T * mI * T.transpose()) * b->state->angVel);
 	} else {
 		Erot = 0.5 * state->angVel.dot(state->inertia.cwiseProduct(state->angVel));
 	}
@@ -283,18 +283,15 @@ void NewtonIntegrator::action()
 		if (!useAspherical) {
 			leapfrogSphericalRotate(state, dt);
 		} else {
-			switch(rotAlgorithm){ // YADE_ENUM throws when trying to assign non existing enum value.
-			case RotAlgorithm::delValle2023 :
-				leapfrogAsphericalRotateCarlos_2023(state, dt, m, scene->iter); break;
-			case RotAlgorithm::Omelyan1998 :
-				leapfrogAsphericalRotateOmelyan_1998(state, dt, m, scene->iter); break;
-			case RotAlgorithm::Fincham1992 :
-				leapfrogAsphericalRotate(state, dt, m); break;
-			default:
-				leapfrogAsphericalRotateCarlos_2023(state, dt, m, scene->iter);
-				LOG_WARN("Unknown rotation algorithm: falling back to delValle2023's algorithm.");
-            	LOG_WARN("Available options are: delValle2023, Omelyan1998, Fincham1992.");
-            	break;
+			switch (rotAlgorithm) { // YADE_ENUM throws when trying to assign non existing enum value.
+				case RotAlgorithm::delValle2023: leapfrogAsphericalRotateCarlos_2023(state, dt, m, scene->iter); break;
+				case RotAlgorithm::Omelyan1998: leapfrogAsphericalRotateOmelyan_1998(state, dt, m, scene->iter); break;
+				case RotAlgorithm::Fincham1992: leapfrogAsphericalRotate(state, dt, m); break;
+				default:
+					leapfrogAsphericalRotateCarlos_2023(state, dt, m, scene->iter);
+					LOG_WARN("Unknown rotation algorithm: falling back to delValle2023's algorithm.");
+					LOG_WARN("Available options are: delValle2023, Omelyan1998, Fincham1992.");
+					break;
 			}
 		}
 
@@ -372,80 +369,86 @@ void NewtonIntegrator::leapfrogAsphericalRotate(State* state, const Real& dt, co
 	state->ori.normalize();
 }
 
-void NewtonIntegrator::leapfrogAsphericalRotateOmelyan_1998(State* state, const Real& dt, const Vector3r& M, int iter){
-   //FIXME: where to increment angular velocity like this? Only done for spherical rotations at the moment
-    //if(scene->isPeriodic && homoDeform) {state->angVel+=dSpin;}
-	Matrix3r       A          = state->ori.conjugate().toRotationMatrix();         // rotation matrix from global to local r.f.
-	Vector3r       w          = A * state->angVel; 							   // local angular velocity at time n
-	if (densityScaling)    w *= state->densityScaling;
-	Vector3r       ww         = w;                                         // auxiliar vector
-    const Vector3r II         = state->inertia;                            // auxiliar Inertia tensor vector
-    const Vector3r tau        = A * M;                                     // Torque in the local reference frame
+void NewtonIntegrator::leapfrogAsphericalRotateOmelyan_1998(State* state, const Real& dt, const Vector3r& M, int iter)
+{
+	//FIXME: where to increment angular velocity like this? Only done for spherical rotations at the moment
+	//if(scene->isPeriodic && homoDeform) {state->angVel+=dSpin;}
+	Matrix3r A = state->ori.conjugate().toRotationMatrix(); // rotation matrix from global to local r.f.
+	Vector3r w = A * state->angVel;                         // local angular velocity at time n
+	if (densityScaling) w *= state->densityScaling;
+	Vector3r       ww  = w;              // auxiliar vector
+	const Vector3r II  = state->inertia; // auxiliar Inertia tensor vector
+	const Vector3r tau = A * M;          // Torque in the local reference frame
 
-    // Calculate angular velocity at time n + 1/2, solve nonlinear system of equations.
-    for (int i = 0; i < niterOmelyan1998; i++)
-        ww = w + ( tau + 0.5*Vector3r(
-            (w[1]*w[2]+ww[1]*ww[2])*(II[1]-II[2]),
-            (w[2]*w[0]+ww[2]*ww[0])*(II[2]-II[0]),
-            (w[0]*w[1]+ww[0]*ww[1])*(II[0]-II[1])
-            )).cwiseQuotient(II)*dt;
+	// Calculate angular velocity at time n + 1/2, solve nonlinear system of equations.
+	for (int i = 0; i < niterOmelyan1998; i++)
+		ww = w
+		        + (tau
+		           + 0.5
+		                   * Vector3r(
+		                           (w[1] * w[2] + ww[1] * ww[2]) * (II[1] - II[2]),
+		                           (w[2] * w[0] + ww[2] * ww[0]) * (II[2] - II[0]),
+		                           (w[0] * w[1] + ww[0] * ww[1]) * (II[0] - II[1])))
+		                        .cwiseQuotient(II)
+		                * dt;
 
-    // Calculate quaternion at time n + 1
-    const Real a = dt*dt*ww.squaredNorm()*0.0625;  // 1/16.0
-	if (a != 0){
-		const Real a1 = 1.0 - a;
-    	const Real a2 = 1.0 + a;
-		const Quaternionr dotQ_n = DotQ(ww, state->ori); // dQ/dt at time n + 1/2
-    	state->ori = Quaternionr((a1/a2)*state->ori.coeffs() + (dt/a2)*dotQ_n.coeffs()); // Q at time n+1
+	// Calculate quaternion at time n + 1
+	const Real a = dt * dt * ww.squaredNorm() * 0.0625; // 1/16.0
+	if (a != 0) {
+		const Real        a1     = 1.0 - a;
+		const Real        a2     = 1.0 + a;
+		const Quaternionr dotQ_n = DotQ(ww, state->ori);                                                       // dQ/dt at time n + 1/2
+		state->ori               = Quaternionr((a1 / a2) * state->ori.coeffs() + (dt / a2) * dotQ_n.coeffs()); // Q at time n+1
 	}
 
-	if (iter % normalizeEvery == 0)  // Just as a safety messure. In theory this is not needed. In reality it becomes unstable quite fast, dont use more than 300
+	if (iter % normalizeEvery
+	    == 0) // Just as a safety messure. In theory this is not needed. In reality it becomes unstable quite fast, dont use more than 300
 		state->ori.normalize(); // This operation is expensive, we dont want to do it every time step.
 
 
 	// Update angular velocity
-    if (densityScaling) ww *= state->densityScaling;
-	state->angMom = A.transpose() * ww.cwiseProduct(II);                       // global angular momentum at time n + 1/2
-    state->angVel = A.transpose() * ww;                                        // global angular velocity at time n + 1/2
+	if (densityScaling) ww *= state->densityScaling;
+	state->angMom = A.transpose() * ww.cwiseProduct(II); // global angular momentum at time n + 1/2
+	state->angVel = A.transpose() * ww;                  // global angular velocity at time n + 1/2
 }
 
-void NewtonIntegrator::leapfrogAsphericalRotateCarlos_2023(State* state, const Real& dt, const Vector3r& M, int iter){
-   //FIXME: where to increment angular velocity like this? Only done for spherical rotations at the moment
-    //if(scene->isPeriodic && homoDeform) {state->angVel+=dSpin;}
-	Matrix3r       A          = state->ori.conjugate().toRotationMatrix();         // rotation matrix from global to local r.f.
-	Vector3r       w          = A * state->angVel; 							   // local angular velocity at time n
-	if (densityScaling)    w *= state->densityScaling;
-    const Vector3r tau        = A * M;                                     // Torque in the local reference frame
+void NewtonIntegrator::leapfrogAsphericalRotateCarlos_2023(State* state, const Real& dt, const Vector3r& M, int iter)
+{
+	//FIXME: where to increment angular velocity like this? Only done for spherical rotations at the moment
+	//if(scene->isPeriodic && homoDeform) {state->angVel+=dSpin;}
+	Matrix3r A = state->ori.conjugate().toRotationMatrix(); // rotation matrix from global to local r.f.
+	Vector3r w = A * state->angVel;                         // local angular velocity at time n
+	if (densityScaling) w *= state->densityScaling;
+	const Vector3r tau = A * M; // Torque in the local reference frame
 
-    // Calculate angular velocity at time n + 1/2, solve nonlinear system of equations.
-    const Vector3r K1 = dt*w_dot(w                 , tau, state->inertia);
-	const Vector3r K2 = dt*w_dot(w + K1            , tau, state->inertia);
-	const Vector3r K3 = dt*w_dot(w + 0.25*(K1 + K2), tau, state->inertia);
-	w += (K1 + K2 + 4.0*K3)/6.0;
+	// Calculate angular velocity at time n + 1/2, solve nonlinear system of equations.
+	const Vector3r K1 = dt * w_dot(w, tau, state->inertia);
+	const Vector3r K2 = dt * w_dot(w + K1, tau, state->inertia);
+	const Vector3r K3 = dt * w_dot(w + 0.25 * (K1 + K2), tau, state->inertia);
+	w += (K1 + K2 + 4.0 * K3) / 6.0;
 
- 	// Update orientation q(t + dt)
+	// Update orientation q(t + dt)
 	Real w_Norm = w.squaredNorm();
 	if (w_Norm != 0) { //If we have an angular velocity, we make a rotation
-		w_Norm = sqrt(w_Norm);
-		const Real Theta = dt*w_Norm*0.5;
-		state->ori = state->ori*Quaternionr(cos(Theta), sin(Theta)*w[0]/w_Norm, sin(Theta)*w[1]/w_Norm, sin(Theta)*w[2]/w_Norm);
+		w_Norm           = sqrt(w_Norm);
+		const Real Theta = dt * w_Norm * 0.5;
+		state->ori       = state->ori * Quaternionr(cos(Theta), sin(Theta) * w[0] / w_Norm, sin(Theta) * w[1] / w_Norm, sin(Theta) * w[2] / w_Norm);
 	}
 
-	if (iter % normalizeEvery == 0) // Just as a safety messure. In theory this is not needed. The formulation preserves the norm. In my tests 10 k was fine, but just in case use 5k
+	if (iter % normalizeEvery
+	    == 0) // Just as a safety messure. In theory this is not needed. The formulation preserves the norm. In my tests 10 k was fine, but just in case use 5k
 		state->ori.normalize(); // This operation is expensive, we dont want to do it every time step.
 
 	// Update angular velocity
-    if (densityScaling) w *= state->densityScaling;
-	state->angMom = A.transpose() * w.cwiseProduct(state->inertia);        // global angular momentum at time n + 1/2
-    state->angVel = A.transpose() * w;                                     // global angular velocity at time n + 1/2
+	if (densityScaling) w *= state->densityScaling;
+	state->angMom = A.transpose() * w.cwiseProduct(state->inertia); // global angular momentum at time n + 1/2
+	state->angVel = A.transpose() * w;                              // global angular velocity at time n + 1/2
 }
 
-Vector3r NewtonIntegrator::w_dot(const Vector3r w, const Vector3r M, const Vector3r II){
+Vector3r NewtonIntegrator::w_dot(const Vector3r w, const Vector3r M, const Vector3r II)
+{
 	return Vector3r(
-            (M[0] + w[1]*w[2]*(II[1] - II[2]))/II[0],
-            (M[1] + w[2]*w[0]*(II[2] - II[0]))/II[1],
-            (M[2] + w[0]*w[1]*(II[0] - II[1]))/II[2]
-        );
+	        (M[0] + w[1] * w[2] * (II[1] - II[2])) / II[0], (M[1] + w[2] * w[0] * (II[2] - II[0])) / II[1], (M[2] + w[0] * w[1] * (II[0] - II[1])) / II[2]);
 }
 
 bool NewtonIntegrator::get_densityScaling() const

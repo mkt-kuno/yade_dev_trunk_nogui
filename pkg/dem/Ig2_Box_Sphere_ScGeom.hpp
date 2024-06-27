@@ -20,7 +20,7 @@ namespace yade { // Cannot have #include directive inside.
 class Ig2_Box_Sphere_ScGeom : public IGeomFunctor {
 private:
 	const Real hertzFac = 1e8;
-	
+
 public:
 	virtual bool
 	go(const shared_ptr<Shape>&       cm1,

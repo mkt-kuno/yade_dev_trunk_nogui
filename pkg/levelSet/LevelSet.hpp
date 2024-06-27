@@ -23,8 +23,8 @@ private:
 	int      nVoxInside;
 	void     init();          // compute nVoxInside, center, volume, and inertia and calls initSurfNodes
 	void     initSurfNodes(); // fills surfNodes
-	Real distanceInterpolation(const Vector3r&, const int&, const int&, const int&) const; // trilinear interpolation of distance in a given cell
-	bool rayTraceInCell(const Vector3r&, const Vector3r&, const Vector3r&, const Vector3i&); // handles the ray tracing from a given point in a given cell
+	Real     distanceInterpolation(const Vector3r&, const int&, const int&, const int&) const; // trilinear interpolation of distance in a given cell
+	bool rayTraceInCell(const Vector3r&, const Vector3r&, const Vector3r&, const Vector3i&);   // handles the ray tracing from a given point in a given cell
 	void rayTrace(const Vector3r&); // recursively calls rayTraceInCell, walking accross the whole grid along a ray starting from center
 	Real smearedHeaviside(Real);
 	struct mcData { // Structure for holding marching cubes triangulation of level set particle
@@ -36,7 +36,7 @@ private:
 public:
 	Real             distance(const Vector3r&, const bool& unbound = false) const; // gives the distance from a point to the surface
 	Vector3r         normal(const Vector3r&, const bool& unbound = false) const;   // gives the outwards normal at some point
-	Real             getVolume();                     // these 3 get*() may call init() if not already done, they can not be const-declared
+	Real             getVolume(); // these 3 get*() may call init() if not already done, they can not be const-declared
 	Vector3r         getCenter();
 	Vector3r         getInertia();
 	Real             getSurface() const;           // this one can be const-declared

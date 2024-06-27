@@ -59,7 +59,7 @@ void LevelSet::rayTrace(const Vector3r& ray)
 		diffSign = false;
 		for (unsigned int gp = 0; gp < 8; gp++) { // passing through 8 cell gridpoints to check whether they all have the same distance sign
 			xInd   = (gp % 2 ? indices[0] + 1
-                                       : indices[0]); // better put parenthesis: "=" and ternary have same precedence, let s not look at associativity
+			                 : indices[0]); // better put parenthesis: "=" and ternary have same precedence, let s not look at associativity
 			yInd   = ((gp & 2) / 2 ? indices[1] + 1 : indices[1]);
 			zInd   = ((gp & 4) / 4 ? indices[2] + 1 : indices[2]);
 			gpDist = distField[xInd][yInd][zInd]; // distance value for current gp

@@ -30,16 +30,18 @@ YADE_PLUGIN((TesselationWrapper));
 CREATE_LOGGER(TesselationWrapper);
 
 // helper macro do assign Matrix3r values to subarrays
-#define TENSOR_TO_MATRIX3R(mat, arr)  {                                                                                                                       \
-	arr(0,0) = mat(1, 1);                                                                                                                                    \
-	arr(0,1) = mat(1, 2);                                                                                                                                    \
-	arr(0,2) = mat(1, 3);                                                                                                                                    \
-	arr(1,0) = mat(2, 1);                                                                                                                                    \
-	arr(1,1) = mat(2, 2);                                                                                                                                    \
-	arr(1,2) = mat(2, 3);                                                                                                                                    \
-	arr(2,0) = mat(3, 1);                                                                                                                                    \
-	arr(2,1) = mat(3, 2);                                                                                                                                    \
-	arr(2,2) = mat(3, 3);}
+#define TENSOR_TO_MATRIX3R(mat, arr)                                                                                                                           \
+	{                                                                                                                                                      \
+		arr(0, 0) = mat(1, 1);                                                                                                                         \
+		arr(0, 1) = mat(1, 2);                                                                                                                         \
+		arr(0, 2) = mat(1, 3);                                                                                                                         \
+		arr(1, 0) = mat(2, 1);                                                                                                                         \
+		arr(1, 1) = mat(2, 2);                                                                                                                         \
+		arr(1, 2) = mat(2, 3);                                                                                                                         \
+		arr(2, 0) = mat(3, 1);                                                                                                                         \
+		arr(2, 1) = mat(3, 2);                                                                                                                         \
+		arr(2, 2) = mat(3, 3);                                                                                                                         \
+	}
 
 //spatial sort traits to use with a pair of CGAL::sphere pointers and integer.
 //template<class _Triangulation>
@@ -87,7 +89,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	int                Sph_Index = sph->getClassIndexStatic();
 	Scene*             scene     = Omega::instance().getScene().get();
 	for (const auto& bi : *bodies) {
-		if (bi and bi->shape->getClassIndex() == Sph_Index and bi->maskOk(TW.groupMask) ) {
+		if (bi and bi->shape->getClassIndex() == Sph_Index and bi->maskOk(TW.groupMask)) {
 			const Sphere* s = YADE_CAST<Sphere*>(bi->shape.get());
 			//FIXME: is the scene periodicity verification useful in the next line ? Tesselation seems to work in both periodic and non-periodic conditions with "scene->cell->wrapShearedPt(bi->state->pos)". I keep the verification to be consistent with all other uses of "wrapShearedPt" function.
 			const Vector3r& pos = scene->isPeriodic ? scene->cell->wrapShearedPt(bi->state->pos) : bi->state->pos;
@@ -135,7 +137,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 
 Real thickness = 0;
 
-TesselationWrapper::~TesselationWrapper() {}
+TesselationWrapper::~TesselationWrapper() { }
 
 void TesselationWrapper::clear(void)
 {
@@ -149,12 +151,9 @@ void TesselationWrapper::clear(void)
 	Tes->vertexHandles.clear();
 }
 
-void TesselationWrapper::insertSceneSpheres(bool reset)
-{
-	build_triangulation_with_ids(scene->bodies, *this, reset);
-}
+void TesselationWrapper::insertSceneSpheres(bool reset) { build_triangulation_with_ids(scene->bodies, *this, reset); }
 
-Real TesselationWrapper::Volume(unsigned int id) { return ((unsigned int)Tes->Max_id() >= id and Tes->vertex(id)!=NULL ) ? Tes->Volume(id) : 0; }
+Real TesselationWrapper::Volume(unsigned int id) { return ((unsigned int)Tes->Max_id() >= id and Tes->vertex(id) != NULL) ? Tes->Volume(id) : 0; }
 
 bool TesselationWrapper::insert(Real x, Real y, Real z, Real rad, unsigned int id)
 {
@@ -340,27 +339,31 @@ boost::python::dict TesselationWrapper::calcVolPoroDef(bool deformation)
 	Pmin                = ts->box.base;
 	Pmax                = ts->box.sommet;
 
-	int bodiesDim = Tes->Max_id() + 1; //=scene->bodies->size();
-	vector<Real> vol_(bodiesDim,0);
-	vector<Real> poro_(bodiesDim,0);
-	vector<Matrix3r> def_(bodiesDim,Matrix3r::Zero()); 
-	
+	int              bodiesDim = Tes->Max_id() + 1; //=scene->bodies->size();
+	vector<Real>     vol_(bodiesDim, 0);
+	vector<Real>     poro_(bodiesDim, 0);
+	vector<Matrix3r> def_(bodiesDim, Matrix3r::Zero());
+
 	boost::python::list vol;
 	boost::python::list poro;
 	boost::python::list def;
-	
+
 	for (RTriangulation::Finite_vertices_iterator V_it = Tri.finite_vertices_begin(); V_it != Tri.finite_vertices_end(); V_it++) {
-		const Body::id_t id        = V_it->info().id();
-		if (id<0 or  V_it->info().v()==0 or V_it->info().isFictious) continue;
-		Real             sphereVol = 4.188790 * math::pow((V_it->point().weight()), 1.5); // 4/3*PI*R³ = 4.188...*R³
-		vol_[id]                    = V_it->info().v();
-		poro_[id]                   = (V_it->info().v() - sphereVol) / V_it->info().v();
+		const Body::id_t id = V_it->info().id();
+		if (id < 0 or V_it->info().v() == 0 or V_it->info().isFictious) continue;
+		Real sphereVol = 4.188790 * math::pow((V_it->point().weight()), 1.5); // 4/3*PI*R³ = 4.188...*R³
+		vol_[id]       = V_it->info().v();
+		poro_[id]      = (V_it->info().v() - sphereVol) / V_it->info().v();
 		if (deformation) TENSOR_TO_MATRIX3R(mma->analyser->ParticleDeformation[id], def_[id]);
 	}
 
-	for (auto& v : vol_) vol.append(v);
-	for (auto& v : poro_) poro.append(v);
-	if (deformation) for (auto& v : def_) def.append(v);
+	for (auto& v : vol_)
+		vol.append(v);
+	for (auto& v : poro_)
+		poro.append(v);
+	if (deformation)
+		for (auto& v : def_)
+			def.append(v);
 	boost::python::dict ret;
 	ret["vol"]  = vol;
 	ret["poro"] = poro;
@@ -382,7 +385,7 @@ boost::python::list TesselationWrapper::getAlphaCaps(Real alpha, Real shrinkedAl
 {
 	vector<AlphaCap> caps;
 	Tes->setExtendedAlphaCaps(caps, alpha, shrinkedAlpha, fixedAlpha);
-	bounded=true;
+	bounded = true;
 	boost::python::list ret;
 	for (auto f = caps.begin(); f != caps.end(); f++)
 		ret.append(boost::python::make_tuple(f->id, makeVector3r(f->normal), makeVector3r(f->centroid)));
@@ -408,7 +411,7 @@ void TesselationWrapper::applyAlphaVel(Matrix3r velGrad, Real alpha, Real shrink
 	build_triangulation_with_ids(scene->bodies, *this, true); //triangulation needed
 	vector<AlphaCap> caps;
 	Tes->setExtendedAlphaCaps(caps, alpha, shrinkedAlpha, fixedAlpha);
-	bounded=true;
+	bounded = true;
 	for (const auto& b : *scene->bodies)
 		b->state->blockedDOFs = State::DOF_NONE;
 	const auto aabb     = Shop::aabbExtrema();
@@ -426,7 +429,7 @@ Matrix3r TesselationWrapper::calcAlphaStress(Real alpha, Real shrinkedAlpha, boo
 	build_triangulation_with_ids(scene->bodies, *this, true); //triangulation needed
 	vector<AlphaCap> caps;
 	Tes->setExtendedAlphaCaps(caps, alpha, shrinkedAlpha, fixedAlpha);
-	bounded=true;
+	bounded = true;
 	Matrix3r cauchyLWS(Matrix3r::Zero());
 	scene->forces.sync(); // needed to make resultants predictable
 	alphaCapsVol = 0.;
@@ -445,7 +448,7 @@ boost::python::list TesselationWrapper::getAlphaGraph(Real alpha, Real shrinkedA
 {
 	if (Tes->Triangulation().number_of_vertices() == 0) insertSceneSpheres(true);
 	segments = Tes->getExtendedAlphaGraph(alpha, shrinkedAlpha, fixedAlpha);
-	bounded = true;
+	bounded  = true;
 	boost::python::list ret;
 	for (auto f = segments.begin(); f != segments.end(); f++)
 		ret.append(*f);

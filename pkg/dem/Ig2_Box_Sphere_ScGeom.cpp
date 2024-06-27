@@ -74,8 +74,8 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		cOnBox_boxLocal[2] = extents[2];
 		inside             = false;
 	}
-	
-	const Real sphereRadiusForBox = (hertzian) ? hertzFac * s->radius :  s->radius;
+
+	const Real sphereRadiusForBox = (hertzian) ? hertzFac * s->radius : s->radius;
 
 	shared_ptr<ScGeom> scm;
 	if (inside) {

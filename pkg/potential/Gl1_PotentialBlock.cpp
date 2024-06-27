@@ -566,7 +566,7 @@ void PotentialBlockVTKRecorder::action()
 			const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(b->shape));
 
 			//vtkSmartPointer<ImpFunc> functionBool [clump->ids.size()];
-			auto clumpIds = clump->ids_get();
+			auto clumpIds  = clump->ids_get();
 			functionBool   = new vtkSmartPointer<ImpFuncPB>[clumpIds.size()];
 			ImplicitBoolNo = clumpIds.size();
 
