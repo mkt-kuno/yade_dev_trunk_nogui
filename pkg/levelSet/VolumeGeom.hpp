@@ -22,20 +22,20 @@ namespace yade {
 
 class VolumeGeom : public IGeom {
 public:
-	virtual ~VolumeGeom()      = default;
-	VolumeGeom(const VolumeGeom&)  = default;
-	inline VolumeGeom& operator=(const VolumeGeom& source)
+	virtual ~VolumeGeom()         = default;
+	VolumeGeom(const VolumeGeom&) = default;
+	inline VolumeGeom& operator   =(const VolumeGeom& source)
 	{
-		penetrationVolume = source.penetrationVolume;
-		contactArea      = source.contactArea;
+		penetrationVolume       = source.penetrationVolume;
+		contactArea             = source.contactArea;
 		averagePenetrationDepth = source.averagePenetrationDepth;
-		contactPoint     = source.contactPoint;
-		normal           = source.normal;
-		twist_axis       = source.twist_axis;
-		orthonormal_axis = source.orthonormal_axis;
-		shearInc         = source.shearInc;
-		radius1          = source.radius1;
-		radius2          = source.radius2;
+		contactPoint            = source.contactPoint;
+		normal                  = source.normal;
+		twist_axis              = source.twist_axis;
+		orthonormal_axis        = source.orthonormal_axis;
+		shearInc                = source.shearInc;
+		radius1                 = source.radius1;
+		radius2                 = source.radius2;
 		return *this;
 	}
 
@@ -48,9 +48,9 @@ public:
 	        const Vector3r&                currentNormal,
 	        bool                           isNew,
 	        const Vector3r&                shift2);
-	Vector3r& rotate(Vector3r& shearForce) const;
+	Vector3r&       rotate(Vector3r& shearForce) const;
 	const Vector3r& shearIncrement() const { return shearInc; };
-	Real refR1, refR2, radius1, radius2;
+	Real            refR1, refR2, radius1, radius2;
 
 protected:
 	// clang-format off

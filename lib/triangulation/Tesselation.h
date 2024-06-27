@@ -75,7 +75,7 @@ namespace CGT {
 		int                                             maxId;
 
 	protected:
-        RTriangulation tri;
+		RTriangulation  tri;
 		RTriangulation* Tri;
 		RTriangulation* Tes; //=NULL or Tri depending on the constructor used.
 

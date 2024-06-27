@@ -50,15 +50,15 @@ public:
 	typedef Tesselation::AlphaFace                           AlphaFace;
 	typedef Tesselation::AlphaCap                            AlphaCap;
 
-    Tesselation tesObj;
-	Tesselation* Tes;
-	Real                      mean_radius, inf;
-	bool                      rad_divided;
-	bool                      bounded;
-	CGT::Point                Pmin;
-	CGT::Point                Pmax;
-	vector<Vector3r>          segments;
-	
+	Tesselation      tesObj;
+	Tesselation*     Tes;
+	Real             mean_radius, inf;
+	bool             rad_divided;
+	bool             bounded;
+	CGT::Point       Pmin;
+	CGT::Point       Pmax;
+	vector<Vector3r> segments;
+
 	~TesselationWrapper();
 
 	/// Insert a sphere, "id" will be used by some getters to retrieve spheres
@@ -114,7 +114,7 @@ public:
 		}
 		return mma->analyser->ParticleDeformation[id](i, j);
 	}
-	
+
 	Matrix3r deformationTensor(unsigned int id)
 	{
 		if (!mma->analyser->ParticleDeformation.size()) {
@@ -125,9 +125,9 @@ public:
 			LOG_ERROR("id out of bounds");
 			return Matrix3r::Zero();
 		}
-		auto m = mma->analyser->ParticleDeformation[id];
+		auto     m = mma->analyser->ParticleDeformation[id];
 		Matrix3r m3;
-		m3 << m(1,1),m(1,2),m(1,3),m(2,1),m(2,2),m(2,3),m(3,1),m(3,2),m(3,3);
+		m3 << m(1, 1), m(1, 2), m(1, 3), m(2, 1), m(2, 2), m(2, 3), m(3, 1), m(3, 2), m(3, 3);
 		return m3;
 	}
 
@@ -145,7 +145,6 @@ public:
 
 
 public:
-
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities (see also the :ref:`dedicated section in user manual <MicroStressAndMicroStrain>`). The calculation of microstrain is explained in [Catalano2014a]_ \n\nSee example usage in script example/tesselationWrapper/tesselationWrapper.py.\n\nBelow is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` function visualized with paraview (in this case Yade's TesselationWrapper was used to process experimental data obtained on sand by Edward Ando at Grenoble University, 3SR lab.)\n\n.. figure:: fig/localstrain.*\n\t:width: 9cm\n\nThe definition of outer contours of arbitrary shapes and the application of stress on them, based on CGAL's 'alpha shapes' is also possible. See :ysrc:`scripts/examples/alphaShapes/GlDrawAlpha.py` (giving the figure below) and other examples therein. Read more in [Pekmezi2020]_ and further papers by the same authors. \n\n.. figure:: fig/alphaShape.*\n\t:width: 9cm",
 	((unsigned int,n_spheres,0,,"|ycomp|"))

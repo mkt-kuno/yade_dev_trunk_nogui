@@ -789,26 +789,22 @@ py::tuple Shop::getDepthProfiles_center(Real vCell, int nCell, Real dz, Real zRe
 Real Shop::getSphereSection(Real z, Real R, Real infS, Real supS)
 {
 	if (z >= R || z <= -R) return 0.0;
-	Real a = sqrt(pow(R,2) - pow(z,2));
-	if (infS > a || infS < -a){
-		if (infS >= 0.0) 
-			infS = a;
-		else 
+	Real a = sqrt(pow(R, 2) - pow(z, 2));
+	if (infS > a || infS < -a) {
+		if (infS >= 0.0) infS = a;
+		else
 			infS = -a;
 	}
-	if (supS > a || supS < -a){
-		if (supS >= 0.0) 
-			supS = a;
-		else 
+	if (supS > a || supS < -a) {
+		if (supS >= 0.0) supS = a;
+		else
 			supS = -a;
 	}
-	return (pow(a,2) * (Mathr::PI - acos(-infS/a) - acos(supS/a))
-			- infS * sqrt(pow(a,2) - pow(infS,2))
-			+ supS * sqrt(pow(a,2) - pow(supS,2)));
+	return (pow(a, 2) * (Mathr::PI - acos(-infS / a) - acos(supS / a)) - infS * sqrt(pow(a, 2) - pow(infS, 2)) + supS * sqrt(pow(a, 2) - pow(supS, 2)));
 }
 
 // Same as getDepthProfile, but allows to specify the slices on which to average.
-// Unlike getDepthProfiles which returns all velocity components separately, getSlicedprofiles returns 
+// Unlike getDepthProfiles which returns all velocity components separately, getSlicedprofiles returns
 // a velocity vector in the same manner as in hydroForceEngine.
 // "P" stands for "Profile" which refers to the direction of discretisation, with nCell number of cells.
 // "S" stands for "Slices" which are the subdomains in which we average the quantities.
@@ -843,63 +839,58 @@ py::tuple Shop::getSlicedProfiles(
 	vector<Real>     phiAverage(nCell, 0.0);
 
 	//  Check for incorrect dirP or dirS
-	if (dirP == dirS) {
-		throw std::invalid_argument("dirP must not be equal to dirS");
-	}
-	if (dirP < 0 || dirP > 2 || dirS < 0 || dirS > 2) {
-		throw std::invalid_argument("dirP and dirS must be equal to 0, 1, or 2");
-	}
-	
+	if (dirP == dirS) { throw std::invalid_argument("dirP must not be equal to dirS"); }
+	if (dirP < 0 || dirP > 2 || dirS < 0 || dirS > 2) { throw std::invalid_argument("dirP and dirS must be equal to 0, 1, or 2"); }
+
 	// Loop over the particles
 	for (const auto& b : *Omega::instance().getScene()->bodies) {
 		shared_ptr<Sphere> s = YADE_PTR_DYN_CAST<Sphere>(b->shape);
 		if (!s) continue;
-		
+
 		// Get particle position and radius
 		posS = b->state->pos[dirS];
 		posP = b->state->pos[dirP];
 		R    = s->radius;
-		
+
 		// Check if the particle has the correct radius
 		if (activateCond == true && R != radiusPy) continue;
-		
+
 		// Loop over the different slices
-		for(unsigned n = 0; n < sliceCenters.size(); n++) {
+		for (unsigned n = 0; n < sliceCenters.size(); n++) {
 			// Define slice boundaries (position relative to particle center)
-			infS = refS + sliceCenters[n] - sliceWidths[n]/2 - posS;
-			supS = refS + sliceCenters[n] + sliceWidths[n]/2 - posS;
-			
+			infS = refS + sliceCenters[n] - sliceWidths[n] / 2 - posS;
+			supS = refS + sliceCenters[n] + sliceWidths[n] / 2 - posS;
+
 			// Check if the particle is in the slice
 			if (infS >= R || supS <= -R) continue;
-			
+
 			// Define the cells containing the particle:
-			// Cell 0 corresponding to [refP; refP+dP]. 
+			// Cell 0 corresponding to [refP; refP+dP].
 			Nmin = int(math::floor((posP - refP - R) / dP));
 			Nmax = int(math::floor((posP - refP + R) / dP));
 
 			// Loop over the cells containing the particle
 			for (int N = Nmin; N <= Nmax; N++) {
-				if (N >= 0 && N < nCell) {  // Stay in the given cells
+				if (N >= 0 && N < nCell) { // Stay in the given cells
 					// Calculate cell boundaries (position relative to particle center)
-					infP = refP + N*dP - posP;
-					supP = refP + (N+1)*dP - posP;
+					infP = refP + N * dP - posP;
+					supP = refP + (N + 1) * dP - posP;
 					if (infP < -R) infP = -R;
 					if (supP > R) supP = R;
 
-					if (infS <= -R && supS >= R){  
+					if (infS <= -R && supS >= R) {
 						// analytical solution of the volume of a slice of sphere :
-						volPart = (Mathr::PI * pow(R, 2) * (supP - infP 
-								- (pow(supP, 3) - pow(infP, 3)) / (3 * pow(R, 2))));
-					} 
-					else {  
+						volPart = (Mathr::PI * pow(R, 2) * (supP - infP - (pow(supP, 3) - pow(infP, 3)) / (3 * pow(R, 2))));
+					} else {
 						// Simpson integration to get the volume of a slice of slice :
-						ndiv = int(math::ceil((supP - infP) / (R / nSimpson)));
-						delta = (supP - infP) / ndiv; // recompute delta to match ndiv
+						ndiv    = int(math::ceil((supP - infP) / (R / nSimpson)));
+						delta   = (supP - infP) / ndiv; // recompute delta to match ndiv
 						volPart = 0;
 						for (int i = 0; i < ndiv; i++) {
-							volPart += (getSphereSection(infP + i*delta, R, infS, supS)
-										+ 4.*getSphereSection(infP + (i+0.5)*delta, R, infS, supS)
-										+ getSphereSection(infP + (i+1)*delta, R, infS, supS));
+							volPart
+							        += (getSphereSection(infP + i * delta, R, infS, supS)
+							            + 4. * getSphereSection(infP + (i + 0.5) * delta, R, infS, supS)
+							            + getSphereSection(infP + (i + 1) * delta, R, infS, supS));
 						}
 						volPart *= delta / 6;
 					}
@@ -1000,7 +991,7 @@ py::list Shop::getBodyIdsContacts(Body::id_t bodyID)
 	if (bodyID < 0) { throw std::logic_error("BodyID should be a positive value!"); }
 
 	const auto scene = Omega::instance().getScene();
-	const auto  b     = Body::byId(bodyID, scene);
+	const auto b     = Body::byId(bodyID, scene);
 
 	for (Body::MapId2IntrT::iterator it = b->intrs.begin(), end = b->intrs.end(); it != end; ++it) {
 		ret.append((*it).first);

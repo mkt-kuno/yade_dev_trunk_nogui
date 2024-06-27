@@ -184,7 +184,6 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene, Body::id_t selectio
 	// clipping planes
 	assert(clipPlaneNormals.size() == (size_t)numClipPlanes);
 	for (size_t i = 0; i < numClipPlanes; ++i) {
-
 		// someone could have modified those from python and truncate the vectors; fill those here in that case
 		if (i == clipPlaneSe3.size()) clipPlaneSe3.emplace_back(Se3r(Vector3r::Zero(), Quaternionr::Identity()));
 		if (i == clipPlaneActive.size()) clipPlaneActive.emplace_back(0);

@@ -196,9 +196,9 @@ public:
 	void deleteClumpBody(shared_ptr<Body> clumpBody)
 	{ //FIXME
 		const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(clumpBody->shape));
-		Scene* scene(Omega::instance().getScene().get());
-		int    totalNumber = clump->members.size();
-		int    count       = 0;
+		Scene*                  scene(Omega::instance().getScene().get());
+		int                     totalNumber = clump->members.size();
+		int                     count       = 0;
 		while (count < totalNumber) {
 			//each time we erase the first one (begin()), the next one becomes first
 			shared_ptr<Body> memberBody(YADE_PTR_CAST<Body>(Body::byId(clump->members.begin()->first, scene)));
@@ -1345,7 +1345,10 @@ try {
 	        .value("triggerPostLoad", yade::Attr::triggerPostLoad)
 	        .value("noResize", yade::Attr::noResize);
 
-	py::class_<pyOmega>("Omega","The whole YADE world made of one or, possibly, several :yref:`scenes<Scene>` serving as independent simulations. The Omega instance is accessed as `O`, e.g., `O.bodies`")
+	py::class_<pyOmega>(
+	        "Omega",
+	        "The whole YADE world made of one or, possibly, several :yref:`scenes<Scene>` serving as independent simulations. The Omega instance is "
+	        "accessed as `O`, e.g., `O.bodies`")
 	        .add_property("iter", &pyOmega::iter, "Get current step number")
 	        .add_property(
 	                "subStep",
@@ -1501,7 +1504,11 @@ try {
 	                "Counter for number of syncs in ForceContainer, for profiling purposes.")
 	        .add_property("numThreads", &pyOmega::numThreads_get /* ,&pyOmega::numThreads_set*/, "Get maximum number of threads openMP can use.")
 	        .add_property("cell", &pyOmega::cell_get, "Periodic :yref:`Cell` of the current scene (None if the scene is aperiodic).")
-	        .add_property("periodic", &pyOmega::periodic_get, &pyOmega::periodic_set, "Get/set whether the current :yref:`scene is periodic<Scene.isPeriodic>` or not (True/False).")
+	        .add_property(
+	                "periodic",
+	                &pyOmega::periodic_get,
+	                &pyOmega::periodic_set,
+	                "Get/set whether the current :yref:`scene is periodic<Scene.isPeriodic>` or not (True/False).")
 	        .def("exitNoBacktrace",
 	             &pyOmega::exitNoBacktrace,
 	             (py::arg("status") = 0),

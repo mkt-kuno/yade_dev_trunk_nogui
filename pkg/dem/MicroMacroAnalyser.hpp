@@ -35,9 +35,9 @@ public:
 	~MicroMacroAnalyser();
 	void action() override;
 	/// Set current state as initial (state=1) or final (state=2) congiguration for later kinematic analysis on the increment; if requested : save snapshots (with specific format) - possibly including contact forces increments on the state1->state2 interval
-	void setState(unsigned int state, bool save_states = false, bool computeIncrement = false, mask_t mask=0);
+	void setState(unsigned int state, bool save_states = false, bool computeIncrement = false, mask_t mask = 0);
 	/// Copy the current simulation in a TriaxialState structure. If filename!=NULL, save it to a file that can be reloaded later for computing strain increments, state must be 1 or 2.
-	CGT::TriaxialState& makeState(unsigned int state, const char* filename = NULL, mask_t mask=0);
+	CGT::TriaxialState& makeState(unsigned int state, const char* filename = NULL, mask_t mask = 0);
 	//const vector<CGT::Tenseur3>& makeDeformationArray(const char* state_file1, const char* state_file0);
 	shared_ptr<CGT::KinematicLocalisationAnalyser> analyser;
 	void                                           postLoad(MicroMacroAnalyser&);

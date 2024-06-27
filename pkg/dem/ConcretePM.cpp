@@ -129,7 +129,7 @@ Real CpmPhys::solveBeta(const Real c, const Real N)
 		cummBetaIter++;
 #endif
 		const auto aux = c * exp(N * ret) + exp(ret);
-		f        = log(aux);
+		f              = log(aux);
 		if (math::abs(f) < maxError) return Real(ret);
 		const auto df = (c * N * exp(N * ret) + exp(ret)) / aux;
 		ret -= f / df;

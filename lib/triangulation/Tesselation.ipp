@@ -39,8 +39,8 @@ namespace CGT {
 		compute();
 	}
 
-	template <class TT> _Tesselation<TT>::~_Tesselation(void) {}
-	
+	template <class TT> _Tesselation<TT>::~_Tesselation(void) { }
+
 	template <class TT> void _Tesselation<TT>::Clear(void)
 	{
 		if (Tri) Tri->clear();

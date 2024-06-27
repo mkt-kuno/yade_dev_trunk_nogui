@@ -103,9 +103,11 @@ public:
 	static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot);
 
 	boost::python::dict members_get() const;
-	vector<Body::id_t> ids_get() const {
+	vector<Body::id_t>  ids_get() const
+	{
 		auto ids_ = vector<Body::id_t>();
-		for (const auto& m : members) ids_.push_back(m.first);
+		for (const auto& m : members)
+			ids_.push_back(m.first);
 		return ids_;
 	}
 
