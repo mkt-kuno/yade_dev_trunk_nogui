@@ -150,7 +150,7 @@ if ('PFVFLOW' in features):
 
 	if (float(flow.execTime) / float(sum([e.execTime for e in O.engines]))) > 0.6:
 		print(
-		        "(INFO) DEM-PFV: More than 60\% of cpu time in FlowEngine (",
+		        r"(INFO) DEM-PFV: More than 60\% of cpu time in FlowEngine (",
 		        100. * (float(flow.execTime) / float(sum([e.execTime for e in O.engines]))),
 		        "%). Should not happen with efficient libraries (check blas/lapack/cholmod implementations)"
 		)

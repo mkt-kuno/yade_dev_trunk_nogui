@@ -21,14 +21,14 @@ from . import wrapper
 
 # Update docstring of your class/function like this:
 #
-#	wrapper.YourClass.__doc__="""
-#		This class is documented from _extraDocs.py. Yay!
+# 	wrapper.YourClass.__doc__="""
+# 		This class is documented from _extraDocs.py. Yay!
 #
-#		.. note::
-#			The c++ documentation will be overwritten by this string.
-#	"""
+# 		.. note::
+# 			The c++ documentation will be overwritten by this string.
+# 	"""
 
-wrapper.TriaxialTest.__doc__ = '''
+wrapper.TriaxialTest.__doc__ = r'''
 Create a scene for triaxal test.
 
 **Introduction**
@@ -185,7 +185,7 @@ If this functor is called for :yref:`L6Geom`, local rotation is updated as
 
 '''
 
-wrapper.LawTester.__doc__ = '''Prescribe and apply deformations of an interaction in terms of local mutual displacements and rotations. The loading path is specified either using :yref:`path<LawTester.path>` (as sequence of 6-vectors containing generalized displacements $u_x$, $u_y$, $u_z$, $\phi_x$, $\phi_y$, $\phi_z$) or :yref:`disPath<LawTester.disPath>` ($u_x$, $u_y$, $u_z$) and :yref:`rotPath<LawTester.rotPath>` ($\phi_x$, $\phi_y$, $\phi_z$). Time function with time values (step numbers) corresponding to points on loading path is given by :yref:`pathSteps<LawTester.pathSteps>`. Loading values are linearly interpolated between given loading path points, and starting zero-value (the initial configuration) is assumed for both :yref:`path<LawTester.path>` and :yref:`pathSteps<LawTester.pathSteps>`. :yref:`hooks<LawTester.hooks>` can specify python code to run when respective point on the path is reached; when the path is finished, :yref:`doneHook<LawTester.doneHook>` will be run.
+wrapper.LawTester.__doc__ = r"""Prescribe and apply deformations of an interaction in terms of local mutual displacements and rotations. The loading path is specified either using :yref:`path<LawTester.path>` (as sequence of 6-vectors containing generalized displacements $u_x$, $u_y$, $u_z$, $\phi_x$, $\phi_y$, $\phi_z$) or :yref:`disPath<LawTester.disPath>` ($u_x$, $u_y$, $u_z$) and :yref:`rotPath<LawTester.rotPath>` ($\phi_x$, $\phi_y$, $\phi_z$). Time function with time values (step numbers) corresponding to points on loading path is given by :yref:`pathSteps<LawTester.pathSteps>`. Loading values are linearly interpolated between given loading path points, and starting zero-value (the initial configuration) is assumed for both :yref:`path<LawTester.path>` and :yref:`pathSteps<LawTester.pathSteps>`. :yref:`hooks<LawTester.hooks>` can specify python code to run when respective point on the path is reached; when the path is finished, :yref:`doneHook<LawTester.doneHook>` will be run.
 
 
 LawTester should be placed between :yref:`InteractionLoop` and :yref:`NewtonIntegrator` in the simulation loop, since it controls motion via setting linear/angular velocities on particles; those velocities are integrated by :yref:`NewtonIntegrator` to yield an actual position change, which in turn causes :yref:`IGeom` to be updated (and :yref:`contact law<LawFunctor>` applied) when :yref:`InteractionLoop` is executed. Constitutive law generating forces on particles will not affect prescribed particle motion, since both particles have all :yref:`DoFs blocked<State.blockedDOFs>` when first used with LawTester.
@@ -214,4 +214,4 @@ LawTester-operated interactions can be rendered with :yref:`GlExtra_LawTester` r
 
 See :ysrc:`scripts/test/law-test.py` for an example.
 
-'''
+"""

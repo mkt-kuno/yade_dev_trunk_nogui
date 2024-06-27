@@ -10,7 +10,7 @@ from yade.minieigenHP import *
 
 
 def textExt(fileName, format='x_y_z_r', shift=Vector3.Zero, scale=1.0, attrs=[], **kw):
-	"""Load sphere coordinates from file in a format selected by the ``format`` argument, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
+	r"""Load sphere coordinates from file in a format selected by the ``format`` argument, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
 
 	:param str filename: file name
 	:param str format: selected input format. Supported ``'x_y_z_r'``(default), ``'x_y_z_r_matId'``, ``'x_y_z_r_attrs'``
@@ -57,7 +57,7 @@ def textExt(fileName, format='x_y_z_r', shift=Vector3.Zero, scale=1.0, attrs=[],
 
 
 def textFacets(fileName, format='x1_y1_z1_x2_y2_z2_x3_y3_z3', shift=Vector3.Zero, scale=1.0, attrs=[], **kw):
-	"""Load facet coordinates from file in a format selected by the ``format`` argument, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
+	r"""Load facet coordinates from file in a format selected by the ``format`` argument, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
 	
 	:param str filename: file name
 	:param str format: selected input format. Supported ``'x1_y1_z1_x2_y2_z2_x3_y3_z3'``(default), ``'x1_y1_z1_x2_y2_z2_x3_y3_z3_matId'``, ``'id_x1_y1_z1_x2_y2_z2_x3_y3_z3_matId'`` or ``'x1_y1_z1_x2_y2_z2_x3_y3_z3_attrs'``
@@ -112,7 +112,7 @@ def textFacets(fileName, format='x1_y1_z1_x2_y2_z2_x3_y3_z3', shift=Vector3.Zero
 
 
 def textClumps(fileName, shift=Vector3.Zero, discretization=0, orientation=Quaternion((0, 1, 0), 0.0), scale=1.0, **kw):
-	"""Load clumps-members from file in a format selected by the ``format`` argument, insert them to the simulation.
+	r"""Load clumps-members from file in a format selected by the ``format`` argument, insert them to the simulation.
 
 	:param str filename: file name
 	:param str format: selected input format. Supported ``'x_y_z_r'``(default), ``'x_y_z_r_clumpId'``
@@ -156,7 +156,7 @@ def textClumps(fileName, shift=Vector3.Zero, discretization=0, orientation=Quate
 
 
 def text(fileName, shift=Vector3.Zero, scale=1.0, **kw):
-	"""Load sphere coordinates from file, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
+	r"""Load sphere coordinates from file, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
 
 	:param string filename: file which has 4 colums [x, y, z, radius].
 	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
@@ -374,7 +374,7 @@ def gengeo(mntable, shift=Vector3.Zero, scale=1.0, **kw):
 
 
 def unv(fileName, shift=(0, 0, 0), scale=1.0, returnConnectivityTable=False, **kw):
-	""" Import geometry from unv file, return list of created facets.
+	r""" Import geometry from unv file, return list of created facets.
 
 		:param string fileName: name of unv file
 		:param (float,float,float)|Vector3 shift: (X,Y,Z) parameter moves the specimen.
@@ -470,7 +470,7 @@ def unv(fileName, shift=(0, 0, 0), scale=1.0, returnConnectivityTable=False, **k
 
 
 def iges(fileName, shift=(0, 0, 0), scale=1.0, returnConnectivityTable=False, **kw):
-	""" Import triangular mesh from .igs file, return list of created facets.
+	r""" Import triangular mesh from .igs file, return list of created facets.
 
 		:param string fileName: name of iges file
 		:param (float,float,float)|Vector3 shift: (X,Y,Z) parameter moves the specimen.
@@ -496,7 +496,7 @@ def iges(fileName, shift=(0, 0, 0), scale=1.0, returnConnectivityTable=False, **
 
 
 def ele(nodeFileName, eleFileName, shift=(0, 0, 0), scale=1.0, **kw):
-	""" Import tetrahedral mesh from .ele file, return list of created tetrahedrons.
+	r""" Import tetrahedral mesh from .ele file, return list of created tetrahedrons.
 
 		:param string nodeFileName: name of .node file
 		:param string eleFileName: name of .ele file
@@ -542,7 +542,7 @@ def ele(nodeFileName, eleFileName, shift=(0, 0, 0), scale=1.0, **kw):
 
 
 def textPolyhedra(fileName, material, shift=Vector3.Zero, scale=1.0, orientation=Quaternion((0, 1, 0), 0.0), **kw):
-	"""Load polyhedra from a text file.
+	r"""Load polyhedra from a text file.
 	
 	:param str filename: file name. Expected file format is the one output by export.textPolyhedra.
 	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
@@ -587,7 +587,7 @@ def textPolyhedra(fileName, material, shift=Vector3.Zero, scale=1.0, orientation
 
 
 def blockMeshDict(path, patchasWall=True, emptyasWall=True, **kw):
-	"""Load openfoam's blockMeshDict file's "boundary" section as facets.
+	r"""Load openfoam's blockMeshDict file's "boundary" section as facets.
 
 	:param str path: file name. Typical value is: "system/blockMeshDict".
 	:param bool patchasWall: load "patch"-es as walls.
@@ -810,7 +810,7 @@ def blockMeshDict(path, patchasWall=True, emptyasWall=True, **kw):
 
 
 def polyMesh(path, patchasWall=True, emptyasWall=True, **kw):
-	"""Load openfoam's polyMesh directory as facets.
+	r"""Load openfoam's polyMesh directory as facets.
 
 	:param str path: directory path. Typical value is: "constant/polyMesh".
 	:param bool patchAsWall: load "patch"-es as walls.

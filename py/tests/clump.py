@@ -27,10 +27,10 @@ class TestSimpleClump(unittest.TestCase):
 		self.assertEqual(b1.clumpId, bC.id)
 		self.assertEqual(b2.clumpId, bC.id)
 		self.assertEqual(bC.clumpId, bC.id)
-		self.assert_(bC.isClump)
-		self.assert_(b1.isClumpMember)
-		self.assert_(b2.isClumpMember)
-		self.assert_(not bC.bounded)
+		self.assertTrue(bC.isClump)
+		self.assertTrue(b1.isClumpMember)
+		self.assertTrue(b2.isClumpMember)
+		self.assertTrue(not bC.bounded)
 
 	def testStaticProperties(self):
 		"Clump: mass, centroid, intertia"

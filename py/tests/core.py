@@ -57,17 +57,17 @@ class TestLoop(unittest.TestCase):
 		'Loop: substepping'
 		O.engines = [ForceResetter(), PyRunner(initRun=True, iterPeriod=1, command='pass')]
 		# value outside the loop
-		self.assert_(O.subStep == -1)
+		self.assertTrue(O.subStep == -1)
 		# O.subStep is meaningful when substepping
 		O.subStepping = True
 		O.step()
-		self.assert_(O.subStep == 0)
+		self.assertTrue(O.subStep == 0)
 		O.step()
-		self.assert_(O.subStep == 1)
+		self.assertTrue(O.subStep == 1)
 		# when substepping is turned off in the middle of the loop, the next step finishes the loop
 		O.subStepping = False
 		O.step()
-		self.assert_(O.subStep == -1)
+		self.assertTrue(O.subStep == -1)
 		# subStep==0 inside the loop without substepping
 		O.engines = [
 		        PyRunner(
@@ -89,26 +89,26 @@ class TestLoop(unittest.TestCase):
 		# run prologue and the first engine, which modifies O.engines
 		O.step()
 		O.step()
-		self.assert_(O.subStep == 1)
-		self.assert_(len(O.engines) == 3)  # gives modified engine sequence transparently
-		self.assert_(len(O._nextEngines) == 3)
-		self.assert_(len(O._currEngines) == 2)
+		self.assertTrue(O.subStep == 1)
+		self.assertTrue(len(O.engines) == 3)  # gives modified engine sequence transparently
+		self.assertTrue(len(O._nextEngines) == 3)
+		self.assertTrue(len(O._currEngines) == 2)
 		O.step()
 		O.step()
 		# run the 2nd ForceResetter, and epilogue
-		self.assert_(O.subStep == -1)
+		self.assertTrue(O.subStep == -1)
 		# start the next step, nextEngines should replace engines automatically
 		O.step()
-		self.assert_(O.subStep == 0)
-		self.assert_(len(O._nextEngines) == 0)
-		self.assert_(len(O.engines) == 3)
-		self.assert_(len(O._currEngines) == 3)
+		self.assertTrue(O.subStep == 0)
+		self.assertTrue(len(O._nextEngines) == 0)
+		self.assertTrue(len(O.engines) == 3)
+		self.assertTrue(len(O._currEngines) == 3)
 
 	def testDead(self):
 		'Loop: dead engines are not run'
 		O.engines = [PyRunner(dead=True, initRun=True, iterPeriod=1, command='pass')]
 		O.step()
-		self.assert_(O.engines[0].nDone == 0)
+		self.assertTrue(O.engines[0].nDone == 0)
 
 
 class TestIO(unittest.TestCase):
@@ -127,7 +127,7 @@ class TestIO(unittest.TestCase):
 				failed.add(c)
 		failed = list(failed)
 		failed.sort()
-		self.assert_(len(failed) == 0, 'Failed classes were: ' + ' '.join(failed))
+		self.assertTrue(len(failed) == 0, 'Failed classes were: ' + ' '.join(failed))
 
 
 class TestMaterialStateAssociativity(unittest.TestCase):
@@ -153,7 +153,7 @@ class TestMaterialStateAssociativity(unittest.TestCase):
 
 	def testMaterialReturnsState(self):
 		"Material+State: CpmMat returns CpmState when asked for newAssocState"
-		self.assert_(CpmMat().newAssocState().__class__ == CpmState)
+		self.assertTrue(CpmMat().newAssocState().__class__ == CpmState)
 
 
 class TestBodies(unittest.TestCase):
@@ -169,20 +169,20 @@ class TestBodies(unittest.TestCase):
 		counted = 0
 		for b in O.bodies:
 			counted += 1
-		self.assert_(counted == self.count)
+		self.assertTrue(counted == self.count)
 
 	def testLen(self):
 		"Bodies: len(O.bodies)"
-		self.assert_(len(O.bodies) == self.count)
+		self.assertTrue(len(O.bodies) == self.count)
 
 	def testErase(self):
 		"Bodies: erased bodies are None in python"
 		O.bodies.erase(0)
-		self.assert_(O.bodies[0] == None)
+		self.assertTrue(O.bodies[0] == None)
 
 	def testNegativeIndex(self):
 		"Bodies: Negative index counts backwards (like python sequences)."
-		self.assert_(O.bodies[-1] == O.bodies[self.count - 1])
+		self.assertTrue(O.bodies[-1] == O.bodies[self.count - 1])
 
 	def testErasedIterate(self):
 		"Bodies: Iterator silently skips erased ones"
@@ -194,7 +194,7 @@ class TestBodies(unittest.TestCase):
 				removed += 1
 		for b in O.bodies:
 			counted += 1
-		self.assert_(counted == self.count - removed)
+		self.assertTrue(counted == self.count - removed)
 
 	def testErasedAndNewlyCreatedSphere(self):
 		"Bodies: The bug is described in LP:1001194. If the new body was created after deletion of previous, it has no bounding box"
@@ -209,21 +209,21 @@ class TestBodies(unittest.TestCase):
 		]
 		O.dt = .5e-4 * utils.PWaveTimeStep()
 		#Before first step the bodies should not have bounds
-		self.assert_(O.bodies[id1].bound == None and O.bodies[id2].bound == None)
+		self.assertTrue(O.bodies[id1].bound == None and O.bodies[id2].bound == None)
 		O.run(1, True)
 		#After first step the bodies should have bounds
-		self.assert_(O.bodies[id1].bound != None and O.bodies[id2].bound != None)
+		self.assertTrue(O.bodies[id1].bound != None and O.bodies[id2].bound != None)
 		#Add 3rd body
 		id3 = O.bodies.append(utils.sphere([0.0, 4.0, 0.0], 0.5))
 		O.run(1, True)
-		self.assert_(O.bodies[id1].bound != None and O.bodies[id2].bound != None and O.bodies[id3].bound != None)
+		self.assertTrue(O.bodies[id1].bound != None and O.bodies[id2].bound != None and O.bodies[id3].bound != None)
 		#Remove 3rd body
 		O.bodies.erase(id3)
 		O.run(1, True)
 		#Add 4th body
 		id4 = O.bodies.append(utils.sphere([0.0, 6.0, 0.0], 0.5))
 		O.run(1, True)
-		self.assert_(O.bodies[id1].bound != None and O.bodies[id2].bound != None and O.bodies[id4].bound != None)
+		self.assertTrue(O.bodies[id1].bound != None and O.bodies[id2].bound != None and O.bodies[id4].bound != None)
 
 
 class TestMaterials(unittest.TestCase):
@@ -237,34 +237,34 @@ class TestMaterials(unittest.TestCase):
 	def testShared(self):
 		"Material: shared_ptr's makes change in material immediate everywhere"
 		O.bodies[0].mat.young = 23423333
-		self.assert_(O.bodies[0].mat.young == O.bodies[1].mat.young)
+		self.assertTrue(O.bodies[0].mat.young == O.bodies[1].mat.young)
 
 	def testSharedAfterReload(self):
 		"Material: shared_ptr's are preserved when saving/loading"
 		O.saveTmp(quiet=True)
 		O.loadTmp(quiet=True)
 		O.bodies[0].mat.young = 9087438484
-		self.assert_(O.bodies[0].mat.young == O.bodies[1].mat.young)
+		self.assertTrue(O.bodies[0].mat.young == O.bodies[1].mat.young)
 
 	def testLen(self):
 		"Material: len(O.materials)"
-		self.assert_(len(O.materials) == 2)
+		self.assertTrue(len(O.materials) == 2)
 
 	def testNegativeIndex(self):
 		"Material: negative index counts backwards."
-		self.assert_(O.materials[-1] == O.materials[1])
+		self.assertTrue(O.materials[-1] == O.materials[1])
 
 	def testIterate(self):
 		"Material: iteration over O.materials"
 		counted = 0
 		for m in O.materials:
 			counted += 1
-		self.assert_(counted == len(O.materials))
+		self.assertTrue(counted == len(O.materials))
 
 	def testAccess(self):
 		"Material: find by index or label; KeyError raised for invalid label."
 		self.assertRaises(KeyError, lambda: O.materials['nonexistent label'])
-		self.assert_(O.materials['materialZero'] == O.materials[0])
+		self.assertTrue(O.materials['materialZero'] == O.materials[0])
 
 
 class TestMatchMaker(unittest.TestCase):

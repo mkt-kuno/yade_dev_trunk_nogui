@@ -38,13 +38,13 @@ from ._gts import *
 def get_coords_and_face_indices(s, unzip=False):
 	"""Returns the coordinates and face indices of Surface s.
 
-    If unzip is True then four tuples are returned.  The first three 
-    are the x, y, and z coordinates for each Vertex on the Surface.  
-    The last is a list of tuples, one for each Face on the Surface, 
-    containing 3 indices linking the Face Vertices to the coordinate 
+    If unzip is True then four tuples are returned.  The first three
+    are the x, y, and z coordinates for each Vertex on the Surface.
+    The last is a list of tuples, one for each Face on the Surface,
+    containing 3 indices linking the Face Vertices to the coordinate
     lists.
 
-    If unzip is False then the coordinates are given in a single list 
+    If unzip is False then the coordinates are given in a single list
     of 3-tuples.
     """
 	vertices = s.vertices()

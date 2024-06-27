@@ -56,7 +56,7 @@ from yade._packObb import *
 if (True):
 
 	def SpherePack_toSimulation(self, rot=Matrix3.Identity, **kw):
-		"""Append spheres directly to the simulation. In addition calling :yref:`O.bodies.append<BodyContainer.append>`,
+		r"""Append spheres directly to the simulation. In addition calling :yref:`O.bodies.append<BodyContainer.append>`,
   this method also appropriately sets periodic cell information of the simulation.
   
     >>> from yade import pack; from math import *
@@ -293,7 +293,7 @@ if (True):
 
 
 def gtsSurface2Facets(surf, **kw):
-	"""Construct facets from given GTS surface. \*\*kw is passed to utils.facet."""
+	r"""Construct facets from given GTS surface. \*\*kw is passed to utils.facet."""
 	import gts
 	return [utils.facet([v.coords() for v in face.vertices()], **kw) for face in surf.faces()]
 

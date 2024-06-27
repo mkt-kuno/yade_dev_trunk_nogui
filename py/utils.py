@@ -24,7 +24,7 @@ from yade._utils import *
 
 
 def saveVars(mark='', loadNow=True, **kw):
-	"""Save passed variables into the simulation so that it can be recovered when the simulation is loaded again.
+	r"""Save passed variables into the simulation so that it can be recovered when the simulation is loaded again.
 
 	For example, variables *a*, *b* and *c* are defined. To save them, use::
 
@@ -418,7 +418,7 @@ def levelSetBody(
 			extents = Vector3(extents[0], extents[1], extents[2])
 		b.shape = lsSimpleShape(3, AlignedBox3(-extents, extents), epsilons=epsilons, step=spacing, smearCoeff=smearCoeff)
 	elif len(distField):
-		b.shape = LevelSet(lsGrid=grid, distField=distField, smearCoeff=smearCoeff) # NB: we could pass twoD = sthg here, function of distField size
+		b.shape = LevelSet(lsGrid=grid, distField=distField, smearCoeff=smearCoeff)  # NB: we could pass twoD = sthg here, function of distField size
 	if clump != None:
 		if not isinstance(clump, Clump):
 			raise ValueError("Please give a Clump instance as a clump attribute, instead of ", clump)
@@ -936,7 +936,7 @@ This class is used by :yref:`yade.utils.readParamsFromTable`.
 		"Setup the reader class, read data into memory."
 		import re
 		# read file in memory, remove newlines and comments; the [''] makes lines 1-indexed
-		ll = [re.sub('\s*#.*', '', l[:-1]) for l in [''] + open(file, 'r').readlines()]
+		ll = [re.sub(r'\s*#.*', '', l[:-1]) for l in [''] + open(file, 'r').readlines()]
 		# usable lines are those that contain something else than just spaces
 		usableLines = [i for i in range(len(ll)) if not re.match(r'^\s*(#.*)?$', ll[i])]
 		headings = ll[usableLines[0]].split()
@@ -1011,7 +1011,7 @@ def waitIfBatch():
 
 
 def readParamsFromTable(tableFileLine=None, noTableOk=True, unknownOk=False, **kw):
-	"""
+	r"""
 	Read parameters from a file and assign them to __builtin__ variables.
 
 	The format of the file is as follows (commens starting with # and empty lines allowed)::

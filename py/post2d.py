@@ -298,7 +298,7 @@ def data(extractor, flattener, intr=False, onlyDynamic=True, stDev=None, relThre
 
 
 def plot(data, axes=None, alpha=.5, clabel=True, cbar=False, aspect='equal', **kw):
-	"""Given output from post2d.data, plot the scalar as discrete or smooth plot.
+	r"""Given output from post2d.data, plot the scalar as discrete or smooth plot.
 
 	For raw discrete data, plot filled circles with radii of particles, colored by the scalar value.
 

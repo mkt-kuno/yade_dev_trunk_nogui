@@ -34,9 +34,9 @@ def polyhedra(material, size=Vector3(1, 1, 1), seed=None, v=[], mask=1, fixed=Fa
 	if len(v) > 0:
 		b.shape = Polyhedra(v=v)
 	else:
-		b.shape = Polyhedra(size=size, seed=random.randint(0, 1E6))
+		b.shape = Polyhedra(size=size, seed=random.randint(0, int(1E6)))
 	if color[0] == -1:
-		b.shape.color = randomColor(seed=random.randint(0, 1E6))
+		b.shape.color = randomColor(seed=random.randint(0, int(1E6)))
 	else:
 		b.shape.color = color
 	b.mat = material
@@ -138,11 +138,11 @@ def fillBox(mincoord, maxcoord, material, sizemin=[1, 1, 1], sizemax=[1, 1, 1], 
 	:param float seed: random seed
 	"""
 	random.seed(seed)
-	v = fillBox_cpp(mincoord, maxcoord, sizemin, sizemax, ratio, random.randint(0, 1E6), material)
+	v = fillBox_cpp(mincoord, maxcoord, sizemin, sizemax, ratio, random.randint(0, int(1E6)), material)
 	#lastnan = -1
 	#for i in range(0,len(v)):
 	#	if(math.isnan(v[i][0])):
-	#		O.bodies.append(polyhedra(material,seed=random.randint(0,1E6),v=v[lastnan+1:i],mask=1,fixed=False))
+	#		O.bodies.append(polyhedra(material,seed=random.randint(0,int(1E6)),v=v[lastnan+1:i],mask=1,fixed=False))
 	#		lastnan = i
 
 
@@ -150,9 +150,9 @@ def fillBox(mincoord, maxcoord, material, sizemin=[1, 1, 1], sizemax=[1, 1, 1], 
 #fill box [mincoord, maxcoord] by non-overlaping polyhedrons with random geometry and sizes within the range (uniformly distributed)
 def fillBoxByBalls(mincoord, maxcoord, material, sizemin=[1, 1, 1], sizemax=[1, 1, 1], ratio=[0, 0, 0], seed=None, mask=1, numpoints=60):
 	random.seed(seed)
-	v = fillBoxByBalls_cpp(mincoord, maxcoord, sizemin, sizemax, ratio, random.randint(0, 1E6), material, numpoints)
+	v = fillBoxByBalls_cpp(mincoord, maxcoord, sizemin, sizemax, ratio, random.randint(0, int(1E6)), material, numpoints)
 	#lastnan = -1
 	#for i in range(0,len(v)):
 	#	if(math.isnan(v[i][0])):
-	#		O.bodies.append(polyhedra(material,seed=random.randint(0,1E6),v=v[lastnan+1:i],mask=1,fixed=False))
+	#		O.bodies.append(polyhedra(material,seed=random.randint(0,int(1E6)),v=v[lastnan+1:i],mask=1,fixed=False))
 	#		lastnan = i

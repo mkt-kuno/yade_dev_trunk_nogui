@@ -12,7 +12,7 @@ from yade.minieigenHP import *
 
 #facetBox===============================================================
 def facetBox(center, extents, orientation=Quaternion((0, 1, 0), 0.0), wallMask=63, **kw):
-	"""
+	r"""
 	Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
 	If any of the box dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the box.
 
@@ -29,7 +29,7 @@ def facetBox(center, extents, orientation=Quaternion((0, 1, 0), 0.0), wallMask=6
 
 #facetParallelepiped===============================================================
 def facetParallelepiped(center, extents, height, orientation=Quaternion((0, 1, 0), 0.0), wallMask=63, **kw):
-	"""
+	r"""
 	Create arbitrarily-aligned Parallelepiped composed of facets, with given center, extents, height  and orientation.
 	If any of the parallelepiped dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the parallelepiped.
 
@@ -115,7 +115,7 @@ def facetCylinder(
         radiusBottomInner=-1,
         **kw
 ):
-	"""
+	r"""
 	Create arbitrarily-aligned cylinder composed of facets, with given center, radius, height and orientation.
 	Return List of facets forming the cylinder;
 
@@ -154,7 +154,7 @@ def facetCylinder(
 
 #facetSphere==========================================================
 def facetSphere(center, radius, thetaResolution=8, phiResolution=8, returnElementMap=False, **kw):
-	"""
+	r"""
 	Create arbitrarily-aligned sphere composed of facets, with given center, radius and orientation.
 	Return List of facets forming the sphere. Parameters inspired by ParaView sphere glyph
 
@@ -219,7 +219,7 @@ def facetCone(
         radiusBottomInner=-1,
         **kw
 ):
-	"""
+	r"""
 	Create arbitrarily-aligned cone composed of facets, with given center, radius, height and orientation.
 	Return List of facets forming the cone;
 
@@ -258,7 +258,7 @@ def facetCone(
 
 #facetPolygon===========================================================
 def facetPolygon(center, radiusOuter, orientation=Quaternion((0, 1, 0), 0.0), segmentsNumber=10, angleRange=None, radiusInner=0, **kw):
-	"""
+	r"""
 	Create arbitrarily-aligned polygon composed of facets, with given center, radius (outer and inner) and orientation.
 	Return List of facets forming the polygon;
 
@@ -287,7 +287,7 @@ def facetPolygon(center, radiusOuter, orientation=Quaternion((0, 1, 0), 0.0), se
 
 #facetHelix===========================================================
 def facetHelix(center, radiusOuter, pitch, orientation=Quaternion((0, 1, 0), 0.0), segmentsNumber=10, angleRange=None, radiusInner=0, **kw):
-	"""
+	r"""
 	Create arbitrarily-aligned helix composed of facets, with given center, radius (outer and inner), pitch and orientation.
 	Return List of facets forming the helix;
 
@@ -330,7 +330,7 @@ def facetBunker(
         closeGap=False,
         **kw
 ):
-	"""
+	r"""
 	Create arbitrarily-aligned bunker, composed of facets, with given center, radii, heights and orientation.
 	Return List of facets forming the bunker;
 
@@ -492,7 +492,7 @@ def facetCylinderConeGenerator(
         radiusBottomInner=-1,
         **kw
 ):
-	"""
+	r"""
 	Please, do not use this function directly! Use geom.facetCylinder and geom.facetCone instead.
 	This is the base function for generating cylinders and cones from facets.
 
