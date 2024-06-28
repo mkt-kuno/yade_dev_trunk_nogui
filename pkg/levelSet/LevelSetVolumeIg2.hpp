@@ -42,7 +42,7 @@ public:
 
 * $u_n = V_n = \sum_i V_i(\vec{x}_i)$
 * $\vec{n} = \frac{ \sum_i V_i \vec{\nabla} \phi_1(\vec{x_i}) - \sum_i V_i \vec{\nabla} \phi_2(\vec{x_i}) }{2V_n}$  chosen to be oriented from :yref:`1<Interaction.id1>` to :yref:`2<Interaction.id2>`
-* $\vec{C} = \frac{1}{V_n} \sum_i \vec{x}_i * V_i(\vec{x}_i) $
+* $\vec{C} = \frac{1}{V_n} \sum_i \vec{x}_i * V_i(\vec{x}_i)$
 
 .. note:: Because this functor expresses the particle overlap $u_n$ as a volume, care needs to be taken that only volume-based contact laws are used. Current contact laws in YADE mainly use the overlap distance to determine the force.
 )""",

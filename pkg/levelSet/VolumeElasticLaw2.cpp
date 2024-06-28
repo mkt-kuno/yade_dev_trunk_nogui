@@ -43,7 +43,7 @@ bool Law2_VolumeGeom_FrictPhys_Elastic::go(shared_ptr<IGeom>& ig, shared_ptr<IPh
 			return false;
 	}
 	Real& un          = geom->penetrationVolume;
-	phys->normalForce = phys->kn * math::max(un, (Real)0) * geom->normal;
+	phys->normalForce = phys->kn * math::pow( math::max(un, (Real)0), volumePower) * geom->normal;
 
 	Vector3r&       shearForce = geom->rotate(phys->shearForce);
 	const Vector3r& shearDisp  = geom->shearIncrement();
