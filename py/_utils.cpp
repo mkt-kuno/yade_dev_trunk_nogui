@@ -278,7 +278,7 @@ void wireNoSpheres() { wireSome("noSpheres"); }
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *   1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimers.
  *   2. Redistributions in binary form must reproduce the above copyright notice in the documentation and/or other materials provided with the distribution.
- *   3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific prior written permission. 
+ *   3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific prior written permission.
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * http://numpy.scipy.org/numpydoc/numpy-13.html told me how to use Numeric.array from c
@@ -288,10 +288,15 @@ bool pointInsidePolygon(py::tuple xy, py::object vertices)
 	Real           testx = py::extract<Real>(xy[0])(), testy = py::extract<Real>(xy[1])();
 	char**         vertData;
 	int            rows, cols;
+	if (PyArray_API == NULL) import_array();
+	if (!PyArray_Check(vertices.ptr())) throw invalid_argument("Vertices must be a NumPy array");
 	PyArrayObject* vert   = (PyArrayObject*)vertices.ptr();
-	int            result = PyArray_As2D((PyObject**)&vert /* is replaced */, &vertData, &rows, &cols, PyArray_DOUBLE);
-	if (result != 0) throw invalid_argument("Unable to cast vertices to 2d array");
+	if (PyArray_NDIM(vert) != 2) throw invalid_argument("Input array must be 2-dimensional");
+	npy_intp dims[2] = { PyArray_DIM(vert, 0), PyArray_DIM(vert, 1) };
+	rows = (int)dims[0], cols = (int)dims[1];
 	if (cols != 2 || rows < 3) throw invalid_argument("Vertices must have 2 columns (x and y) and at least 3 rows.");
+	int result = PyArray_AsCArray((PyObject**)&vert /* is replaced */, (void**)&vertData, dims, 2, PyArray_DescrFromType(NPY_DOUBLE));
+	if (result < 0) throw invalid_argument("Unable to cast vertices to 2d array");
 	int  i /*current node*/, j /*previous node*/;
 	bool inside = false;
 	for (i = 0, j = rows - 1; i < rows; j = i++) {
@@ -299,7 +304,7 @@ bool pointInsidePolygon(py::tuple xy, py::object vertices)
 		       vx_j = *(double*)(vert->data + j * vert->strides[0]), vy_j = *(double*)(vert->data + j * vert->strides[0] + vert->strides[1]);
 		if (((vy_i > testy) != (vy_j > testy)) && (testx < (vx_j - vx_i) * (testy - vy_i) / (vy_j - vy_i) + vx_i)) inside = !inside;
 	}
-	Py_DECREF(vert);
+	PyArray_Free((PyObject*)vert, (void*)vertData);
 	return inside;
 }
 
