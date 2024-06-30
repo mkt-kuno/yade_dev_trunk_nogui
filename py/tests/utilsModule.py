@@ -5,6 +5,7 @@
 
 import unittest
 import random, math
+import numpy as np
 from yade.wrapper import *
 from yade._customConverters import *
 from yade import utils
@@ -47,3 +48,22 @@ class TestUtils(unittest.TestCase):
 		j = utils.createInteraction(0, 2)
 		self.assertTrue(j.iterBorn == 1 and j.iterMadeReal == 1)
 		self.assertRaises(RuntimeError, lambda: utils.createInteraction(0, 3))
+
+	def testPointInsidePolygon(self):
+		vertices = np.array([[0, 0], [4, 0], [4, 4], [0, 4]])
+		point_inside = (2, 2)
+		point_outside = (5, 5)
+		point_edge = (4, 2)
+		point_vertex = (0, 0)
+
+		# Should return True when a point is inside.
+		self.assertTrue(utils.pointInsidePolygon(point_inside, vertices))
+
+		# Should return False when a point is outside.
+		self.assertFalse(utils.pointInsidePolygon(point_outside, vertices))
+
+		# Should return False when a point is on the edge.
+		self.assertFalse(utils.pointInsidePolygon(point_edge, vertices))
+
+		# Should return True when a point is on the vertex.
+		self.assertTrue(utils.pointInsidePolygon(point_vertex, vertices))
