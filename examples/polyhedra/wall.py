@@ -64,8 +64,7 @@ O.engines = [
         #qt.SnapshotEngine(fileBase='W',iterPeriod=50,label='snapshot')
 ]
 
-#O.dt=.5*polyhedra_utils.PWaveTimeStep()
-O.dt = 0.000025
+O.dt=.5*PWaveTimeStep()
 O.saveTmp()
 
 #O.run()

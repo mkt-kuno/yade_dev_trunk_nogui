@@ -595,7 +595,7 @@ try {
 	py::def("initMPI", initMPI, "Initialize MPI communicator, for Foam Coupling");
 	py::def("PWaveTimeStep",
 	        PWaveTimeStep,
-	        "Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
+	        "Get timestep accoring to the velocity of P-Wave propagation; computed for spheres and/or polyhedra based on their sizes, rigidities and masses.");
 	py::def("RayleighWaveTimeStep", RayleighWaveTimeStep, "Determination of time step according to Rayleigh wave speed of force propagation.");
 	py::def("getSpheresVolume",
 	        Shop__getSpheresVolume,

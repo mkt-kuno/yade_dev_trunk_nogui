@@ -122,41 +122,6 @@ bool do_Polyhedras_Intersect(const shared_ptr<Shape>& cm1, const shared_ptr<Shap
 }
 
 //**********************************************************************************
-//determination of critical time step for polyhedrons & spheres (just rough estimation)
-Real PWaveTimeStep()
-{
-	const shared_ptr<Scene> _rb = shared_ptr<Scene>();
-	shared_ptr<Scene>       rb  = (_rb ? _rb : Omega::instance().getScene());
-	Real                    dt  = std::numeric_limits<Real>::infinity();
-	for (const auto& b : *rb->bodies) {
-		if (!b || !b->material || !b->shape) continue;
-		shared_ptr<Sphere>    s = YADE_PTR_DYN_CAST<Sphere>(b->shape);
-		shared_ptr<Polyhedra> p = YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
-		if (!s && !p) continue;
-		if (!p) {
-			//spheres
-			shared_ptr<ElastMat> ebp = YADE_PTR_DYN_CAST<ElastMat>(b->material);
-			if (!ebp) continue;
-			Real density = b->state->mass / ((4. / 3.) * Mathr::PI * pow(s->radius, 3));
-			dt           = min(dt, s->radius / sqrt(ebp->young / density));
-		} else {
-			//polyhedrons
-			shared_ptr<PolyhedraMat> ebp = YADE_PTR_DYN_CAST<PolyhedraMat>(b->material);
-			if (!ebp) continue;
-			Real density = b->state->mass / p->GetVolume();
-			//get equivalent radius and use same equation as for sphere
-			Real equi_radius = pow(p->GetVolume() / ((4. / 3.) * Mathr::PI), 1. / 3.);
-			dt               = min(dt, equi_radius / sqrt(ebp->young * equi_radius / density));
-		}
-	}
-	if (dt == std::numeric_limits<Real>::infinity()) {
-		dt = 1.0;
-		LOG_WARN("PWaveTimeStep has not found any suitable spherical or polyhedral body to calculate dt. dt is set to 1.0");
-	}
-	return dt;
-}
-
-//**********************************************************************************
 //returns approximate sieve size of polyhedron
 Real SieveSize(const shared_ptr<Shape>& cm1)
 {
@@ -649,9 +614,6 @@ try {
 	YADE_SET_DOCSTRING_OPTS;
 	py::def("PrintPolyhedra", PrintPolyhedra, "Print list of vertices sorted according to polyhedrons facets.");
 	py::def("PrintPolyhedraActualPos", PrintPolyhedraActualPos, "Print list of vertices sorted according to polyhedrons facets.");
-	py::def("PWaveTimeStep",
-	        PWaveTimeStep,
-	        "Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
 	py::def("do_Polyhedras_Intersect", do_Polyhedras_Intersect, "check polyhedras intersection");
 	py::def("fillBox_cpp", fillBox_cpp, "Generate non-overlaping polyhedrons in box");
 	py::def("fillBoxByBalls_cpp", fillBoxByBalls_cpp, "Generate non-overlaping 'spherical' polyhedrons in box");

@@ -606,9 +606,9 @@ Polyhedron Polyhedron_Plane_intersection(Polyhedron A, Plane B, CGALpoint centro
 	Intersection = ConvexHull(dual_planes);
 	if (Intersection.empty()) return Intersection;
 
-	//simplify
-	std::transform(Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(), Plane_equation());
-	Intersection = Simplify(Intersection, SIMPLIFY_LIMIT);
+	//simplify - turn off simplification in the interaction computations
+	//std::transform(Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(), Plane_equation());
+	//Intersection = Simplify(Intersection, SIMPLIFY_LIMIT);
 	std::transform(Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(), Plane_equation());
 
 	//dualize again
@@ -728,9 +728,9 @@ Polyhedron Polyhedron_Polyhedron_intersection(Polyhedron A, Polyhedron B, CGALpo
 	Intersection = ConvexHull(dual_planes);
 	if (Intersection.empty()) return Intersection;
 
-	//simplify
-	std::transform(Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(), Plane_equation());
-	Intersection = Simplify(Intersection, SIMPLIFY_LIMIT);
+	//simplify - turn off simplification in the interaction computations
+	//std::transform(Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(), Plane_equation());
+	//Intersection = Simplify(Intersection, SIMPLIFY_LIMIT);
 	std::transform(Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(), Plane_equation());
 
 	//dualize again

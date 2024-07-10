@@ -37,6 +37,10 @@
 
 #include "pkg/common/Grid.hpp"
 
+#ifdef YADE_CGAL
+#include "pkg/polyhedra/Polyhedra.hpp"
+#endif // YADE_CGAL
+
 #include "pkg/dem/Tetra.hpp"
 
 #ifdef YADE_OPENGL
@@ -467,19 +471,41 @@ vector<boost::tuple<Vector3r, Real, int>> Shop::loadSpheresFromFile(const string
 
 Real Shop::PWaveTimeStep(const shared_ptr<Scene> _rb)
 {
-	shared_ptr<Scene> rb = (_rb ? _rb : Omega::instance().getScene());
-	Real              dt = std::numeric_limits<Real>::infinity();
+	//const shared_ptr<Scene> _rb = shared_ptr<Scene>();
+	shared_ptr<Scene>       rb  = (_rb ? _rb : Omega::instance().getScene());
+	Real                    dt  = std::numeric_limits<Real>::infinity();
 	for (const auto& b : *rb->bodies) {
 		if (!b || !b->material || !b->shape) continue;
-		shared_ptr<ElastMat> ebp = YADE_PTR_DYN_CAST<ElastMat>(b->material);
-		shared_ptr<Sphere>   s   = YADE_PTR_DYN_CAST<Sphere>(b->shape);
-		if (!ebp || !s) continue;
-		Real density = b->state->mass / ((4 / 3.) * Mathr::PI * pow(s->radius, 3));
-		dt           = min(dt, s->radius / sqrt(ebp->young / density));
+		shared_ptr<Sphere>    s = YADE_PTR_DYN_CAST<Sphere>(b->shape);
+		if (!s) {
+		        bool no_cgal = true; // extra variable used while isolating the polyhedra part to fit it into one #ifdef directive
+		        #ifdef YADE_CGAL
+		        no_cgal = false;
+			shared_ptr<Polyhedra> p = YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
+			if (!p) {
+			        continue;			
+			} else {
+			        //polyhedrons
+			        shared_ptr<PolyhedraMat> ebp = YADE_PTR_DYN_CAST<PolyhedraMat>(b->material);
+			        if (!ebp) continue;
+			        Real density = b->state->mass / p->GetVolume();
+			        //get equivalent radius and use same equation as for sphere
+			        Real equi_radius = pow(p->GetVolume() / ((4. / 3.) * Mathr::PI), 1. / 3.);
+			        dt               = min(dt, equi_radius / sqrt(ebp->young * equi_radius / density));		
+			}
+			#endif // YADE_CGAL
+			if (no_cgal) continue;
+		} else {
+			//spheres
+			shared_ptr<ElastMat> ebp = YADE_PTR_DYN_CAST<ElastMat>(b->material);
+			if (!ebp) continue;
+			Real density = b->state->mass / ((4. / 3.) * Mathr::PI * pow(s->radius, 3));
+			dt           = min(dt, s->radius / sqrt(ebp->young / density));
+		} 
 	}
 	if (dt == std::numeric_limits<Real>::infinity()) {
 		dt = 1.0;
-		LOG_WARN("PWaveTimeStep has not found any suitable spherical body to calculate dt. dt is set to 1.0");
+		LOG_WARN("PWaveTimeStep has not found any suitable spherical or polyhedral body to calculate dt. dt is set to 1.0");
 	}
 	return dt;
 }
