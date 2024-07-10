@@ -6,34 +6,109 @@
 ##########################################################################
 
 
-# http://www.cmake.org/pipermail/cmake/2011-January/041666.html
+# Inspired by http://www.cmake.org/pipermail/cmake/2011-January/041666.html
 #
 # - Find Python Module
 FUNCTION(FIND_PYTHON_MODULE module)
-  #Reset result value as this function can be called multiple times while testing different python versions:
-  UNSET(PY_${module} CACHE)
+  #Set a variable with the module name in upper case
   STRING(TOUPPER ${module} module_upper)
 
+  #Reset result value as this function can be called multiple times while testing different python versions:
+  UNSET(PY_${module_upper} CACHE)
+  UNSET(${module_upper}_INCLUDE_DIR CACHE)
+
   IF(ARGC GREATER 1 AND ARGV1 STREQUAL "REQUIRED")
-    SET(${module}_FIND_REQUIRED TRUE)
+    SET(${module_upper}_FIND_REQUIRED TRUE)
   ENDIF(ARGC GREATER 1 AND ARGV1 STREQUAL "REQUIRED")
 
   EXECUTE_PROCESS(COMMAND "${PYTHON_EXECUTABLE}" "-c" 
-    "from __future__ import print_function ; import re, ${module} ; print (re.compile('/__init__.py.*').sub('',${module}.__file__))" #NOTE: from __future__ imports MUST be at the beginning of command.
-    RESULT_VARIABLE _${module}_status 
-    OUTPUT_VARIABLE _${module}_location
+    #Use future module for compatibility of the print function with python 2
+    #Since tkinter does not have __version__ attribute, use TkVersion attribute instead to get the version
+    "from __future__ import print_function; import re, ${module}; \
+    location = re.compile('/__init__.py.*').sub('', ${module}.__file__); \
+    include_dir = ${module}.get_include() if hasattr(${module}, 'get_include') else None; \
+    version = ${module}.TkVersion if hasattr(${module}, 'TkVersion') else ${module}.__version__; \
+    print(location, include_dir, version);"
+    RESULT_VARIABLE _${module}_status
+    ERROR_VARIABLE _${module}_error
+    OUTPUT_VARIABLE _${module}_output
     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    IF(_${module}_status MATCHES 0)
-      SET(PY_${module} ${_${module}_location} CACHE STRING "Location of Python module ${module}")
-    ENDIF(_${module}_status MATCHES 0)
-
-  FIND_PACKAGE_HANDLE_STANDARD_ARGS(${module} DEFAULT_MSG PY_${module})
-  #We are in a function, make the result available in the parent scope which is the main CMakeLists.txt:
-  IF(${module}_FOUND)
-    SET(${module}_FOUND ${${module}_FOUND} PARENT_SCOPE)
+  IF(_${module}_status MATCHES 0)      
+    #Split the _${module}_output into a list 
+    STRING(REPLACE " " ";" _${module}_output_list ${_${module}_output})
+    
+    #Get location from the first element of the list
+    LIST(GET _${module}_output_list 0 _${module}_location)
+    
+    #Get include dir from the second element of the list
+    LIST(GET _${module}_output_list 1 _${module}_include_dir)
+    
+    #Set MODULE_FOUND variable
+    IF(_${module}_include_dir MATCHES "None")
+      SET(PY_${module_upper} ${_${module}_location} CACHE STRING "Location of Python module ${module}")
+      FIND_PACKAGE_HANDLE_STANDARD_ARGS(${module_upper} DEFAULT_MSG PY_${module_upper})
+    ELSEIF(_${module}_include_dir MATCHES "Traceback")  # Safeguard for mpi4py
+      SET(${module_upper}_FOUND False)
+      IF(${module_upper}_FIND_REQUIRED)
+        MESSAGE(FATAL_ERROR "${module} include directory not found : matches Traceback")
+        RETURN()
+      ELSE()
+        MESSAGE("${module} include directory not found : matches Traceback")
+      ENDIF()
+    ELSE()  # for numpy, mpi4py or other libraries with get_include() method
+      SET(${module_upper}_INCLUDE_DIR ${_${module}_include_dir} CACHE STRING "${module} include directory")
+      FIND_PACKAGE_HANDLE_STANDARD_ARGS(${module_upper} DEFAULT_MSG ${module_upper}_INCLUDE_DIR)
+      INCLUDE_DIRECTORIES(${${module_upper}_INCLUDE_DIR})
+    ENDIF()
+    
+    #Concatenate the rest of the list to create the version in case there is space in the python __version__
+    #Can't use LIST(SUBLIST ...) as it is not compatible with old versions of cmake
+    SET(_${module}_version)
+    LIST(LENGTH _${module}_output_list len)
+    MATH(EXPR end_index "${len} - 1")
+    FOREACH(i RANGE 2 ${end_index})
+      LIST(GET _${module}_output_list ${i} item)
+      LIST(APPEND _${module}_version ${item})
+    ENDFOREACH()
+    STRING(REPLACE ";" " " ${module_upper}_VERSION ${_${module}_version})
+    
+    #Get the version major, minor and patch depending of the version format
+    #Feel free to add other formats, for now, only x.x.x, x.x or (x, x) formats are supported
+    IF(${module_upper}_VERSION MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)$")
+      SET(${module_upper}_VERSION_MAJOR "${CMAKE_MATCH_1}" )
+      SET(${module_upper}_VERSION_MINOR "${CMAKE_MATCH_2}")
+      SET(${module_upper}_VERSION_PATCH "${CMAKE_MATCH_3}")
+    ELSEIF(${module_upper}_VERSION MATCHES "^([0-9]+)\\.([0-9]+)$")
+      SET(${module_upper}_VERSION_MAJOR "${CMAKE_MATCH_1}")
+      SET(${module_upper}_VERSION_MINOR "${CMAKE_MATCH_2}")
+      SET(${module_upper}_VERSION_PATCH "0")
+    ELSEIF(${module_upper}_VERSION MATCHES "^\\(([0-9]+),([0-9]+)\\)$")
+      SET(${module_upper}_VERSION_MAJOR "${CMAKE_MATCH_1}")
+      SET(${module_upper}_VERSION_MINOR "${CMAKE_MATCH_2}")
+      SET(${module_upper}_VERSION_PATCH "0")
+    ENDIF()
+  
+  ELSE(_${module}_status MATCHES 0)
+    SET(${module_upper}_FOUND FALSE)
+    IF(${module_upper}_FIND_REQUIRED)
+      MESSAGE(FATAL_ERROR "${module} import failure:\n${_${module}_error}")
+      RETURN()
+    ENDIF()
+  ENDIF(_${module}_status MATCHES 0)
+   
+  #Set the variables with PARENT_SCOPE in order to access them outside of the function
+  SET(${module_upper}_FOUND ${${module_upper}_FOUND} PARENT_SCOPE)
+  IF(${module_upper}_FOUND)
+    SET(${module_upper}_VERSION ${${module_upper}_VERSION} PARENT_SCOPE)
+    SET(${module_upper}_VERSION_MAJOR ${${module_upper}_VERSION_MAJOR} PARENT_SCOPE)
+    SET(${module_upper}_VERSION_MINOR ${${module_upper}_VERSION_MINOR} PARENT_SCOPE)
+    SET(${module_upper}_VERSION_PATCH ${${module_upper}_VERSION_PATCH} PARENT_SCOPE)
   ELSE()
-    UNSET(${module}_FOUND PARENT_SCOPE)
+    UNSET(${module_upper}_VERSION PARENT_SCOPE)
+    UNSET(${module_upper}_VERSION_MAJOR PARENT_SCOPE)
+    UNSET(${module_upper}_VERSION_MINOR PARENT_SCOPE)
+    UNSET(${module_upper}_VERSION_PATCH PARENT_SCOPE)
   ENDIF()
 ENDFUNCTION(FIND_PYTHON_MODULE)
 
@@ -87,33 +162,29 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	ENDIF()
 	# END find Boost for py_version
 
-	# find Python modules. WARNING: each FindXXX.cmake MUST unset XXX_FOUND or set XXX_FOUND to FALSE [PARENT_SCOPE] if the module was not found.
-	FIND_PACKAGE(NumPy QUIET)
-	IF(NOT NUMPY_FOUND)
-		MESSAGE(${fail_message} numpy)
-		RETURN()
-	ENDIF(NOT NUMPY_FOUND)
-
-	FOREACH(PYTHON_MODULE IPython matplotlib pygraphviz Xlib)
-		FIND_PYTHON_MODULE(${PYTHON_MODULE} QUIET)
-		IF( NOT ${PYTHON_MODULE}_FOUND )
-			MESSAGE(${fail_message} ${PYTHON_MODULE})
+	# Find Python modules and set the version variable in the parent scope which is CMakeLists.txt
+	FOREACH(module IN ITEMS IPython numpy matplotlib pygraphviz Xlib sphinx tkinter)
+		IF(${module} MATCHES "tkinter" AND ${PYTHON_VERSION_MAJOR} EQUAL 2)
+			SET(module "Tkinter")
+		ENDIF()
+		FIND_PYTHON_MODULE(${module} REQUIRED)
+		STRING(TOUPPER ${module} module_upper)
+		SET(${module_upper}_FOUND ${${module_upper}_FOUND} PARENT_SCOPE)
+		IF(${module_upper}_FOUND)
+			MESSAGE(STATUS "${module} version found: ${${module_upper}_VERSION}")
+			SET(${module_upper}_VERSION ${${module_upper}_VERSION} PARENT_SCOPE)
+			SET(${module_upper}_VERSION_MAJOR ${${module_upper}_VERSION_MAJOR} PARENT_SCOPE)
+			SET(${module_upper}_VERSION_MINOR ${${module_upper}_VERSION_MINOR} PARENT_SCOPE)
+			SET(${module_upper}_VERSION_PATCH ${${module_upper}_VERSION_PATCH} PARENT_SCOPE)
+		ELSE()
+			MESSAGE(${fail_message} ${module})
+			UNSET(${module_upper}_VERSION PARENT_SCOPE)
+			UNSET(${module_upper}_VERSION_MAJOR PARENT_SCOPE)
+			UNSET(${module_upper}_VERSION_MINOR PARENT_SCOPE)
+			UNSET(${module_upper}_VERSION_PATCH PARENT_SCOPE)
 			RETURN()
 		ENDIF()
 	ENDFOREACH()
-	IF(${PYTHON_VERSION_MAJOR} EQUAL 2)
-		FIND_PYTHON_MODULE(Tkinter QUIET)
-		IF(NOT Tkinter_FOUND)
-			MESSAGE(${fail_message} Tkinter)
-			RETURN()
-		ENDIF()
-	ELSE()
-		FIND_PYTHON_MODULE(tkinter QUIET)
-		IF(NOT tkinter_FOUND)
-			MESSAGE(${fail_message} tkinter)
-			RETURN()
-		ENDIF()
-	ENDIF()
 
 	# NOTE: If we are here, we found a suitable Python version with all packages needed.
 	SET(ALL_PYTHON_DEPENDENCIES_FOUND TRUE PARENT_SCOPE)
@@ -123,7 +194,6 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	ENDFOREACH()
 	INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 	INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
-	INCLUDE_DIRECTORIES(${NUMPY_INCLUDE_DIRS})
 	INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 	#Export findboost vars to global parent scope:
 	FOREACH(boost_var boost_FOUND Boost_INCLUDE_DIRS Boost_LIBRARY_DIRS Boost_LIBRARIES Boost_<C>_FOUND Boost_<C>_LIBRARY Boost_VERSION Boost_LIB_VERSION Boost_MAJOR_VERSION Boost_MINOR_VERSION Boost_SUBMINOR_VERSION)

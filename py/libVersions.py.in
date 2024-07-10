@@ -134,7 +134,8 @@ def getAllVersionsCmake():
 	# 5. qglviewer  - I don't know how to detect it
 	# 6. python
 	addVer("python",'${PYTHON_VERSION_MAJOR}','${PYTHON_VERSION_MINOR}','${PYTHON_VERSION_PATCH}','${PYTHON_VERSION_STRING}')
-	# 7. matplotlib - I don't know how to detect it
+	# 7. matplotlib
+	addVer("matplotlib" ,'${MATPLOTLIB_VERSION_MAJOR}','${MATPLOTLIB_VERSION_MINOR}','${MATPLOTLIB_VERSION_PATCH}', '${MATPLOTLIB_VERSION}')
 	# 8. eigen
 	addVer("eigen" ,'${EIGEN3_WORLD_VERSION}','${EIGEN3_MAJOR_VERSION}','${EIGEN3_MINOR_VERSION}','${EIGEN3_VERSION}')
 	# 9. gdb        - I don't know how to detect it
@@ -154,32 +155,15 @@ def getAllVersionsCmake():
 	addVer("numpy" ,'${NUMPY_VERSION_MAJOR}','${NUMPY_VERSION_MINOR}','${NUMPY_VERSION_PATCH}', '${NUMPY_VERSION}')
 	# Note: these below are getting the version currently installed, not the one with which yade was compiled. Maybe this will need to be changed.
 	# 19. ipython
-	try:
-		import IPython
-		ipver=IPython.__version__
-		ipvertab=IPython.__version__.split('.')
-		addVer("ipython", ipvertab[0] , ipvertab[1] , ipvertab[2] , ipver )
-	except:
-		pass
-	# 20. sphinx, https://www.sphinx-doc.org/en/master/extdev/appapi.html#checking-the-sphinx-version
-	try:
-		import sphinx
-		spver=sphinx.version_info
-		addVer("sphinx", spver[0] , spver[1] , spver[2] , '%i.%i.%i-%s-%i'%spver )
-	except:
-		pass
+	addVer("ipython" ,'${IPYTHON_VERSION_MAJOR}','${IPYTHON_VERSION_MINOR}','${IPYTHON_VERSION_PATCH}', '${IPYTHON_VERSION}')
+	# 20. sphinx,
+	addVer("sphinx" ,'${SPHINX_VERSION_MAJOR}','${SPHINX_VERSION_MINOR}','${SPHINX_VERSION_PATCH}', '${SPHINX_VERSION}')
 	# 21. clp
 	# Note: this can be fixed in the same way as forced detection of freeglut, with file cMake/FindMissingVersions.cmake
 	addVer("clp",'${CLP_WORLD_VERSION}','${CLP_MAJOR_VERSION}','${CLP_MINOR_VERSION}','${CLP_VERSION}')
 	addVer("coinutils",'${COINUTILS_WORLD_VERSION}','${COINUTILS_MAJOR_VERSION}','${COINUTILS_MINOR_VERSION}','${COINUTILS_VERSION}')
 	# 22. PyMPI
-	try:
-		import mpi4py
-		mpi4ver=mpi4py.__version__
-		mpi4vertab=mpi4py.__version__.split('.')
-		addVer("mpi4py", mpi4vertab[0] , mpi4vertab[1] , mpi4vertab[2] , mpi4ver )
-	except:
-		pass
+	addVer("mpi4py" ,'${MPI4PY_VERSION_MAJOR}','${MPI4PY_VERSION_MINOR}','${MPI4PY_VERSION_PATCH}', '${MPI4PY_VERSION}')
 	# 23. MPFR
 	addVer("mpfr",'${MPFR_MAJOR_VERSION}','${MPFR_MINOR_VERSION}','${MPFR_PATCHLEVEL_VERSION}','${MPFR_VERSION}')
 	addVer("mpc",'${MPC_MAJOR_VERSION}','${MPC_MINOR_VERSION}','${MPC_PATCHLEVEL_VERSION}','${MPC_VERSION}')
@@ -190,7 +174,13 @@ def getAllVersionsCmake():
 		addVer("mpmath",'${MPMATH_VERSION}'.split('.')[0],'${MPMATH_VERSION}'.split('.')[1],'${MPMATH_VERSION}'.split('.')[2],'${MPMATH_VERSION}')
 	except:
 		pass
-
+	# 25. tkinter
+	addVer("tkinter" ,'${TKINTER_VERSION_MAJOR}','${TKINTER_VERSION_MINOR}','${TKINTER_VERSION_PATCH}', '${TKINTER_VERSION}')
+	# 26. pygraphviz
+	addVer("pygraphviz" ,'${PYGRAPHVIZ_VERSION_MAJOR}','${PYGRAPHVIZ_VERSION_MINOR}','${PYGRAPHVIZ_VERSION_PATCH}', '${PYGRAPHVIZ_VERSION}')
+	# 27. Xlib
+	addVer("Xlib" ,'${XLIB_VERSION_MAJOR}','${XLIB_VERSION_MINOR}','${XLIB_VERSION_PATCH}', '${XLIB_VERSION}')
+	
 	return ret
 
 def printAllVersions(rstFormat=False):
