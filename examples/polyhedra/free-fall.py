@@ -4,20 +4,20 @@ from yade import plot, polyhedra_utils
 gravel = PolyhedraMat()
 gravel.density = 2600  #kg/m^3
 gravel.young = 1E7  #Pa
-gravel.poisson = 20000 / 1E7
-gravel.frictionAngle = 0.5  #rad
+gravel.poisson = 0.3#20000 / 1E7
+gravel.frictionAngle = pi/4  #rad
 
 steel = PolyhedraMat()
 steel.density = 7850  #kg/m^3
 steel.young = 10 * gravel.young
 steel.poisson = gravel.poisson
-steel.frictionAngle = 0.4  #rad
+steel.frictionAngle = pi/4  #rad
 
 rubber = PolyhedraMat()
 rubber.density = 1000  #kg/m^3
 rubber.young = gravel.young / 10
 rubber.poisson = gravel.poisson
-rubber.frictionAngle = 0.7  #rad
+rubber.frictionAngle = pi/4  #rad
 
 O.bodies.append(
         polyhedra_utils.polyhedra(
@@ -54,8 +54,7 @@ O.engines = [
         PyRunner(command='checkUnbalancedI()', realPeriod=5, label='checker')
 ]
 
-#O.dt=0.25*polyhedra_utils.PWaveTimeStep()
-O.dt = 0.0025 * polyhedra_utils.PWaveTimeStep()
+O.dt=0.05*PWaveTimeStep()
 
 from yade import qt
 qt.Controller()

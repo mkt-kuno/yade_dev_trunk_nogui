@@ -340,7 +340,6 @@ Vector3r FindNormal(Polyhedron Int, Polyhedron PA, Polyhedron PB);
 shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction, Vector3r point);
 //new polyhedra
 shared_ptr<Body> NewPolyhedra(vector<Vector3r> v, shared_ptr<Material> mat);
-
 } // namespace yade
 
 #endif // YADE_CGAL
