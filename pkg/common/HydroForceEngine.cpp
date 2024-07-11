@@ -59,16 +59,13 @@ void HydroForceEngine::initialization()
 void HydroForceEngine::computeRadiusParts()
 {
 	radiusParts = vector<Real>();
-	FOREACH(Body::id_t id, ids)
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies)
 	{
-		if (scene->bodies->exists(id)) {
-			Body* b = Body::byId(id, scene).get();
-			if (b && !b->isClump()) {
-				const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
-				if (sphere) {
-					Real r = sphere->radius;
-					if (std::find(radiusParts.begin(), radiusParts.end(), r) == radiusParts.end()) { radiusParts.push_back(r); }
-				}
+		if (!b->isClump()) {
+			const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
+			if (sphere) {
+				Real r = sphere->radius;
+				if (std::find(radiusParts.begin(), radiusParts.end(), r) == radiusParts.end()) { radiusParts.push_back(r); }
 			}
 		}
 	}
