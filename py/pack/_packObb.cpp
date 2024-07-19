@@ -17,20 +17,7 @@ template <typename Scalar> Eigen::Matrix<Scalar, 3, 3> matrixFromEulerAnglesXYZ(
 	return m;
 }
 
-#if EIGEN_VERSION_AT_LEAST(3, 3, 0) // this is for ubuntu 16.04 xenial
-// https://eigen.tuxfamily.org/dox/unsupported/index.html : contributions from various users. They are provided "as is", without any support.
-// better to use that, than reinvent own Euler angles.
-#include <unsupported/Eigen/EulerAngles>
-
-inline yade::Matrix3r makeFromEulerAngle(::yade::Real x, ::yade::Real y, ::yade::Real z)
-{
-	yade::Matrix3r ret = Eigen::EulerAngles<::yade::Real, Eigen::EulerSystemXYZ>(x, y, z).toRotationMatrix();
-	assert(ret == matrixFromEulerAnglesXYZ<::yade::Real>(x, y, z));
-	return ret;
-}
-#else
 inline yade::Matrix3r makeFromEulerAngle(::yade::Real x, ::yade::Real y, ::yade::Real z) { return matrixFromEulerAnglesXYZ<::yade::Real>(x, y, z); }
-#endif
 
 namespace yade { // Cannot have #include directive inside.
 

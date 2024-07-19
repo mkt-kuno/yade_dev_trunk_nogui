@@ -179,8 +179,6 @@ namespace CGT {
 						CVector fluidSurfk = cell->info().facetSurfaces[j] * cell->info().facetFluidSurfacesRatio[j];
 						/// handle fictious vertex since we can get the projected surface easily here
 						if (cell->vertex(j)->info().isFictious) {
-							using math::
-							        abs; // It has to be added because on ubuntu xenial 16.04 g++ 5.3.1 Argument Depended Lookup does not work in cases when function from one namespace is used inside another namespace to be found by ADL
 							Real projSurf = abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
 							tempVect = -projSurf * boundary(cell->vertex(j)->info().id()).normal;
 							//define the cached value for later use with cache*p
@@ -326,8 +324,6 @@ namespace CGT {
 						if (S0 == 0) S0 = checkSphereFacetOverlap(v1, v2, v0);
 						if (S0 == 0) S0 = checkSphereFacetOverlap(v2, v0, v1);
 						//take absolute value, since in rare cases the surface can be negative (overlaping spheres)
-						using math::
-						        abs; // It has to be added because on ubuntu xenial 16.04 g++ 5.3.1 Argument Depended Lookup does not work in cases when function from one namespace is used inside another namespace to be found by ADL
 						fluidArea = abs(area - crossSections[0] - crossSections[1] - crossSections[2] + S0);
 						cell->info().facetFluidSurfacesRatio[j] = fluidArea / area;
 						// kFactor<0 means we replace Poiseuille by Darcy localy, yielding a particle size-independent bulk conductivity
