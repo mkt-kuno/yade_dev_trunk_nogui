@@ -292,11 +292,6 @@ def makeBaseClassesClickable(f, writer):
 			out.append(m.group(1) + bbb + m.group(3))
 		elif writer == 'latex':
 			if (
-			        (not (r'\pysiglinewithargsret{\sphinxstrong{class }\sphinxcode{yade.wrapper.}\sphinxbfcode{' in l and r'\emph{inherits' in l)
-			        )  # debian stretch, devuan ascii
-			        and (not (r'\pysiglinewithargsret{\strong{class }\code{yade.wrapper.}\bfcode{' in l and r'\emph{inherits' in l)
-			            )  # ubuntu xenial 16.04
-			        and
 			        (not (r'\pysiglinewithargsret{\sphinxbfcode{class }\sphinxcode{yade.wrapper.}\sphinxbfcode{' in l and r'\emph{inherits' in l)
 			        )  # ubuntu bionic 18.04
 			        and (
@@ -376,10 +371,15 @@ else:
 	###HACK: sphinx sometimes produces lots of backslashes in tex source on ipython outs (with are '\PYGZbs{}' in the source) -> remove them all.
 	import re
 	find_tex_backslashes = re.compile(r'^(\\PYG{g\+go}{)(\\PYGZbs{})*')
+
 	with open(outDir + '/latex/Yade.tex', 'r', encoding="utf8") as f:
 		lines = f.readlines()
 	with open(outDir + '/latex/Yade.tex', 'w', encoding="utf8") as f:
-		for l in lines:
-			f.write(find_tex_backslashes.sub(r'\1', l))
+		for line in lines:
+			line = find_tex_backslashes.sub(r'\1', line)
+			# find and replace this structure ^[ as it causes compilation error in latex
+			line = line.replace('\x1b[', '[')
+			f.write(line)
+
 	###HACK
 sys.exit()

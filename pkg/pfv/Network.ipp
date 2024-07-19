@@ -58,8 +58,6 @@ namespace CGT {
 
 	template <class Tesselation> Real Network<Tesselation>::volumePoreVoronoiFraction(CellHandle& cell, int& j, bool reuseFacetData)
 	{
-		using math::
-		        abs; // It has to be added because on ubuntu xenial 16.04 g++ 5.3.1 Argument Depended Lookup does not work in cases when function from one namespace is used inside another namespace to be found by ADL
 		Point& p1 = cell->info();
 		Point& p2 = cell->neighbor(j)->info();
 		if (!reuseFacetData) facetNFictious = detectFacetFictiousVertices(cell, j);

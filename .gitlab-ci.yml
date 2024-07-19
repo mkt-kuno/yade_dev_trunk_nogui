@@ -2,12 +2,12 @@
 # image: registry.gitlab.com/yade-dev/docker-yade
 #
 # Five new images:
-# image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_nogui
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_foam
-# image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-# image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
+# image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
+# image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04
+# image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bookworm
 # image: registry.gitlab.com/yade-dev/docker-yade:suse15
@@ -211,11 +211,7 @@ variables:
       - install
     expire_in: 2 weeks
 
-# 2.1 build stage: ubuntu 16.04
-make_16_04:
-  <<: *make_definition
-  <<: *artifacts_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04
+# 2.1 build stage
 
 make_18_04:
   <<: *make_definition
@@ -242,16 +238,15 @@ make_22_04:
     expire_in: 2 weeks
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04
 
-make_stretch:
+make_24_04:
   <<: *make_definition
   <<: *artifacts_definition
-  <<: *skip_WIP
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-
-make_buster:
-  <<: *make_definition
-  <<: *artifacts_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
+  artifacts:
+    paths:
+      - install
+      - build
+    expire_in: 2 weeks
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
 
 make_bullseye:
   <<: *make_definition
@@ -529,13 +524,6 @@ make_SSE:
     paths:
       - screenshots
 
-test_16_04:
-  <<: *test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04
-  dependencies:
-    - make_16_04
-  needs: ["make_16_04"]
-
 test_18_04:
   <<: *test_definition
   <<: *skip_WIP
@@ -558,20 +546,12 @@ test_22_04:
     - make_22_04
   needs: ["make_22_04"]
 
-test_stretch:
+test_24_04:
   <<: *test_definition
-  <<: *skip_WIP
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
   dependencies:
-    - make_stretch
-  needs: ["make_stretch"]
-
-test_buster:
-  <<: *test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-  dependencies:
-    - make_buster
-  needs: ["make_buster"]
+    - make_24_04
+  needs: ["make_24_04"]
 
 test_bullseye:
   <<: *test_definition
@@ -779,13 +759,6 @@ test_SSE:
     - if grep -q "Arch Linux" /etc/issue; then /usr/sbin/uname -m; else  /usr/bin/dpkg --print-architecture ; fi
   timeout: 35 minutes
 
-check_16_04:
-  <<: *check_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04
-  dependencies:
-    - make_16_04
-  needs: ["make_16_04"]
-
 check_18_04:
   <<: *check_definition
   <<: *skip_WIP
@@ -808,24 +781,12 @@ check_22_04:
     - make_22_04
   needs: ["make_22_04"]
 
-check_stretch:
+check_24_04:
   <<: *check_definition
-  <<: *skip_WIP
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
   dependencies:
-    - make_stretch
-  needs: ["make_stretch"]
-
-check_buster:
-  <<: *check_definition
-  before_script:
-    - export OMPI_MCA_rmaps_base_oversubscribe=1
-    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
-    - export OMPI_MCA_mpi_yield_when_idle=1 #degraded mode when oversubscribing (https://www.open-mpi.org
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-  dependencies:
-    - make_buster
-  needs: ["make_buster"]
+    - make_24_04
+  needs: ["make_24_04"]
 
 check_bullseye:
   <<: *check_definition
@@ -1008,7 +969,7 @@ doc_18_04:
   dependencies:
     - make_18_04
   needs: ["make_18_04"]
-  
+
 doc_22_04:
   <<: *doc_definition
   <<: *skip_WIP
@@ -1018,6 +979,14 @@ doc_22_04:
     - make_22_04
   needs: ["make_22_04"]
 
+doc_24_04:
+  <<: *doc_definition
+  <<: *skip_WIP
+  <<: *gitlab_runner_retry_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
+  dependencies:
+    - make_24_04
+  needs: ["make_24_04"]
 
 # 5. pages stage; uploads documentation to the website
 pages:
@@ -1078,20 +1047,6 @@ pages:
     expire_in: 5 day
   tags:
     - fast
-
-deb_stretch:
-  <<: *deb_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-  before_script:
-    - rm -rf ./deb
-    - ./scripts/ppa_ci/builddeb.py -d "stretch"
-
-deb_buster:
-  <<: *deb_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-  before_script:
-    - rm -rf ./deb
-    - ./scripts/ppa_ci/builddeb.py -d "buster"
 
 deb_bullseye:
   <<: *deb_definition
@@ -1162,13 +1117,6 @@ deb_trixie_mpfr150:
     - export PREC_NAME="-mpfr150"
     - ./scripts/ppa_ci/builddeb.py -d "trixie" -p "mpfr150"
 
-deb_xenial:
-  <<: *deb_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04
-  before_script:
-    - rm -rf ./deb
-    - ./scripts/ppa_ci/builddeb.py -d "xenial"
-
 deb_bionic:
   <<: *deb_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
@@ -1214,3 +1162,9 @@ deb_jammy_mpfr150:
     - export PREC_NAME="-mpfr150"
     - ./scripts/ppa_ci/builddeb.py -d "jammy" -p "mpfr150"
 
+deb_noble:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
+  before_script:
+    - rm -rf ./deb
+    - ./scripts/ppa_ci/builddeb.py -d "noble"

@@ -47,15 +47,6 @@ all the newly added features.
 To install the daily-version you need to add the repository to your
 /etc/apt/sources.list.
 
-- Debian 9 **stretch**::
-
-	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ stretch main" >> /etc/apt/sources.list.d/yadedaily.list'
-
-
-- Debian 10 **buster**::
-
-	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ buster main" >> /etc/apt/sources.list.d/yadedaily.list'
-
 
 - Debian 11 **bullseye**::
 
@@ -70,11 +61,6 @@ To install the daily-version you need to add the repository to your
 - Debian 13 **trixie** also with :ref:`high precision<highPrecisionReal>` ``long double``, ``float128`` and ``mpfr150`` packages::
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ trixie main" >> /etc/apt/sources.list.d/yadedaily.list'
-
-
-- Ubuntu 16.04 **xenial**::
-
-	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ xenial main" >> /etc/apt/sources.list.d/yadedaily.list'
 
 
 - Ubuntu 18.04 **bionic**::
@@ -128,16 +114,6 @@ Images contain both stable and daily versions of packages.
 Docker images are based on supported distributions:
 
 
-- Debian 9 **stretch**::
-
-	docker run -it registry.gitlab.com/yade-dev/docker-prod:debian-stretch
-
-
-- Debian 10 **buster**::
-
-	docker run -it registry.gitlab.com/yade-dev/docker-prod:debian-buster
-
-
 - Debian 11 **bullseye**::
 
 	docker run -it registry.gitlab.com/yade-dev/docker-prod:debian-bullseye
@@ -149,11 +125,6 @@ Docker images are based on supported distributions:
 - Debian 13 **trixie**::
 
 	docker run -it registry.gitlab.com/yade-dev/docker-prod:debian-trixie
-
-- Ubuntu 16.04 **xenial**::
-
-	docker run -it registry.gitlab.com/yade-dev/docker-prod:ubuntu16.04
-
 
 - Ubuntu 18.04 **bionic**::
 
@@ -256,7 +227,7 @@ They can be installed from the command line of your Linux distribution, assuming
 		python3-pil libjs-jquery python3-sphinx python3-git libxmu-dev libxi-dev libcgal-dev \
 		help2man libbz2-dev zlib1g-dev libopenblas-dev libsuitesparse-dev \
 		libmetis-dev python3-bibtexparser python3-future coinor-clp coinor-libclp-dev \
-		python3-mpmath libmpfr-dev libmpfrc++-dev libmpc-dev texlive-xetex
+		python3-mpmath libmpfr-dev libmpfrc++-dev libmpc-dev texlive-xetex python3-pickleshare python3-ipython-genutils
 
 Note: on Ubuntu 22.04, the VTK library should be ``libvtk9-dev``.
 
@@ -410,10 +381,7 @@ Supported linux releases
 
 `Currently supported <https://gitlab.com/yade-dev/trunk/pipelines?scope=branches>`_ [#buildLog]_ linux releases and their respective `docker <https://docs.docker.com/>`_ `files <https://docs.docker.com/engine/reference/builder/>`_ are:
 
-* `Ubuntu 16.04 xenial <https://gitlab.com/yade-dev/docker-yade/blob/ubuntu16-py3/Dockerfile>`_
 * `Ubuntu 18.04 bionic <https://gitlab.com/yade-dev/docker-yade/blob/ubuntu18.04/Dockerfile>`_
-* `Debian 9 stretch <https://gitlab.com/yade-dev/docker-yade/blob/debian-stretch/Dockerfile>`_
-* `Debian 10 buster <https://gitlab.com/yade-dev/docker-yade/blob/debian-buster/Dockerfile>`_
 * `openSUSE 15 <https://gitlab.com/yade-dev/docker-yade/blob/suse15/Dockerfile>`_
 
 These are the bash commands used to prepare the linux distribution and environment for installing and testing yade.

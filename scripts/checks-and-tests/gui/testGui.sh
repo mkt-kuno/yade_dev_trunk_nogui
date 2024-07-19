@@ -111,11 +111,15 @@ else
 		if [[ ${CI_JOB_NAME} == test_22_04 || ${CI_JOB_NAME} == test_bookworm ]]; then
 		python3 ${GUI_TESTS_PATH}/helper/compareScreenshotsParts.py ${REFERENCE_SCREENSHOTS}/ubuntu22_04 ${CREATE_NEW_SCREENSHOTS}  5 || { sleep 1 ; exit 1; }
 		else
+		if [[ ${CI_JOB_NAME} == test_24_04 ]]; then
+		python3 ${GUI_TESTS_PATH}/helper/compareScreenshotsParts.py ${REFERENCE_SCREENSHOTS}/ubuntu24_04 ${CREATE_NEW_SCREENSHOTS}  5 || { sleep 1 ; exit 1; }
+		else
 		if [[ ${CI_JOB_NAME} == test_trixie ]]; then
 		python3 ${GUI_TESTS_PATH}/helper/compareScreenshotsParts.py ${REFERENCE_SCREENSHOTS}/trixie ${CREATE_NEW_SCREENSHOTS}  5 || { sleep 1 ; exit 1; }
 		else
 		# Smallest xterm tolerance is 5, enough for different session cookie and some small variation in messages.
 		python3 ${GUI_TESTS_PATH}/helper/compareScreenshotsParts.py ${REFERENCE_SCREENSHOTS}/default ${CREATE_NEW_SCREENSHOTS}  5 || { sleep 1 ; exit 1; }
+		fi
 		fi
 		fi
 	fi
