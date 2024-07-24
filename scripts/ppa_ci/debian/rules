@@ -55,7 +55,7 @@ override_dh_compress:
 
 override_dh_auto_install-indep: 
 	#Generate docs
-	cd $(CURDIR)/doc/sphinx; PYTHONPATH=. $(tmpInstall)/usr/bin/yadedaily yadeSphinx.py html; PYTHONPATH=. $(tmpInstall)/usr/bin/yadedaily yadeSphinx.py latex; cd _build/latex; xelatex Yade.tex; xelatex Yade.tex; xelatex Yade.tex;
+	cd $(CURDIR)/doc/sphinx; PYTHONPATH=. $(tmpInstall)/usr/bin/yadedaily yadeSphinx.py html; PYTHONPATH=. $(tmpInstall)/usr/bin/yadedaily yadeSphinx.py latex; PYTHONPATH=. $(tmpInstall)/usr/bin/yadedaily yadeSphinx.py workarounds; cd _build/latex; xelatex Yade.tex; xelatex Yade.tex; xelatex Yade.tex;
 	#Delete all pyc files
 	find . -name '*.pyc' -print0 | xargs -0 rm -f
 
