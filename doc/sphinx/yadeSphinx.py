@@ -378,7 +378,7 @@ else:
 		for line in lines:
 			line = find_tex_backslashes.sub(r'\1', line)
 			# find and replace this structure ^[ as it causes compilation error in latex
-			line = line.replace('\x1b[', '[')
+			line = line.replace('\x1b\x5b', '[')
 			f.write(line)
 
 	###HACK
