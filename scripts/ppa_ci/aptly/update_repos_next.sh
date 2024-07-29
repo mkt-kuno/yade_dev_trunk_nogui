@@ -5,7 +5,16 @@
 PATHDEB="/home/anton/deb/"
 
 set -e
+
+# check, if $PATHDEB/OLD_ID exists and if not, create it
+if [ ! -f ${PATHDEB}/OLD_ID ]
+then
+	touch ${PATHDEB}/OLD_ID
+	echo "0" > ${PATHDEB}/OLD_ID
+fi
+
 OLD_ID=$(cat ${PATHDEB}/OLD_ID)
+
 NEW_ID=$(curl -L "https://gitlab.com/api/v4/projects/10133144/repository/commits/master" | jq --raw-output '.short_id')
 if [ "$OLD_ID" != "$NEW_ID" ]
 then

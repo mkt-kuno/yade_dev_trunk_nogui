@@ -21,7 +21,7 @@ Packages
 **Stable packages**
 
 
-Since 2011, all Ubuntu (starting from 11.10, Oneiric) and Debian (starting from Wheezy) versions
+Since 2011, all Ubuntu (starting from 11.10, Oneiric; not Ubuntu 24.04 noble) and Debian (starting from Wheezy) versions
 have Yade in their main repositories. There are only stable releases in place.
 To install Yade, run the following::
 
@@ -75,6 +75,10 @@ To install the daily-version you need to add the repository to your
 - Ubuntu 22.04 **jammy** also with :ref:`high precision<highPrecisionReal>` ``long double``, ``float128`` and ``mpfr150`` packages::
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ jammy main" >> /etc/apt/sources.list.d/yadedaily.list'
+
+- Ubuntu 24.04 **noble**::
+
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ noble main" >> /etc/apt/sources.list.d/yadedaily.list'
 
 
 Add the PGP-key AA915EEB as trusted and install ``yadedaily``::
