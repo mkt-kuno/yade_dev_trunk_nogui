@@ -1,4 +1,62 @@
 ==================================================
+yade-2024.08a
+Sun, Aug 04 20:05:00 2024 +0100
+
+Alpha shapes
+
+Bug fixes
+  Fix Archlinux build: python 3.12 support, fix escape  sequences, unit test: assertTrue, randint: int arguments (!1024)
+  fix build failure with numpy 2.0 (!1026)
+  fix #331 `O.cell.nextVelGrad` discrepancy of documentation and actual code (!1028)
+
+Clang-format & reorganize
+  Add indications to use python-formatter in .gitlab-ci.yml  (!1022)
+  Clang C++ code reformat and python yapf3 code reformat  (!1025)
+
+Clumps
+
+Documentation / Comments
+  improved predicate documentation (!1009)
+  +2 papers by Bettina Suhr (!1018)
+  Debug install and Profiling doc minor updates (!1023)
+  CohFrict doc: -1 typo (!1016)
+
+Examples
+
+Fluid & thermal & particle saturation
+
+GUI
+
+High precision RealHP<N> ComplexHP<N>
+
+LevelSet & Vol. Interacting LevelSet
+  Implementation of Volume-interacting Level-Set DEM or  VLS-DEM (2/3) (!984)
+  Volume law improvement (!1021)
+
+OpenMPI calculations
+
+Packaging improvements & building
+  Fix #341, fix doc building on noble and trixie. (!1034)
+  Minor ppa fixes, add information about yadedaily for  Ubuntu 24.04 noble (!1035)
+
+Polyhedra / Facets
+  Update Polyhedra_01.cpp (!1020)
+  Drop Simplify() fucntion in polyhedra-wall and  polyhedra-polyhedra interactions. Additionally merge 'utils.PWaveTimeStep()'  and 'polyhedra_utils.PWaveTimeStep()' functions into one. (!1031)
+
+PotentialParticles / Blocks
+
+Small improvements
+  remove more Python2 crumbs (!1008)
+  Add 'case 0' to the switch handling separation plane,  that does nothing - skips switch and moves to the regular test. (!1012)
+  Add new util function getSlicedProfiles() to average  quantities over specified subdomains. (!1013)
+  Update cmake files to retrieve version of python modules.  (!1029)
+  makes computeRadiusPart consider all the spheres radius  in the domain (!1030)
+
+Tests & checks & CI
+  In progress: Add Ubuntu 24.04, deprecate 16.04, Debian  Stretch and Buster (!1032)
+  Add Ubuntu 24.04, deprecate 16.04, Debian Stretch and  Buster (small fix) (!1033)
+
+==================================================
 yade-2024.02a
 Sun, Feb 09 21:26:00 2024 +0100
 
@@ -9579,3 +9637,23 @@ Olivier Galizzi (147):
       Added file yade.sxw which contain concept and spirit of yade
       Added tree file to rename files and directories
       Added some concepts into yade.sxw
+
+== START sections template - copy it to the top after each release, so that people can add their ChangeLog entries in a proper section ==
+Alpha shapes
+Bug fixes
+Clang-format & reorganize
+Clumps
+Documentation / Comments
+Examples
+Fluid & thermal & particle saturation
+GUI
+High precision RealHP<N> ComplexHP<N>
+LevelSet & Vol. Interacting LevelSet
+OpenMPI calculations
+Packaging improvements & building
+Polyhedra / Facets
+PotentialParticles / Blocks
+Small improvements
+Tests & checks & CI
+== END sections template ==
+
