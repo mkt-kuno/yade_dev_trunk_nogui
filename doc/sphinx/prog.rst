@@ -101,10 +101,16 @@ Development tools
 
 Integrated Development Environment and other tools
 ---------------------------------------------------
-A frequently used IDE is Kdevelop. We recommend using this software for navigating 
-in the sources, compiling and debugging. Other useful tools for debugging and 
-profiling are `Valgrind <https://valgrind.org/>`__ and `KCachegrind <https://kcachegrind.github.io/html/Home.html>`__. A series of wiki pages is dedicated to 
+A frequently used IDE is Kdevelop. We recommend using this software for navigating
+in the sources, compiling and debugging. Other useful tools for debugging and
+profiling are `Valgrind <https://valgrind.org/>`__ and `KCachegrind <https://kcachegrind.github.io/html/Home.html>`__. A series of wiki pages is dedicated to
 these tools in the `development section <https://yade-dem.org/wiki/Yade#Development>`__ of the wiki.
+
+Yade is agnostic to the IDE used; it can be compiled and run directly from the command line.
+You can modify the source code using any text editor, such as vim `<https://www.vim.org/>`__,
+emacs `<https://www.gnu.org/software/emacs/>`__, vscode `<https://code.visualstudio.com/>`__,
+or any other editor of your choice.
+
 
 Hosting and versioning
 ----------------------
@@ -127,6 +133,69 @@ GIT is a distributed revision control system. It is available packaged for all m
 The `source code <https://gitlab.com/yade-dev/>`__ is periodically
 imported to Launchpad for building PPA-packages.
 The repository `can be http-browsed <https://gitlab.com/yade-dev/trunk>`__.
+
+Development process
+--------------------
+
+Git is used for version control. The main development branch is called ``master`` and is hosted at `GitLab <https://gitlab.com/yade-dev/trunk>`__.
+For the development process, the following steps are recommended:
+
+#. Clone the repository to your local machine: ``git clone https://gitlab.com/yade-dev/trunk.git``
+#. Create a new branch for your work: ``git checkout -b my-new-feature``
+#. Make your changes and commit them: ``git commit -am 'Add some feature'``
+#. Push to the branch: ``git push origin my-new-feature``
+#. Submit a merge request on GitLab: `Merge Request <https://gitlab.com/yade-dev/trunk/merge_requests>`__
+
+The merge request will be reviewed by the developers and, if accepted, merged into the main branch.
+Yade has a wide range of pipelines that are automatically triggered by GitLab when a new commit is pushed to the repository.
+These pipelines include building the software, running tests, and generating the documentation.
+The results of these pipelines can be viewed on the `GitLab CI/CD page <https://gitlab.com/yade-dev/trunk/-/pipelines>`__ or
+by clicking on the green checkmark next to a commit in the GitLab interface.
+If some tests fail, the developers will be notified and the merge request will not be accepted until the issues are resolved.
+
+It is required to add at least one line into the `ChangeLog <https://gitlab.com/yade-dev/trunk/blob/master/ChangeLog>`_ file in the
+root directory of the repository for each merge request. This file is used to generate
+the `release notes <https://gitlab.com/yade-dev/trunk/-/releases>`__ for each new version of Yade.
+
+How to make a release
+----------------------
+
+The release process is automated using GitLab CI/CD pipelines. The release process is triggered by creating a new tag in the repository.
+The tag should be named according to the version number, e.g. ``2022.01a``.
+The release process will build the software, run tests, and generate the documentation.
+
+
+#.  Create RELEASE file in the root folder with the version number in it.
+#.  Add new changelog entries to Changelog using "git shortlog PREVVERSION..".
+#.  Create branch using the following command and format:
+
+	.. code-block:: bash
+
+		git checkout -b YYYY.MM
+
+#.  Tag release "git tag -as YYYY.MMa -m"YYYY.MMa"
+#.  Return to master branch and remove RELEASE file
+#.  Push master, new branch and tags to gitlab
+#.  Download tar.gz
+#.  Create asc-file (signature): ``gpg --armor --sign --detach-sig tarball.tar.gz``
+#.  Upload new tarball on Launchpad
+#.  Make announcement on mailing list and on `Launchpad <https://launchpad.net/yade>`__.
+
+
+RELEASE file should contain the version number in the following format:
+
+.. code-block:: bash
+
+	YYYY.MM
+
+where ``YYYY`` is the year and ``MM`` is the month of the release. For example, the release file for the January 2022 release should contain the following text:
+
+.. code-block:: bash
+
+	2022.01a
+
+
+
 
 Build robot
 -----------

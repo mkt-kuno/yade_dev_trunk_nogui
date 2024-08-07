@@ -8,6 +8,7 @@ Bug fixes
   Fix Archlinux build: python 3.12 support, fix escape  sequences, unit test: assertTrue, randint: int arguments (!1024)
   fix build failure with numpy 2.0 (!1026)
   fix #331 `O.cell.nextVelGrad` discrepancy of documentation and actual code (!1028)
+  rewrite checkVTKRecorder, formatted with yapf (!1036)
 
 Clang-format & reorganize
   Add indications to use python-formatter in .gitlab-ci.yml  (!1022)
@@ -20,6 +21,7 @@ Documentation / Comments
   +2 papers by Bettina Suhr (!1018)
   Debug install and Profiling doc minor updates (!1023)
   CohFrict doc: -1 typo (!1016)
+  Update documentation about the development process and how to release (!1037)
 
 Examples
 
@@ -51,6 +53,7 @@ Small improvements
   Add new util function getSlicedProfiles() to average  quantities over specified subdomains. (!1013)
   Update cmake files to retrieve version of python modules.  (!1029)
   makes computeRadiusPart consider all the spheres radius  in the domain (!1030)
+  Update .gitlab-ci.yml so that on every Merge Request ChangeLog file must be updated (!1037)
 
 Tests & checks & CI
   In progress: Add Ubuntu 24.04, deprecate 16.04, Debian  Stretch and Buster (!1032)
