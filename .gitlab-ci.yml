@@ -102,6 +102,16 @@ variables:
       if [[ -e "/usr/bin/clang-format" ]] ; then
           export CLANG_VERSION=`clang-format --version | sed -e 's/^.*version\s\([0-9]\+\).*$/\1/g'` ;
           if [[ ${CHECK_FORMAT} == "CHECK_FORMAT" && ${CLANG_VERSION} -ge "10" ]] ; then
+                  echo -e "\n\e[92m===\nWas ChangeLog updated with the latest changes?\n===\e[0m\n" ;
+                  export CHANGELOG_LINES=`git diff --shortstat origin/master -- ChangeLog | sed -e 's/^.*,\s\([0-9]\+\)\sinsertion.*$/\1/g'` ;
+                  export CHANGELOG_LINES_WC=`git diff origin/master -- ChangeLog | wc -l` ;
+                  if [[ ${CHANGELOG_LINES_WC} -eq "0" ]] ; then
+                          echo -e "\n\e[91m===\n*** ERROR *** The ChangeLog file was not updated in this Merge Request.\nPlease make sure to update ChangeLog with your latest changes.\nA short one line description with information about what was changed will suffice.\nPlease add it in the appropriate section near the top of the file, with two spaces at the beginning of the line.\nThe sections were introduced to reduce the number of git rebase conflicts with other Merge Requests, where each is modifying the same ChangeLog.\nPlease add the Merge Request number at the end of your line.\n===\e[0m\n \n";
+                          exit 1 ;
+                  else
+                          echo -e "\n\e[92m===\nNice, the ChangeLog has $CHANGELOG_LINES lines added\n===\e[0m\n" ;
+                          git diff origin/master -- ChangeLog ;
+                  fi;
                   echo -e "\n\e[92m===\nclang-format version is $CLANG_VERSION \n===\e[0m\n" ;
                   scripts/clang-formatter.sh ./ ;
                   scripts/python-formatter.sh ./ --allow-dirty ;
@@ -200,7 +210,8 @@ variables:
     - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then install/bin/yade-ci --quickperformance -j8; fi
     - cat /etc/os-release
     - if grep -q "Arch Linux" /etc/issue; then /usr/sbin/uname -m; else  /usr/bin/dpkg --print-architecture ; fi
-    - echo -e "\n\e[93m===\n(make_minimal only) clang-format reports CHANGED_LINES = "$CHANGED_LINES"\n===\e[0m\n";
+    - echo -e "\n\e[93m===\n(make_minimal only) scripts/clang-formatter.sh and scripts/python-formatter.sh report CHANGED_LINES = "$CHANGED_LINES"\n===\e[0m\n";
+    - echo -e "\n\e[93m===\n(make_minimal only) ChangeLog diff had CHANGELOG_LINES = "$CHANGELOG_LINES" lines added in this merge request\n===\e[0m\n";
   tags:
     - fast
 
@@ -1168,3 +1179,4 @@ deb_noble:
   before_script:
     - rm -rf ./deb
     - ./scripts/ppa_ci/builddeb.py -d "noble"
+
