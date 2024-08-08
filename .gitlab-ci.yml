@@ -105,7 +105,7 @@ variables:
                   echo -e "\n\e[92m===\nWas ChangeLog updated with the latest changes?\n===\e[0m\n" ;
                   export CHANGELOG_LINES=`git diff --shortstat origin/master -- ChangeLog | sed -e 's/^.*,\s\([0-9]\+\)\sinsertion.*$/\1/g'` ;
                   export CHANGELOG_LINES_WC=`git diff origin/master -- ChangeLog | wc -l` ;
-                  if [[ ${CHANGELOG_LINES_WC} -eq "0" ]] ; then
+                  if [[ ${CHANGELOG_LINES_WC} -eq "0" && ${CI_PIPELINE_SOURCE} == "merge_request_event" ]] ; then
                           echo -e "\n\e[91m===\n*** ERROR *** The ChangeLog file was not updated in this Merge Request.\nPlease make sure to update ChangeLog with your latest changes.\nA short one line description with information about what was changed will suffice.\nPlease add it in the appropriate section near the top of the file, with two spaces at the beginning of the line.\nThe sections were introduced to reduce the number of git rebase conflicts with other Merge Requests, where each is modifying the same ChangeLog.\nPlease add the Merge Request number at the end of your line.\n===\e[0m\n \n";
                           exit 1 ;
                   else

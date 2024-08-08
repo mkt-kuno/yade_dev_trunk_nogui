@@ -3,22 +3,52 @@ yade-202x.0xa
 Sun, Aug 04 20:05:00 2024 +0100
 
 Bug Fixes
+*********
 
 Code Formatting & Organization
+******************************
 
 Documentation & Comments
+************************
 
 Examples
+********
 
 User Interface (GUI)
+********************
 
 Models & Shapes
+***************
+Alpha shapes
+------------
+
+Clumps
+------
+
+Fluid & thermal & particle saturation
+-------------------------------------
+
+LevelSet & Volume Interacting LevelSet
+--------------------------------------
+
+Polyhedra / Facets
+------------------
+
+PotentialParticles / Blocks
+---------------------------
+
+OpenMPI / OpenMP threads
+************************
 
 Packaging & Build Improvements
+******************************
+  Small fix in ChangeLog checker & review categories for changelog for new development cycle (!1039)
 
 Small Enhancements
+******************
 
 Testing & Continuous Integration
+********************************
 
 ==================================================
 yade-2024.08a
@@ -9681,4 +9711,55 @@ PotentialParticles / Blocks
 Small improvements
 Tests & checks & CI
 == END sections template ==
+
+== START Another categories template, to use at the top of this file ==
+
+Bug Fixes
+*********
+
+Code Formatting & Organization
+******************************
+
+Documentation & Comments
+************************
+
+Examples
+********
+
+User Interface (GUI)
+********************
+
+Models & Shapes
+***************
+Alpha shapes
+------------
+
+Clumps
+------
+
+Fluid & thermal & particle saturation
+-------------------------------------
+
+LevelSet & Volume Interacting LevelSet
+--------------------------------------
+
+Polyhedra / Facets
+------------------
+
+PotentialParticles / Blocks
+---------------------------
+
+OpenMPI / OpenMP threads
+************************
+
+Packaging & Build Improvements
+******************************
+
+Small Enhancements
+******************
+
+Testing & Continuous Integration
+********************************
+
+== END Another categories template ==
 
