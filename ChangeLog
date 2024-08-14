@@ -46,6 +46,7 @@ Packaging & Build Improvements
 
 Small Enhancements
 ******************
+  Add a new engine TimeAverager to average data over time for specific spheres identified by their IDs (!1040)
 
 Testing & Continuous Integration
 ********************************
