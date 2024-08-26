@@ -9,8 +9,9 @@
 #include <lib/base/Logging.hpp>
 #include <lib/base/Math.hpp>
 #include <core/Clump.hpp>
-#include <pkg/dem/ScGeom.hpp>
 #include <pkg/levelSet/LevelSet.hpp>
+#include <pkg/levelSet/OtherClassesForLSContact.hpp> // MultiFrictPhys
+#include <pkg/levelSet/LevelSetIGeom.hpp> // MultiScGeom
 
 namespace yade { // Cannot have #include directive inside.
 class ShopLS {
@@ -63,17 +64,19 @@ public:
                 std::array<Real, 2>,
                 std::array<Real, 2>,
                 std::array<std::array<Real, 2>, 2>); // bi-interpolation in a plane, used in LevelSet.distance()
-	static shared_ptr<ScGeom>
-	                          geomPtr(Vector3r                       ctctPt,
-	                                  Real                           un,
-	                                  Real                           rad1,
-	                                  Real                           rad2,
-	                                  const State&                   rbp1,
-	                                  const State&                   rbp2,
-	                                  const shared_ptr<Interaction>& c,
-	                                  const Vector3r&                currentNormal,
-	                                  const Vector3r&                shift2);
-	static shared_ptr<ScGeom> geomPtrForLaterRemoval(const State& rbp1, const State& rbp2, const shared_ptr<Interaction>& c);
+	static void     handleNonTouchingNodeForMulti(shared_ptr<MultiScGeom>&, shared_ptr<MultiFrictPhys>&, int);
+	static void     handleTouchingNodeForMulti(shared_ptr<MultiScGeom>&, shared_ptr<MultiFrictPhys>&, int,
+	        Vector3r                       ctctPt,
+	        Real                           un,
+	        Real                           rad1,
+	        Real                           rad2,
+	        const State&                   rbp1,
+	        const State&                   rbp2,
+	        const Scene*                   scene,
+	        const shared_ptr<Interaction>& c,
+	        const Vector3r&                currentNormal,
+			const Vector3r&                shift2
+				  );
 };
 } // namespace yade
 #endif //YADE_LS_DEM

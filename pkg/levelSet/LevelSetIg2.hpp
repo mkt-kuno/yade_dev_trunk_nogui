@@ -14,6 +14,22 @@
 namespace yade {
 class Ig2_LevelSet_LevelSet_ScGeom : public IGeomFunctor {
 public:
+	static void geomPtrForLaterRemoval(
+	        const State&                   rbp1,
+	        const State&                   rbp2,
+	        const shared_ptr<Interaction>& c,
+	        const Scene*                   scene); // static because also used in e.g., Ig2_Box_LevelSet_ScGeom
+	std::pair<std::pair<Vector3r, Vector3r>, std::pair<bool, bool>>
+	                                boundOverlap(bool single, const State&, const State&, const shared_ptr<Interaction>&, const Vector3r&);
+	bool goSingleOrMulti(
+	        bool single,
+	        const shared_ptr<Shape>&,
+	        const shared_ptr<Shape>&,
+	        const State&,
+	        const State&,
+	        const bool&,
+	        const shared_ptr<Interaction>&,
+	        const Vector3r&);
 	bool go(const shared_ptr<Shape>&,
 	        const shared_ptr<Shape>&,
 	        const State&,
@@ -45,6 +61,39 @@ public:
 	DEFINE_FUNCTOR_ORDER_2D(LevelSet, LevelSet);
 };
 REGISTER_SERIALIZABLE(Ig2_LevelSet_LevelSet_ScGeom);
+
+class Ig2_LevelSet_LevelSet_MultiScGeom : public Ig2_LevelSet_LevelSet_ScGeom {
+public:
+	bool go(const shared_ptr<Shape>&,
+	        const shared_ptr<Shape>&,
+	        const State&,
+	        const State&,
+	        const Vector3r&,
+	        const bool&,
+	        const shared_ptr<Interaction>&) override; // reminder: method signature is imposed by InteractionLoop.cpp
+	// clang-format-off
+	bool
+	goReverse(const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r&, const bool&, const shared_ptr<Interaction>&)
+	        override
+	{
+		LOG_ERROR(
+		        "We ended up calling goReverse.. How is this possible for symmetric IgFunctor ? Anyway, we now have to code something"); /* nothing, such as in TTetraGeom, mixed examples elsewhere*/
+		return false;
+	};
+	YADE_CLASS_BASE_DOC(
+	        Ig2_LevelSet_LevelSet_MultiScGeom,
+	        Ig2_LevelSet_LevelSet_ScGeom,
+	        "Multiple contact points version of :yref:`Ig2_LevelSet_LevelSet_ScGeom` for a :yref:`MultiScGeom` description of a contact between two "
+	        "(non-convex typically) :yref:`LevelSet`-shaped bodies (with a :yref:`ScGeom` interaction at each contacting surface node). Does not support "
+	        "periodic boundary conditions at the moment. It is designed to be used in combination with :yref:`MultiFrictPhys` for what concerns the "
+	        ":yref:`interaction physics<Interaction.phys>` (which is here also touched by that Ig2 in some contrast with general YADE design, from a "
+	        "developer point of view) [Duriez2023]_.");
+	// clang-format on
+	DECLARE_LOGGER;
+	FUNCTOR2D(LevelSet, LevelSet);
+	DEFINE_FUNCTOR_ORDER_2D(LevelSet, LevelSet);
+};
+REGISTER_SERIALIZABLE(Ig2_LevelSet_LevelSet_MultiScGeom);
 
 class Ig2_Box_LevelSet_ScGeom : public IGeomFunctor {
 public:
@@ -88,12 +137,37 @@ public:
 		return go(cm2, cm1, state2, state1, -shift2, force, c);
 	};
 	// clang-format off
-	YADE_CLASS_BASE_DOC(Ig2_Wall_LevelSet_ScGeom,IGeomFunctor,"Creates or updates a :yref:`ScGeom` instance representing the intersection of one :yref:`LevelSet` body with one :yref:`Wall` body, where overlap is chosen to occur on the opposite wall side than the LevelSet body's center. :yref:`Contact normal<ScGeom.normal>` is given by the wall normal while :yref:`overlap<ScGeom.penetrationDepth>` and :yref:`contact points<ScGeom.contactPoint>` are defined likewise to :yref:`Ig2_LevelSet_LevelSet_ScGeom`.");
+	YADE_CLASS_BASE_DOC(Ig2_Wall_LevelSet_ScGeom,IGeomFunctor,"Creates or updates a :yref:`ScGeom` instance representing the intersection of one :yref:`LevelSet`-shaped body with one :yref:`Wall`-shaped body, where overlap is chosen to occur on the opposite wall side than the LevelSet body's center. :yref:`Contact normal<ScGeom.normal>` is given by the wall normal (relative orientation of wall wrt global axes is not supported) while :yref:`overlap<ScGeom.penetrationDepth>` and :yref:`contact points<ScGeom.contactPoint>` are defined likewise to :yref:`Ig2_LevelSet_LevelSet_ScGeom`.");
 	// clang-format on
 	DECLARE_LOGGER;
 	FUNCTOR2D(Wall, LevelSet);
 	DEFINE_FUNCTOR_ORDER_2D(Wall, LevelSet);
 };
 REGISTER_SERIALIZABLE(Ig2_Wall_LevelSet_ScGeom);
+
+class Ig2_Wall_LevelSet_MultiScGeom : public IGeomFunctor {
+public:
+	bool go(const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r&, const bool&, const shared_ptr<Interaction>&)
+	        override; // reminder: method signature is imposed by InteractionLoop.cpp
+	bool goReverse(
+	        const shared_ptr<Shape>&       cm1,
+	        const shared_ptr<Shape>&       cm2,
+	        const State&                   state1,
+	        const State&                   state2,
+	        const Vector3r&                shift2,
+	        const bool&                    force,
+	        const shared_ptr<Interaction>& c) override
+	{
+		c->swapOrder();
+		return go(cm2, cm1, state2, state1, -shift2, force, c);
+	};
+	// clang-format off
+	YADE_CLASS_BASE_DOC(Ig2_Wall_LevelSet_MultiScGeom,IGeomFunctor,"Creates or updates a :yref:`MultiScGeom` instance representing the multiple contact points interaction kinematics of one :yref:`LevelSet` body with one :yref:`Wall` body, extending :yref:`Ig2_Wall_LevelSet_ScGeom` to non-convex LevelSet-shaped bodies. Relative orientation of wall wrt global axes is again not supported. TODO: time cost could / should be improved (wrt Ig2_LevelSet_LevelSet_MultiScGeom; jduriez note see aor8* and aor9*)");
+	// clang-format on
+	DECLARE_LOGGER;
+	FUNCTOR2D(Wall, LevelSet);
+	DEFINE_FUNCTOR_ORDER_2D(Wall, LevelSet);
+};
+REGISTER_SERIALIZABLE(Ig2_Wall_LevelSet_MultiScGeom);
 } // namespace yade
 #endif // YADE_LS_DEM
