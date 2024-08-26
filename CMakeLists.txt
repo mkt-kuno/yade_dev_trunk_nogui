@@ -53,9 +53,26 @@
 #  SUITESPARSEPATH: define this variable with the path to a custom suitesparse install
 #  PYTHON_VERSION: force python version to the given one, set -1 to automatically use the last version on the system. (-1 by default)
 #  DISABLE_PKGS : comma-separated list of disabled packages from 'pkg', 'preprocessing' or 'postprocessing', if empty all packages will be built.The packages `common` and `dem` are required to run, but the project can be compiled without them. (EMPTY by default)
-
-project(Yade C CXX)
 cmake_minimum_required(VERSION 3.5.0)
+project(Yade C CXX)
+if(POLICY CMP0072)
+# FindOpenGL prefers GLVND by default when available.
+# https://cmake.org/cmake/help/latest/policy/CMP0072.html
+  cmake_policy(SET CMP0072 NEW)
+endif()
+if(POLICY CMP0095)
+# RPATH entries are properly escaped in the intermediary CMake install script.
+# https://cmake.org/cmake/help/latest/policy/CMP0095.html
+
+  cmake_policy(SET CMP0095 NEW)
+endif()
+
+if(POLICY CMP0167)
+# The FindBoost module is removed.
+# https://cmake.org/cmake/help/latest/policy/CMP0167.html
+
+  cmake_policy(SET CMP0167 NEW)
+endif()
 IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0.0)
   set (CMAKE_CXX_STANDARD 14)
 ELSE()
@@ -813,7 +830,6 @@ ENDIF((Boost_MAJOR_VERSION EQUAL 1) OR (Boost_MAJOR_VERSION GREATER 1) AND
 IF(ENABLE_VTK)
   SET(VTK_VERSIONS 9 8.2 8.1 6)
   SET(VTK_COMPONENTS IOParallelXML CommonCore IOImage IOXML FiltersCore ImagingCore RenderingCore ImagingGeneral ImagingHybrid FiltersGeneral FiltersSources)
-  
   MESSAGE(STATUS "Checking supported libvtk versions: ${VTK_VERSIONS}")
   FOREACH(vtk_ver ${VTK_VERSIONS})
 	IF(${vtk_ver} EQUAL 9)
@@ -823,15 +839,13 @@ IF(ENABLE_VTK)
    		FOREACH(comp ${VTK_COMPONENTS})
       			LIST(APPEND PRE_9_VTK_COMPONENTS "vtk${comp}")
    		ENDFOREACH()
-	
 		FIND_PACKAGE(VTK ${vtk_ver} QUIET COMPONENTS ${PRE_9_VTK_COMPONENTS})
 	ENDIF()
-	
+
 	IF(VTK_FOUND)
 		BREAK()
 	ENDIF()
   ENDFOREACH()
-  
   IF(VTK_FOUND)
     INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
     LINK_DIRECTORIES( ${VTK_LIBRARY_DIRS} )
@@ -989,12 +1003,21 @@ IF(ENABLE_PFVFLOW AND ENABLE_LINSOLV)
   ENDIF(DEFINED SUITESPARSEPATH)
   FIND_PACKAGE(Cholmod)
   FIND_PACKAGE(OpenBlas)
+  IF((SUITESPARSE_MAIN_VERSION GREATER 6) OR (SUITESPARSE_MAIN_VERSION EQUAL 6))
+  SET(INTEGRATED_METIS TRUE)
+  SET(METIS_INCLUDE_DIR "")
+  SET(METIS_LIBRARY "${CHOLMOD_LIBRARIES}")
+  ELSE((SUITESPARSE_MAIN_VERSION GREATER 6) OR (SUITESPARSE_MAIN_VERSION EQUAL 6))
   FIND_PACKAGE(Metis)
+  ENDIF((SUITESPARSE_MAIN_VERSION GREATER 6) OR (SUITESPARSE_MAIN_VERSION EQUAL 6))
 
-  IF(CHOLMOD_FOUND AND OPENBLAS_FOUND AND METIS_FOUND AND CGAL_FOUND)
+  IF(CHOLMOD_FOUND AND OPENBLAS_FOUND  AND CGAL_FOUND)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CGAL_DEFINITIONS} -DLINSOLV")
 
-    SET(LINKLIBS  "${LINKLIBS};${CHOLMOD_LIBRARIES};${AMD_LIBRARY};${CAMD_LIBRARY};${COLAMD_LIBRARY};${CCOLAMD_LIBRARY};${OPENBLAS_LIBRARY};${METIS_LIBRARY};${SUITESPARSE_LIBRARY};${SUITESPARSECONFIG_LIBRARY}")
+    SET(LINKLIBS  "${LINKLIBS};${CHOLMOD_LIBRARIES};${AMD_LIBRARY};${CAMD_LIBRARY};${COLAMD_LIBRARY};${CCOLAMD_LIBRARY};${OPENBLAS_LIBRARY};${SUITESPARSE_LIBRARY};${SUITESPARSECONFIG_LIBRARY}")
+    IF (NOT INTEGRATED_METIS)
+    SET(LINKLIBS "${LINKLIBS};${METIS_LIBRARY}")
+    ENDIF(NOT INTEGRATED_METIS)
     INCLUDE_DIRECTORIES(${METIS_INCLUDE_DIR} ${CHOLMOD_INCLUDE_DIR} ${BLAS_INCLUDE_DIR})
     MESSAGE(STATUS "Found Cholmod in " ${CHOLMOD_LIBRARIES})
     MESSAGE(STATUS "Found OpenBlas in " ${OPENBLAS_LIBRARY})
@@ -1019,11 +1042,11 @@ IF(ENABLE_PFVFLOW AND ENABLE_LINSOLV)
       SET(DISABLED_FEATS "${DISABLED_FEATS} CHOLMOD_GPU")
     ENDIF(CHOLMOD_GPU)
 
-  ELSE(CHOLMOD_FOUND AND OPENBLAS_FOUND AND METIS_FOUND AND CGAL_FOUND)
+  ELSE(CHOLMOD_FOUND AND OPENBLAS_FOUND AND CGAL_FOUND)
     MESSAGE(STATUS "Missing dependency for LINSOLV, disabled")
     SET(DISABLED_FEATS "${DISABLED_FEATS} LINSOLV")
     SET(ENABLE_LINSOLV OFF)
-  ENDIF(CHOLMOD_FOUND AND OPENBLAS_FOUND AND METIS_FOUND AND CGAL_FOUND)
+  ENDIF(CHOLMOD_FOUND AND OPENBLAS_FOUND AND CGAL_FOUND)
 ELSE(ENABLE_PFVFLOW AND ENABLE_LINSOLV)
   SET(DISABLED_FEATS "${DISABLED_FEATS} LINSOLV")
       IF(ENABLE_TWOPHASEFLOW)
@@ -1276,13 +1299,18 @@ MESSAGE (STATUS "runtimePREFIX is set to " ${runtimePREFIX})
 SET(YADE_LIB_PATH ${CMAKE_INSTALL_PREFIX}/${LIBRARY_OUTPUT_PATH}/yade${SUFFIX})
 SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR})
 SET(YADE_PY_PATH ${YADE_LIB_PATH}/py)
+IF (NOT YADE_EXEC_BIN)
+SET(YADE_EXEC_BIN ${YADE_EXEC_PATH}/yade${SUFFIX} )
+ENDIF(NOT YADE_EXEC_BIN)
+IF (NOT YADE_DOC_PATH)
 SET(YADE_DOC_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/doc/yade${SUFFIX})
+ENDIF (NOT YADE_DOC_PATH)
+IF (NOT YADE_MAN_PATH)
 SET(YADE_MAN_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_MANDIR})
-
+ENDIF (NOT YADE_MAN_PATH)
 
 SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-SET(CMAKE_INSTALL_RPATH "${YADE_LIB_PATH};${YADE_PY_PATH};${YADE_PY_PATH}/yade/;${YADE_PY_PATH}/yade/qt;${YADE_PY_PATH}/gts")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 #===========================================================
@@ -1317,6 +1345,7 @@ ENDIF(ENABLE_POTENTIAL_PARTICLES OR ENABLE_POTENTIAL_BLOCKS OR ENABLE_LS_DEM)
 # boot is linked to nearly evey other *.so and should be loaded first
 ADD_LIBRARY(boot SHARED ${CMAKE_CURRENT_SOURCE_DIR}/core/main/pyboot.cpp)
 SET_TARGET_PROPERTIES(boot PROPERTIES PREFIX "" LINK_FLAGS "-Wl,--no-as-needed" )
+SET_TARGET_PROPERTIES(boot PROPERTIES INSTALL_RPATH "$ORIGIN/../..;$ORIGIN/qt")
 TARGET_LINK_LIBRARIES(boot ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS} ${VTK_LIBRARIES} -lrt)
 
 # this is /core and /lib
@@ -1504,7 +1533,10 @@ IF(ENABLE_OAR)
   INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/bins/yade${SUFFIX}-oar" DESTINATION ${YADE_EXEC_PATH}/)
 ENDIF(ENABLE_OAR)
 INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/bins/yade${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
-INSTALL(CODE "execute_process( COMMAND ${CMAKE_COMMAND} -E create_symlink ${YADE_EXEC_PATH}/yade${SUFFIX} ${YADE_EXEC_PATH}/yade${SUFFIX}.py)")
+IF(NOT NOSUFFIX)
+# yade.py with no suffix breaks import
+INSTALL(CODE "execute_process( COMMAND ${CMAKE_COMMAND} -E create_symlink yade${SUFFIX} \$ENV{DESTDIR}/${YADE_EXEC_PATH}/yade${SUFFIX}.py)")
+ENDIF(NOT NOSUFFIX)
 INSTALL(FILES "${CMAKE_BINARY_DIR}/config.py" DESTINATION ${YADE_PY_PATH}/yade/)
 INSTALL(FILES "${CMAKE_BINARY_DIR}/libVersions.py" DESTINATION ${YADE_PY_PATH}/yade/)
 INSTALL(FILES "${CMAKE_BINARY_DIR}/__init__.py" DESTINATION ${YADE_PY_PATH}/yade/)
@@ -1566,19 +1598,19 @@ ADD_CUSTOM_COMMAND(
                   TARGET doc PRE_BUILD
                   COMMAND rm -rf ${CMAKE_BINARY_DIR}/doc/sphinx/_build
                   COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/doc/* ${CMAKE_BINARY_DIR}/doc
-                  COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_PATH}/yade${SUFFIX} -x yadeSphinx.py html
-                  COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_PATH}/yade${SUFFIX} -x yadeSphinx.py latex
-                  COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_PATH}/yade${SUFFIX} -x yadeSphinx.py epub
-                  COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_PATH}/yade${SUFFIX} -x yadeSphinx.py workarounds
+                  COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_BIN} -x yadeSphinx.py html
+                  COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_BIN} -x yadeSphinx.py latex
+                  COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_BIN} -x yadeSphinx.py epub
+                  COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_BIN} -x yadeSphinx.py workarounds
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx
-                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX}
+                  DEPENDS ${YADE_EXEC_BIN}
                   )
 ADD_CUSTOM_COMMAND(
                   TARGET doc POST_BUILD
                   COMMAND xelatex Yade.tex
                   COMMAND xelatex Yade.tex
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex
-                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.tex
+                  DEPENDS ${YADE_EXEC_BIN} ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.tex
                   )
 ADD_CUSTOM_COMMAND(
                   TARGET doc POST_BUILD
@@ -1586,34 +1618,34 @@ ADD_CUSTOM_COMMAND(
                   COMMAND mv ${CMAKE_BINARY_DIR}/doc/sphinx/_build/html ${YADE_DOC_PATH}/html
                   COMMAND mv ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.pdf ${YADE_DOC_PATH}/
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex
-                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.tex
+                  DEPENDS ${YADE_EXEC_BIN} ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.tex
                   )
 ADD_CUSTOM_COMMAND(
                   TARGET doc POST_BUILD
                   COMMAND mv ${CMAKE_BINARY_DIR}/doc/sphinx/_build/epub/Yade.epub ${YADE_DOC_PATH}/ || true
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex
-                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.tex
+                  DEPENDS ${YADE_EXEC_BIN} ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.tex
                   )
 #===========================================================
 #Building manpage
 ADD_CUSTOM_TARGET(manpage)
 ADD_CUSTOM_COMMAND(
                   TARGET manpage POST_BUILD
-                  COMMAND help2man ${YADE_EXEC_PATH}/yade${SUFFIX} > yade${SUFFIX}.1
-                  COMMAND help2man ${YADE_EXEC_PATH}/yade${SUFFIX}-batch > yade${SUFFIX}-batch.1
+                  COMMAND help2man ${YADE_EXEC_BIN} > yade${SUFFIX}.1
+                  COMMAND help2man ${YADE_EXEC_BIN}-batch > yade${SUFFIX}-batch.1
                   COMMAND mkdir -p ${YADE_MAN_PATH}
                   COMMAND mv *.1 ${YADE_MAN_PATH}
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} /usr/bin/help2man
+                  DEPENDS ${YADE_EXEC_BIN} /usr/bin/help2man
                   )
 #===========================================================
 #Execute standard checks
 ADD_CUSTOM_TARGET(check)
 ADD_CUSTOM_COMMAND(
                   TARGET check POST_BUILD
-                  COMMAND ${YADE_EXEC_PATH}/yade${SUFFIX} --test
-                  COMMAND ${YADE_EXEC_PATH}/yade${SUFFIX} --check
+                  COMMAND ${YADE_EXEC_BIN} --test
+                  COMMAND ${YADE_EXEC_BIN} --check
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX}
+                  DEPENDS ${YADE_EXEC_BIN}
                   )
 #===========================================================

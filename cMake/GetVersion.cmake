@@ -4,68 +4,48 @@ IF (NOT YADE_VERSION)
   IF (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/RELEASE )
     #Release file is found
     SET(READFILE cat)
-    exec_program(
-      ${READFILE}
-      ${CMAKE_CURRENT_SOURCE_DIR}
-      ARGS "RELEASE"
-      OUTPUT_VARIABLE YADE_VERSION 
+    execute_process(
+      COMMAND ${READFILE} "RELEASE"
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      OUTPUT_VARIABLE YADE_VERSION
+      OUTPUT_STRIP_TRAILING_WHITESPACE
     )
   ELSEIF (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.git)
     #Use git for version defining
-    exec_program(
-      "git"
-      ${CMAKE_CURRENT_SOURCE_DIR}
-      ARGS "log"
-      ARGS "-n1"
-      ARGS "--pretty=oneline"
-      ARGS "|"
-      ARGS "cut"
-      ARGS "-c1-7"
+    execute_process(
+      COMMAND git log -n1 --pretty=oneline
+      COMMAND cut -c1-7
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       OUTPUT_VARIABLE VERSION_GIT
+      OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    exec_program(
-      "git"
-      ${CMAKE_CURRENT_SOURCE_DIR}
-      ARGS "log"
-      ARGS "-n1"
-      ARGS "--pretty=fuller"
-      ARGS "--date=iso"
-      ARGS "|"
-      ARGS "grep"
-      ARGS "AuthorDate"
-      ARGS "|"
-      ARGS "cut"
-      ARGS "-c13-22"
+    execute_process(
+      COMMAND git log -n1 --pretty=fuller --date=iso
+      COMMAND grep AuthorDate
+      COMMAND cut -c13-22
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       OUTPUT_VARIABLE VERSION_DATE
+      OUTPUT_STRIP_TRAILING_WHITESPACE
     )
     SET(YADE_VERSION "${VERSION_DATE}.git-${VERSION_GIT}")
-    
+
     #git log -n1 --pretty=format:"%ai_%h"
   ELSEIF (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.bzr/branch/last-revision)
     #Use bzr for version defining
-    exec_program(
-      "less"
-      ${CMAKE_CURRENT_SOURCE_DIR}/.bzr/branch/
-      ARGS "last-revision"
-      ARGS "|"
-      ARGS "cut"
-      ARGS "-c13-20"
+    execute_process(
+      COMMAND less last-revision
+      COMMAND cut -c13-20
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/.bzr/branch/
       OUTPUT_VARIABLE VERSION_GIT
+      OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    exec_program(
-      "bzr"
-      ${CMAKE_CURRENT_SOURCE_DIR}
-      ARGS "log"
-      ARGS "-l"
-      ARGS "1"
-      ARGS "--gnu-changelog"
-      ARGS "|"
-      ARGS "head"
-      ARGS "-n1"
-      ARGS "|"
-      ARGS "cut"
-      ARGS "-c1-10"
+    execute_process(
+      COMMAND bzr log -l 1 --gnu-changelog
+      COMMAND head -n 1
+      COMMAND cut -c1-10
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       OUTPUT_VARIABLE VERSION_DATE
+      OUTPUT_STRIP_TRAILING_WHITESPACE
     )
     SET(YADE_VERSION "${VERSION_DATE}.git-${VERSION_GIT}")
   ELSE (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.git )
