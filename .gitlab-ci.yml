@@ -417,6 +417,27 @@ test_22_foam11:
     - pwd
     - source /opt/openfoam11/etc/bashrc && scripts/checks-and-tests/testOpenFoam.sh
 
+test_22_foam10:
+  <<: *platforms_definition
+  <<: *gitlab_runner_retry_definition
+  <<: *skip_WIP
+  stage: test
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam2312
+  dependencies:
+    - make_22_04
+  needs: ["make_22_04"]
+  timeout: 25 minutes
+  before_script:
+    - export NO_GUI="NO_GUI"
+    - sh -c "wget -O - https://dl.openfoam.org/gpg.key > /etc/apt/trusted.gpg.d/openfoam.asc"
+    - add-apt-repository http://dl.openfoam.org/ubuntu
+    - apt-get update && apt-get -y install openfoam10
+  script:
+    - export PYTHONUNBUFFERED=1
+    - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - pwd
+    - source /opt/openfoam10/etc/bashrc && scripts/checks-and-tests/testOpenFoam.sh
 
 # 3.2. check stage
 .check_template: &check_definition
