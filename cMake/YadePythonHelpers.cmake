@@ -21,7 +21,7 @@ FUNCTION(FIND_PYTHON_MODULE module)
     SET(${module_upper}_FIND_REQUIRED TRUE)
   ENDIF(ARGC GREATER 1 AND ARGV1 STREQUAL "REQUIRED")
 
-  EXECUTE_PROCESS(COMMAND "${PYTHON_EXECUTABLE}" "-c" 
+  EXECUTE_PROCESS(COMMAND "${PYTHON_EXECUTABLE}" "-c"
     #Use future module for compatibility of the print function with python 2
     #Since tkinter does not have __version__ attribute, use TkVersion attribute instead to get the version
     "from __future__ import print_function; import re, ${module}; \
@@ -34,16 +34,16 @@ FUNCTION(FIND_PYTHON_MODULE module)
     OUTPUT_VARIABLE _${module}_output
     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-  IF(_${module}_status MATCHES 0)      
-    #Split the _${module}_output into a list 
+  IF(_${module}_status MATCHES 0)
+    #Split the _${module}_output into a list
     STRING(REPLACE " " ";" _${module}_output_list ${_${module}_output})
-    
+
     #Get location from the first element of the list
     LIST(GET _${module}_output_list 0 _${module}_location)
-    
+
     #Get include dir from the second element of the list
     LIST(GET _${module}_output_list 1 _${module}_include_dir)
-    
+
     #Set MODULE_FOUND variable
     IF(_${module}_include_dir MATCHES "None")
       SET(PY_${module_upper} ${_${module}_location} CACHE STRING "Location of Python module ${module}")
@@ -61,7 +61,7 @@ FUNCTION(FIND_PYTHON_MODULE module)
       FIND_PACKAGE_HANDLE_STANDARD_ARGS(${module_upper} DEFAULT_MSG ${module_upper}_INCLUDE_DIR)
       INCLUDE_DIRECTORIES(${${module_upper}_INCLUDE_DIR})
     ENDIF()
-    
+
     #Concatenate the rest of the list to create the version in case there is space in the python __version__
     #Can't use LIST(SUBLIST ...) as it is not compatible with old versions of cmake
     SET(_${module}_version)
@@ -72,7 +72,7 @@ FUNCTION(FIND_PYTHON_MODULE module)
       LIST(APPEND _${module}_version ${item})
     ENDFOREACH()
     STRING(REPLACE ";" " " ${module_upper}_VERSION ${_${module}_version})
-    
+
     #Get the version major, minor and patch depending of the version format
     #Feel free to add other formats, for now, only x.x.x, x.x or (x, x) formats are supported
     IF(${module_upper}_VERSION MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)$")
@@ -88,7 +88,7 @@ FUNCTION(FIND_PYTHON_MODULE module)
       SET(${module_upper}_VERSION_MINOR "${CMAKE_MATCH_2}")
       SET(${module_upper}_VERSION_PATCH "0")
     ENDIF()
-  
+
   ELSE(_${module}_status MATCHES 0)
     SET(${module_upper}_FOUND FALSE)
     IF(${module_upper}_FIND_REQUIRED)
@@ -96,7 +96,7 @@ FUNCTION(FIND_PYTHON_MODULE module)
       RETURN()
     ENDIF()
   ENDIF(_${module}_status MATCHES 0)
-   
+
   #Set the variables with PARENT_SCOPE in order to access them outside of the function
   SET(${module_upper}_FOUND ${${module_upper}_FOUND} PARENT_SCOPE)
   IF(${module_upper}_FOUND)

@@ -243,7 +243,14 @@ py::list openblasVer() { return {}; }
 
 #if defined(LINSOLV) || defined(FLOW_ENGINE)
 // 16. metis
+#if SUITESPARSE_MAIN_VERSION >= 6
+#include <cholmod.h>
+#define METIS_VER_MAJOR CHOLMOD_MAIN_VERSION
+#define METIS_VER_MINOR CHOLMOD_SUB_VERSION
+#define MTMETIS_VER_SUBMINOR CHOLMOD_SUBSUB_VERSION
+#else
 #include <metis.h>
+#endif
 py::list metisVer()
 {
 	py::list ret;

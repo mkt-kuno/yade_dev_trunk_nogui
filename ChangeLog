@@ -46,6 +46,7 @@ OpenMPI / OpenMP threads
 Packaging & Build Improvements
 ******************************
   Small fix in ChangeLog checker & review categories for changelog for new development cycle (!1039)
+  Tune RPATH setting, fix some cmake warnings & broken symlink, allow to make doc without yade properly installed, and fix build failure for suitesparse>=6.0.0 (!1041)
 
 Small Enhancements
 ******************
@@ -511,7 +512,7 @@ Small improvements (19 MRs)
   Add -Wshadow, simpler CMakeLists.txt
   fix #202 (-Wshadow name conflict) rename k → kParallelForeachIndexCounter in YADE_PARALLEL_FOREACH_BODY_BEGIN
   Add -Wswitch-default to CMakeLists.txt
-  CMAKE_UNITY_BUILD (faster build times) documentation and smallfix 
+  CMAKE_UNITY_BUILD (faster build times) documentation and smallfix
   Fix #204 - UNITY_BUILD works with cpp Logging
   Use boost::enable_shared_from_this, this should help with #199 (mess with type casting) and #205 (unintended python variables)
   Rename CentralGravityEngine → CentralConstantAccelerationEngine
@@ -704,7 +705,7 @@ Bug fixes (45 MRs):
   fix yade crash, when closing 3D view via "X" window frame button, in Ubuntu 20.04, fixes #164 FIX yade crash when closing the 3D view.
   Fix close view crash
   small mailmap fix and test cleanup
-  Little bit of work on #97 : lib/base/Math.hpp should be math only 
+  Little bit of work on #97 : lib/base/Math.hpp should be math only
   Fix compilation against newer QT5.
   Some small fixes for Sacha : Fix compilation with boost 1.65 and g++ 9.3 combination
   Fix denser grid in GLViewer.
@@ -9767,4 +9768,3 @@ Testing & Continuous Integration
 ********************************
 
 == END Another categories template ==
-
