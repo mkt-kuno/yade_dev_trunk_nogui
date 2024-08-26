@@ -93,7 +93,7 @@ public:
 	``lsBodies``
 		Exports :yref:`LevelSet` shaped bodies in global frame, after mapping to current positions and orientations their :yref:`grid<LevelSet.lsGrid>` with :yref:`distance fields<LevelSet.distField>`. A Python function (to use within Paraview) is provided at :ysrc:`examples/levelSet/pvVisu.py` for helping bodies' surfaces rendering in Paraview.
 	``intr``
-		Store interactions as lines between nodes at respective particles positions. Additionally stores magnitude of normal (``forceN``) and shear (``absForceT``) forces on interactions (the :yref:`geom<Interaction.geom> must be of type :yref:`NormShearPhys`).
+		Store interactions as lines between nodes at respective particles positions. Additionally stores on interactions (the :yref:`geom<Interaction.geom> must be of type :yref:`NormShearPhys`) the signed magnitude of normal force (``forceN``) and the component-wise absolute value of shear force (``absForceT``).
 
 **Generic recorders**
 
@@ -115,14 +115,12 @@ public:
 		Saves coordination number (number of neighbours) of :yref:`spheres<Sphere>` and of :yref:`facets<Facet>`; only active if ``spheres`` or ``facets`` are activated.
 	``velocity``
 		Saves linear and angular velocities of spherical particles as Vector3 and length(fields ``linVelVec``, ``linVelLen`` and ``angVelVec``, ``angVelLen`` respectively``); only effective with ``spheres``.
-	``stress``
-		Saves stresses of :yref:`spheres<Sphere>` and of :yref:`facets<Facet>`  as Vector3 and length; only active if ``spheres`` or ``facets`` are activated.
 	``force``
 		Saves force and torque of :yref:`spheres<Sphere>`, :yref:`facets<Facet>` and :yref:`boxes<Box>` as Vector3 and length (norm); only active if ``spheres``, ``facets`` or ``boxes`` are activated.
 	``pericell``
 		Saves the shape of the cell (simulation has to be periodic).
 	``bstresses``
-		Considering the per-particle stress tensors as given by :yref:`bodyStressTensors<yade.utils.bodyStressTensors>`, saves the per-particle principal stresses, sigI (most tensile) $\geq$ sigII $\geq$ sigIII (most compressive), and the associated principal directions dirI, dirII, dirIII.
+		For :yref:`spheres<Sphere>` (if activated) and while considering the per-particle stress tensors as given by :yref:`bodyStressTensors<yade.utils.bodyStressTensors>`, saves the per-particle principal stresses, sigI (most tensile) $\geq$ sigII $\geq$ sigIII (most compressive), and the associated principal directions dirI, dirII, dirIII.
 
 **Specific recorders**
 
