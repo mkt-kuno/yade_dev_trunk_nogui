@@ -296,13 +296,13 @@ As a more precise alternative to the above ``DISABLE_*`` options, other ``cmake`
 	* ENABLE_MASK_ARBITRARY: enable arbitrary precision of bitmask variables (only ``Body::groupMask`` yet implemented) (experimental). If ON, use -DMASK_ARBITRARY_SIZE=int to set number of used bits (256 by default) (OFF by default)
 	* ENABLE_MPFR: use `mpfr <https://www.mpfr.org/>`_ in ``C++`` and `mpmath <http://mpmath.org/>`_ in ``python`` for higher precision ``Real`` or for CGAL exact predicates, see :ref:`high precision documentation<highPrecisionReal>` for more details. Requires ``python3-mpmath libmpfr-dev libmpfrc++-dev`` packages (OFF by default)
 	* ENABLE_MPI: enable MPI environment and communication thanks to `OpenMPI <https://www.open-mpi.org/software/>`_ and `python3-mpi4py <https://bitbucket.org/mpi4py/>`_ (see also `there <https://mpi4py.readthedocs.io/en/stable/>`_), for parallel distributed computing (distributed memory) and Yade-OpenFOAM coupling. Requires ``python3-mpi4py`` (ON by default)
+	* ENABLE_MULTI_REAL_HP: allow using twice, quadruple or higher precisions of ``Real`` as ``RealHP<2>``, ``RealHP<4>`` or ``RealHP<N>`` in computationally demanding sections of ``C++`` code. See :ref:`high precision documentation<highPrecisionReal>` for additional details (ON by default).
 	* ENABLE_OPENMP: enable OpenMP-parallelizing of Yade execution (ON by default)
 	* ENABLE_PARTIALSAT : enable the partially saturated clay engine :yref:`PartialSatClayEngine`, under construction (ON by default)
 	* ENABLE_PFVFLOW: enable PFV :yref:`FlowEngine` (ON by default)
 	* ENABLE_POTENTIAL_BLOCKS: enable :yref:`PotentialBlock` shape description thanks for instance to the `COIN-OR <https://github.com/coin-or/Clp>`_ Linear Programming Solver, requires ``coinor-clp coinor-libclp-dev libopenblas-dev`` (ON by default)
 	* ENABLE_POTENTIAL_PARTICLES: enable :yref:`PotentialParticle` shape description, requires ``libopenblas-dev`` (ON by default)
 	* ENABLE_PROFILING: enable profiling, e.g., shows some more metrics, which can define bottlenecks of the code (OFF by default)
-	* ENABLE_MULTI_REAL_HP: allow using twice, quadruple or higher precisions of ``Real`` as ``RealHP<2>``, ``RealHP<4>`` or ``RealHP<N>`` in computationally demanding sections of ``C++`` code. See :ref:`high precision documentation<highPrecisionReal>` for additional details (ON by default).
 	* ENABLE_SPH: enable Smoothed Particle Hydrodynamics (OFF by default)
 	* ENABLE_THERMAL : enable :yref:`ThermalEngine` (ON by default, experimental)
 	* ENABLE_TWOPHASEFLOW: enable :yref:`TwoPhaseFlowEngine` (ON by default)
