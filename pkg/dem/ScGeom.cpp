@@ -61,6 +61,24 @@ void ScGeom::precompute(
 	shearInc         = relativeVelocity * scene->dt;
 }
 
+void ScGeom::doIg2Work(Vector3r ctctPt, Real un, Real rad1, Real rad2, const State& rbp1, const State& rbp2, const Scene* scene, const shared_ptr<Interaction>& c, const Vector3r& currentNormal, const Vector3r& shift2, bool newScGeom, bool avoidGranularRatcheting){
+	// goal is to avoid duplicating the definition of ScGeom attributes and execution of its ::precompute.
+	contactPoint = ctctPt;
+	penetrationDepth = un;
+	// NB radius1, radius2: those are useful for
+	// 1. contact kinematics description if and only if avoidGranularRatcheting
+	// 2. applying contact forces in C-S Law2, if sphericalBodies
+	// 3. GSTS time step determination with respect to rotational stiffnesses
+	// 4. and also, after being coined as refR1, refR2, for contact stiffness expression in FrictPhys/FrictMat
+	radius1 = rad1;
+	radius2 = rad2;
+	precompute(rbp1,rbp2,scene,c,currentNormal,newScGeom,shift2,avoidGranularRatcheting);
+	// precompute will take care of
+	// 1. preparing the rotation of shearForce to the new tangent plane (done later, in Law2) defining these orthonormal_axis and twist_axis, if newScGeom = false
+	// 2. updating geomPtr->normal (previous value) to currentNormal
+	// 3. computing the relative velocity at contact, through getIncidentVel(avoidGranularRatcheting), using now-defined contactPoint
+//	Comparing with Ig2_Sphere_Sphere_ScGeom.cpp, I think everything is here..
+}
 
 Vector3r
 ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real /*dt*/, const Vector3r& shift2, const Vector3r& shiftVel, bool avoidGranularRatcheting) const

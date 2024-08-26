@@ -8,13 +8,16 @@
 #include <pkg/levelSet/ShopLS.hpp>
 
 namespace yade {
-YADE_PLUGIN((Bo1_LevelSet_Aabb));
+YADE_PLUGIN((Bo1_LevelSet_Aabb)(MultiFrictPhys)(Ip2_FrictMat_FrictMat_MultiFrictPhys));
 CREATE_LOGGER(Bo1_LevelSet_Aabb);
+CREATE_LOGGER(Ip2_FrictMat_FrictMat_MultiFrictPhys);
 
 void Bo1_LevelSet_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*)
 { //TODO: use Eigen Aligned Box.extend to avoid the 2*6 if below ?
 	// NB: see BoundDispatcher::processBody() (called by BoundDispatcher::action(), called by InsertionSortCollider::action()) in pkg/common/Dispatching.cpp for the attributes used upon calling
-	if (!bv) { bv = shared_ptr<Bound>(new Aabb); }
+	if (!bv) {
+		bv = shared_ptr<Bound>(new Aabb);
+	}
 	Aabb*     aabb    = static_cast<Aabb*>(bv.get()); // no need to bother deleting that raw pointer: e.g. https://stackoverflow.com/q/53908753/9864634
 	LevelSet* lsShape = static_cast<LevelSet*>(cm.get());
 	Real      inf     = std::numeric_limits<Real>::infinity();
@@ -80,6 +83,35 @@ void Bo1_LevelSet_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, c
 	aabb->min = Vector3r(xMin, yMin, zMin);
 	aabb->max = Vector3r(xMax, yMax, zMax);
 }
+
+void Ip2_FrictMat_FrictMat_MultiFrictPhys::go(const shared_ptr<Material>& mat1, const shared_ptr<Material>& mat2, const shared_ptr<Interaction>& interaction)
+{
+	// As usual, we maybe do not need to reexecute several times Ip2::go for a given interaction. But testing interaction->phys is inappropriate here because Ig2_LS_LS_MultiScGeom did actually already define a phys.. (if only Ip2 would execute before Ig2 in InteractionLoop..)
+	if (interaction->iterMadeReal >= 0)
+		return; // we thus rather test iterMadeReal, which is assigned to sthg else than -1 in the InteractionLoop, after Ig2 and Ip2 have executed
+	LOG_DEBUG("Passing here because iterMadeReal = " << interaction->iterMadeReal);
+	LOG_DEBUG(
+	        "YADE_PTR_DYN_CAST<MultiFrictPhys>(interaction->phys) = "
+	        << YADE_PTR_DYN_CAST<MultiFrictPhys>(interaction->phys)
+	        << " (0 would be a problem)"); // the dynamic cast will never be executed here unless LOG_DEBUG level is actually effective
+	const shared_ptr<MultiFrictPhys>& contactPhysics = YADE_PTR_CAST<MultiFrictPhys>(interaction->phys); // phys already exists, no need for new ..
+	// Direct assignment of mother values of stiffnesses:
+	contactPhysics->kn = kn;
+	contactPhysics->ks = ks;
+	// Contact friction from Materials' frictionAngle(s):
+	const shared_ptr<FrictMat>& fmat1 = YADE_PTR_CAST<FrictMat>(mat1);
+	const shared_ptr<FrictMat>& fmat2 = YADE_PTR_CAST<FrictMat>(mat2);
+	contactPhysics->frictAngle        = std::min(fmat1->frictionAngle, fmat2->frictionAngle);
+	LOG_DEBUG("Mother friction angle assigned into MultiFrictPhys data from FrictMat");
+	// And we still need to go through the following loop for contacts which were created at the very first iteration (and filled with 0 at that time by Ig2)
+	LOG_DEBUG("About to looping over nodes");
+	for (unsigned int idx = 0; idx < contactPhysics->contacts.size(); idx++) {
+		contactPhysics->contacts[idx]->kn                     = kn;
+		contactPhysics->contacts[idx]->ks                     = ks;
+		contactPhysics->contacts[idx]->tangensOfFrictionAngle = std::tan(contactPhysics->frictAngle);
+	}
+	LOG_DEBUG("Nodes loop done");
+};
 
 } // namespace yade
 #endif //YADE_LS_DEM

@@ -31,6 +31,8 @@ Fluid & thermal & particle saturation
 LevelSet & Volume Interacting LevelSet
 --------------------------------------
 
+  MultiScGeom and MultiFrictPhys new classes (with other ones) for multiple contact points between (non-convex) LevelSet-shaped bodies
+
 Polyhedra / Facets
 ------------------
 

@@ -166,6 +166,29 @@ Vector3i ShopLS::nGPv(const Vector3r& min, const Vector3r& max, const Real& step
 
 vector<vector<vector<Real>>> ShopLS::distIniClump(shared_ptr<Clump> clump, shared_ptr<RegularGrid> grid)
 {
+	// Measuring first clump boundaries (in local axes):
+	AlignedBox3r aabb;
+	int          Sph_Index = Sphere::getClassIndexStatic(); // get sphere index for checking if clump members are spheres
+	for (const auto& mm : clump->members) {
+		const shared_ptr<Body> subBody = Body::byId(mm.first);
+		if (subBody->shape->getClassIndex() == Sph_Index) { //clump member should be a sphere
+			const Sphere* sphere = YADE_CAST<Sphere*>(subBody->shape.get());
+			aabb.extend(mm.second.position + Vector3r::Constant(sphere->radius));
+			aabb.extend(mm.second.position - Vector3r::Constant(sphere->radius));
+		} else
+			LOG_ERROR("One clump member is not Sphere-shaped");
+	}
+	// Then the LS grid:
+	const Vector3r gridMax(grid->max());
+	const Vector3r clumpMin(aabb.min()), clumpMax(aabb.max());
+	// Before checking whether both are indeed consistent:
+	for (int axis = 0; axis < 3; axis++) {
+		if ((clumpMin[axis] < grid->min[axis]) or (clumpMax[axis] > gridMax[axis]))
+			LOG_ERROR(
+			        "Mismatch on axis " << axis << " between the considered grid that extends between " << grid->min << " and " << gridMax
+			                            << " versus the given clump that is between " << clumpMin << " and " << clumpMax);
+	}
+	// We can now safely compute the distance field:
 	return phiIni(2, Vector3r::Zero(), Vector2r::Zero(), clump, grid);
 }
 
@@ -180,6 +203,8 @@ vector<vector<vector<Real>>> ShopLS::distIniSE(const Vector3r& radii, const Vect
 shared_ptr<LevelSet>
 ShopLS::lsSimpleShape(int shape, const AlignedBox3r& aabb, const Real& step, const Real& smearCoeff, const Vector2r& epsilons, shared_ptr<Clump> clump)
 {
+	// Reminder (as defined in utils.py): shape = 0 for disk; 1 for sphere; 2 for box; 3 for se; 4 for clump of Sphere
+	// aabb is a tangent Axis-Aligned Bounding Box in local frame (vec 0 = center of mass)
 	Vector3r minBod(aabb.min()), maxBod(aabb.max()), dimAabb(maxBod - minBod);
 	if ((dimAabb[0] < 0) || (dimAabb[1] < 0) || (dimAabb[2] < 0)) LOG_ERROR("You specified negative extents for aabb, this is not expected.");
 
@@ -195,10 +220,19 @@ ShopLS::lsSimpleShape(int shape, const AlignedBox3r& aabb, const Real& step, con
 		minGrid       = -maxGrid;
 		lsShape->twoD = true;
 	} else if (shape <= 4) { // sphere, box, superellipsoid, clump of spherical particles, all combined
-		                 //		NB: pay attention to the following line, it has to enable the origin to belong to the grid (on all 3 axes)
-		int nIntX(int(ceil(maxBod[0] / step)) + 1), nIntY(int(ceil(maxBod[1] / step)) + 1), nIntZ(int(ceil(maxBod[2] / step)) + 1);
-		maxGrid       = Vector3r(nIntX * step, nIntY * step, nIntZ * step);
-		minGrid       = -maxGrid;
+		// NB: pay attention to the following lines, we want the origin to belong to the grid (on all 3 axes)
+		// On the + side:
+		Vector3r nInt(
+		        ceil(maxBod[0] / step) + 1 // no need to try to make it a one-liner Vector3i
+		        ,
+		        ceil(maxBod[1] / step) + 1 // it might require complex switching from Eigen::Array to Matrix such as Vector3i nInt(( (( (maxBod/step).array() ).ceil()).rint()).matrix() + Vector3i::Ones())
+		        ,
+		        ceil(maxBod[2] / step)
+		                + 1); // but this will anyway be multiplied by a Real below and multiplying Real with Vector3i (logically) does not seem to exist
+		maxGrid = step * nInt; //Vector3r(nIntX * step, nIntY * step, nIntZ * step);
+		// On the - side:
+		nInt          = Vector3r(ceil(math::abs(minBod[0]) / step) + 1, ceil(math::abs(minBod[1]) / step) + 1, ceil(math::abs(minBod[2]) / step) + 1);
+		minGrid       = -nInt * step;
 		lsShape->twoD = false;
 	} else
 		LOG_FATAL("You asked for some shape value=" << shape << " which is not supported");
@@ -313,63 +347,84 @@ Vector3r ShopLS::grad_fioRose(Vector3r gp)
 	Vector3r grad_fio(1, -7.5 / r * cos(5 * theta) * sin(4 * phi), -6 / r * sin(5 * theta) / sin(theta) * cos(4 * phi));
 	return grad_fio;
 }
-shared_ptr<ScGeom> ShopLS::geomPtrForLaterRemoval(const State& rbp1, const State& rbp2, const shared_ptr<Interaction>& c)
+
+void ShopLS::handleNonTouchingNodeForMulti(shared_ptr<MultiScGeom>& geomMulti, shared_ptr<MultiFrictPhys>& physMulti, int nodeIdx)
 {
-	// to use when we can not really compute anything, e.g. bodies lsGrid do not overlap anymore, but still need to have some geom data (while returning true as per general InteractionLoop workflow because it is an existing interaction. Otherwise we would need to update InteractionLoop itself to avoid LOG_WARN messages). Data mostly include an infinite tensile stretch to insure subsequent interaction removal (by Law2)
-	return ShopLS::geomPtr(
-	        Vector3r::Zero() /* inconsequential bullsh..*/,
-	        -std::numeric_limits<Real>::infinity() /* arbitrary big tensile value to trigger interaction removal by Law2*/,
-	        1, /* inconsequential bullsh..*/
-	        1, /* inconsequential bullsh..*/
-	        rbp1,
-	        rbp2,
-	        c,
-	        Vector3r::UnitX() /* inconsequential bullsh..*/,
-	        Vector3r::Zero() /* inconsequential bullsh..*/);
+	// For a surface node being detected not to be in contact, makes what is needed in a Multi* case, i.e. remove it from Multi*.contacts if it was contacting before
+	// Implemented here to avoid code duplication in a number of Ig2_*_MultiScGeom
+	const auto findIt(geomMulti->iteratorToNode(nodeIdx));
+	if (findIt != geomMulti->nodesIds.end()) // we do need findIt below, so we can not use geomMulti->hasNode (unless computing twice the same iterator)
+	{   // that node was contacting before, we need to remove it
+		// we avoid the swap - pop_back method used in FastMarchingMethod since https://stackoverflow.com/a/4442529/9864634 mentions a not understood relation about order of elements (which is important here)
+		// erase-remove idiom (https://stackoverflow.com/a/3385251/9864634) to test even though we do not want to remove by value ?
+		const auto distanceInItera(std::distance(geomMulti->nodesIds.begin(), findIt));
+		geomMulti->contacts.erase(geomMulti->contacts.begin() + distanceInItera);
+		geomMulti->nodesIds.erase(findIt);
+		physMulti->contacts.erase(physMulti->contacts.begin() + distanceInItera);
+		physMulti->nodesIds.erase(physMulti->nodesIds.begin() + distanceInItera);
+	}
 }
 
-shared_ptr<ScGeom> ShopLS::geomPtr(
-        Vector3r                       ctctPt,
-        Real                           un,
-        Real                           rad1,
-        Real                           rad2,
-        const State&                   rbp1,
-        const State&                   rbp2,
-        const shared_ptr<Interaction>& c,
-        const Vector3r&                currentNormal,
-        const Vector3r&                shift2)
+void ShopLS::handleTouchingNodeForMulti(shared_ptr<MultiScGeom>& geomMulti, shared_ptr<MultiFrictPhys>& physMulti, int nodeIdx,
+	Vector3r                       ctctPt,
+	Real                           un,
+	Real                           rad1,
+	Real                           rad2,
+	const State&                   state1,
+	const State&                   state2,
+	const Scene*                   scene,
+	const shared_ptr<Interaction>& c,
+	const Vector3r&                currentNormal,
+	const Vector3r&                shift2
+	)
 {
-	shared_ptr<ScGeom> geomPtr;
-	bool               isNew = !c->geom;
-	if (isNew) geomPtr = shared_ptr<ScGeom>(new ScGeom());
-	else
-		geomPtr = YADE_PTR_CAST<ScGeom>(c->geom);
-	geomPtr->contactPoint     = ctctPt;
-	geomPtr->penetrationDepth = un;
-	// NB radius1, radius2: those are useful for
-	// 1* contact kinematics description if and only if avoidGranularRatcheting, (not the case here)
-	// 2* applying contact forces in C-S Law2, if sphericalBodies (not the case here)
-	// 3* time step determination with respect to rotational stiffnesses
-	// and also, as refR1, refR2, for
-	// 4* contact stiffness expression in FrictPhys/FrictMat
-	geomPtr->radius1 = rad1;
-	geomPtr->radius2 = rad2;
-	geomPtr->precompute(
-	        rbp1,
-	        rbp2,
-	        Omega::instance().getScene().get(),
+	const auto findIt(geomMulti->iteratorToNode(nodeIdx));
+	if (findIt != geomMulti->nodesIds.end()) // same remark as in handleNonTouchingNodeForMulti
+	{
+		// we update the geom:
+		geomMulti->contacts[std::distance(geomMulti->nodesIds.begin(), findIt)]->doIg2Work(
+			ctctPt,
+			un,
+			rad1,rad2,
+			state1,
+	        state2,
+	        scene,
 	        c,
 	        currentNormal,
-	        isNew,
-	        shift2,
-	        false); // the avoidGranularRatcheting=1 expression of relative velocity at contact does not make sense with radius1 and radius2 in all cases of LevelSet-sthg interaction (because the shapes are non-spherical): our present radius1+radius2 may have nothing in common with branch vector
-	// precompute will take care of
-	// * preparing the rotation of shearForce to the new tangent plane (done later, in Law2) defining these orthonormal_axis and twist_axis
-	// * updating geomPtr->normal to normal
-	// * computing the relative velocity at contact, through getIncidentVel(avoidGranularRatcheting=false), using now-defined contactPoint
-
-	// Comparing with Ig2_Sphere_Sphere_ScGeom.cpp, I think everything is here
-	return geomPtr;
+			shift2,
+			false,
+			false);
+		// and have nothing to do for what concerns the phys
+	} else { // that node was not contacting before
+		// we store the information of contact for that node in Multi* geom and phys:
+		physMulti->nodesIds.push_back(nodeIdx);
+		geomMulti->nodesIds.push_back(nodeIdx);
+		// we then create a new ScGeom shared_ptr:
+		shared_ptr<ScGeom> scGeomPtr(new ScGeom);
+		// filled with appropriate data:
+		scGeomPtr->doIg2Work(
+			ctctPt,
+			un,
+			rad1,rad2,
+			state1,
+	        state2,
+	        scene,
+	        c,
+	        currentNormal,
+			shift2,
+			true,
+			false);
+		// that we store in MultiScGeom::contacts:
+		geomMulti->contacts.push_back(scGeomPtr);
+		// we also have to create a new FrictPhys shared_ptr:
+		shared_ptr<FrictPhys> frictPhysPtr(new FrictPhys);
+		// with properties (these below lines unfortunately just give 0 at interaction creation ! Because Ip2 could not enter into play yet. It would have helped if Ip2 would be executed *before* Ig2 in InteractionLoop.. Will be corrected in Ip2):
+		frictPhysPtr->kn                     = physMulti->kn;
+		frictPhysPtr->ks                     = physMulti->ks;
+		frictPhysPtr->tangensOfFrictionAngle = std::tan(physMulti->frictAngle);
+		// we store in MultiFrictPhys::contacts:
+		physMulti->contacts.push_back(frictPhysPtr);
+	}
 }
 
 Real ShopLS::distApproxRose(Vector3r gp)
