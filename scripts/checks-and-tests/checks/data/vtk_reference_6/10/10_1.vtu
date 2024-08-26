@@ -7,10 +7,6 @@
       <CellData>
         <DataArray type="Float64" Name="color" NumberOfComponents="3" format="ascii" RangeMin="1e+299" RangeMax="-1e+299">
         </DataArray>
-        <DataArray type="Float64" Name="stressVec" NumberOfComponents="3" format="ascii" RangeMin="1e+299" RangeMax="-1e+299">
-        </DataArray>
-        <DataArray type="Float64" Name="stressLen" format="ascii" RangeMin="1e+299" RangeMax="-1e+299">
-        </DataArray>
         <DataArray type="Float64" Name="forceVec" NumberOfComponents="3" format="ascii" RangeMin="1e+299" RangeMax="-1e+299">
         </DataArray>
         <DataArray type="Float64" Name="forceLen" format="ascii" RangeMin="1e+299" RangeMax="-1e+299">

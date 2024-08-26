@@ -102,18 +102,6 @@ public:
 	//! Flip cell shear without affecting interactions, such that abs of shear strain is minimal for each shear component
 	static Matrix3r flipCell();
 
-	//! Class for storing stresses, affected on bodies, obtained from Interactions
-	struct bodyState {
-		Vector3r normStress, shearStress;
-		bodyState()
-		{
-			normStress  = Vector3r(0.0, 0.0, 0.0);
-			shearStress = Vector3r(0.0, 0.0, 0.0);
-		}
-	};
-	//! Function of getting stresses for each body
-	static void getStressForEachBody(vector<Shop::bodyState>&);
-
 	//! Define the exact average stress in each particle from contour integral ("LW" stands for Love-Weber, since this is what the contour integral gives).
 	static void     getStressLWForEachBody(vector<Matrix3r>& bStresses);
 	static py::list getStressLWForEachBody();

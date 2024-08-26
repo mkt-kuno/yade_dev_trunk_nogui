@@ -145,40 +145,6 @@ Real Shop::periodicWrap(Real x, Real x0, Real x1, long* period)
 	return x0 + xxNorm * (x1 - x0);
 }
 
-void Shop::getStressForEachBody(vector<Shop::bodyState>& bodyStates)
-{
-	const shared_ptr<Scene>& scene = Omega::instance().getScene();
-	bodyStates.resize(scene->bodies->size());
-	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions)
-	{
-		Vector3r normalStress, shearStress;
-		if (!I->isReal()) continue;
-
-		const FrictPhys* physFP  = YADE_CAST<FrictPhys*>(I->phys.get());
-		ScGeom*          geomScG = YADE_CAST<ScGeom*>(I->geom.get());
-
-		const Body::id_t id1 = I->getId1(), id2 = I->getId2();
-
-		if ((physFP) and (geomScG)) {
-			Real minRad
-			        = (geomScG->radius1 <= 0 ? geomScG->radius2
-			                                 : (geomScG->radius2 <= 0 ? geomScG->radius1 : min(geomScG->radius1, geomScG->radius2)));
-			Real crossSection = Mathr::PI * pow(minRad, 2);
-
-			normalStress = ((1. / crossSection) * geomScG->normal.dot(physFP->normalForce)) * geomScG->normal;
-			for (int i = 0; i < 3; i++) {
-				int ix1 = (i + 1) % 3, ix2 = (i + 2) % 3;
-				shearStress[i] = geomScG->normal[ix1] * physFP->shearForce[ix1] + geomScG->normal[ix2] * physFP->shearForce[ix2];
-				shearStress[i] /= crossSection;
-			}
-			bodyStates[id1].normStress += normalStress;
-			bodyStates[id2].normStress += normalStress;
-			bodyStates[id1].shearStress += shearStress;
-			bodyStates[id2].shearStress += shearStress;
-		}
-	}
-}
-
 /* Return the stress tensor decomposed in 2 contributions, from normal and shear forces.
 The formulation follows the [Thornton2000]_ article
 "Numerical simulations of deviatoric shear deformation of granular media", eq (3) and (4)
