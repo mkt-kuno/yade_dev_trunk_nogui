@@ -1,2 +1,2 @@
-yadeComm.C 
+yadeComm.C
 LIB=$(FOAM_USER_LIBBIN)/libYadeComm
