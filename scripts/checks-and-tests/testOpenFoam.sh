@@ -1,4 +1,5 @@
 #! /bin/bash
+
 cd ..
 rm -rf Yade-OpenFOAM-coupling
 
@@ -13,25 +14,41 @@ if [ -z "$WM_PROJECT_VERSION" ]; then
     source $bashrcPath
 fi
 
-
-cp -rf ../../trunk/pkg/openfoam/coupling Yade-OpenFOAM-coupling
+#git clone https://github.com/dpkn31/Yade-OpenFOAM-coupling.git
+cp -rf trunk/pkg/openfoam/coupling Yade-OpenFOAM-coupling
 cd Yade-OpenFOAM-coupling
 python3 setup.py
+#./Allclean
+#./Allwmake
 
-#### testing icoFoamYade ####
-cd ../../../trunk/examples/openfoam/example_icoFoamYade
+cd ../trunk/examples/openfoam/example_icoFoamYade
 echo `pwd`
 blockMesh
 decomposePar
 mkdir yadep
 mkdir spheres
-mpirun --allow-run-as-root -n 2 ../../../../install/bin/yade-ci scriptMPI.py
 
-#### testing pimpleFoamYade ####
-cd ../example_pimpleFoamYade
-echo `pwd`
-blockMesh
-decomposePar
-mkdir yadep
-mkdir spheres
-mpirun --allow-run-as-root -n 2 ../../../../install/bin/yade-ci scriptMPI.py
+
+
+if [ -f icoFoamYade ]; then
+    echo 'File exists.'
+else
+    echo 'File does not exist.'
+fi
+
+mpirun --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py
+
+#cd ../example_pimpleFoamYade
+#echo `pwd`
+#blockMesh
+#decomposePar
+#mkdir yadep
+#mkdir spheres
+#
+#if [ -f pimpleFoamYade ]; then
+#    echo 'File exists.'
+#else
+#    echo 'File does not exist.'
+#fi
+#
+#mpirun --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py

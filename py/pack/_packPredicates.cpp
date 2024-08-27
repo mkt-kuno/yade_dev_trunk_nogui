@@ -484,12 +484,11 @@ try {
 	py::scope().attr("__doc__") = "Spatial predicates for volumes (defined analytically or by triangulation).";
 	YADE_SET_DOCSTRING_OPTS;
 	// base predicate class
-	py::class_<PredicateWrap, /* necessary, as methods are pure virtual*/ boost::noncopyable>("Predicate", "Spatial predicate base class.\nPredicates support boolean operations as described in `user's manual <user.html#boolean-operations-on-predicates>`_")
-	        .def("__call__", py::pure_virtual(&Predicate::operator()), (py::args("pt"), py::args("pad") = 0))
-	        .def("containsPoint", py::pure_virtual(&Predicate::operator()), (py::args("pt"), py::args("pad") = 0), "if given point is inside the predicate or not. ``pred.containsPoint(pt,pad)`` is equivalent to directly calling predicate itself ``pred(pt,pad)``")
-	        .def("aabb", py::pure_virtual(&Predicate::aabb), "lower and upper corner of predicate's axis aligned bounding box")
-	        .def("dim", &Predicate::dim, "axis aligned dimensions of the predicate")
-	        .def("center", &Predicate::center, "center of the predicate")
+	py::class_<PredicateWrap, /* necessary, as methods are pure virtual*/ boost::noncopyable>("Predicate")
+	        .def("__call__", py::pure_virtual(&Predicate::operator()))
+	        .def("aabb", py::pure_virtual(&Predicate::aabb))
+	        .def("dim", &Predicate::dim)
+	        .def("center", &Predicate::center)
 	        .def("__or__", makeUnion)
 	        .def("__and__", makeIntersection)
 	        .def("__sub__", makeDifference)
