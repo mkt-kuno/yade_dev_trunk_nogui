@@ -23,7 +23,7 @@ The logic for an initially centralized scene is as follows:
 	- calculate internal and cross-domains interactions
 	- execute Newton on assigned bodies (modified Newton skips other domains)
 	- send updated positions to other workers and partial force on floor to master
-	
+
 5. When one worker triggers collision detection all workers will follow. It will result in updating the intersections between subdomains.
 
 6. If enabled, bodies may be re-allocated to different domains just after a collision detection, based on a filter. Custom filters are possible. One is predidefined here (medianFilter)
@@ -212,7 +212,7 @@ def disconnect():
 	'''
 	Kill all mpi processes, leaving python interpreter to rank 0 as in single-threaded execution.
 	The scenes in workers are lost since further reconnexion to mpi will just spawn new processes.
-	The scene in master thread is left unchanged. 
+	The scene in master thread is left unchanged.
 	'''
 
 	global comm, comm_slave, numThreads
@@ -662,7 +662,7 @@ def reboundRemoteBodies(ids):
 def updateDomainBounds(subdomains):  #subdomains is the list of subdomains by body ids
 	'''
 	Update bounds of current subdomain, broadcast, and receive updated bounds from other subdomains
-	Precondition: collider.boundDispatcher.__call__() 
+	Precondition: collider.boundDispatcher.__call__()
 	'''
 	wprint("Updating bounds: " + str(subdomains))
 	if (rank == 0):
@@ -720,7 +720,7 @@ def maskedConnection(b, boolArray):
 def genLocalIntersections(subdomains):
 	'''
 	Defines sets of bodies within current domain overlapping with other domains.
-	
+
 	The structure of the data for domain 'k' is:
 	[[id1, id2, ...],  <----------- intersections[0] = ids of bodies in domain k interacting with master domain (subdomain k itself excluded)
 	[id3, id4, ...],  <----------- intersections[1] = ids of bodies in domain k interacting with domain rank=1 (subdomain k itself excluded)
@@ -936,7 +936,7 @@ def isendRecvForces():
 
 def waitForces():
 	'''
-	wait until all forces are sent to master. 
+	wait until all forces are sent to master.
 	O.freqs is empty for master, and for all threads if not ACCUMULATE_FORCES
 	'''
 	for r in O.freqs:
@@ -1022,7 +1022,7 @@ def mergeScene():
 def splitScene():
 	'''
 	Split a monolithic scene into distributed scenes on threads.
-	
+
 	Precondition: the bodies have subdomain no. set in user script
 	'''
 	if not COPY_MIRROR_BODIES_WHEN_COLLIDE:
@@ -1328,9 +1328,9 @@ def eraseRemote():
 def mpirun(nSteps, np=None, withMerge=False):
 	'''
 	Parallel version of O.run() using MPI domain decomposition.
-	
+
 	Parameters
-	
+
 	nSteps : The numer of steps to compute
 	np :  number of mpi workers (master+subdomains), if=1 the function fallback to O.run()
 	withMerge : wether subdomains should be merged into master at the end of the run (default False). If True the scene in the master process is exactly in the same state as after O.run(nSteps,True). The merge can be time consumming, it is recommended to activate only if post-processing or other similar tasks require it.
@@ -1342,6 +1342,24 @@ def mpirun(nSteps, np=None, withMerge=False):
 		np = numThreads
 	if (np == 1):
 		mprint("single-core, fall back to O.run()")
+		if FLUID_COUPLING:
+			fluidCoupling = typedEngine("FoamCoupling")
+			fluidCoupling.comm = comm
+			fluidCoupling.setIdList(fluidBodies)
+
+			#tell the collider how to handle this new thing
+			collider = typedEngine("InsertionSortCollider")
+			collider.boundDispatcher.functors = collider.boundDispatcher.functors + [Bo1_FluidDomainBbox_Aabb()]
+			collider.targetInterv = 0
+			collider.keepListsShort = True  # probably not needed, O.bodies.insertAtId should turn it on automaticaly
+			O.bodies.useRedirection = True  # idem
+			O.bodies.allowRedirection = False
+
+			collider.boundDispatcher.sweepDist = collider.verletDist
+			collider.boundDispatcher.minSweepDistFactor = collider.minSweepDistFactor
+			collider.boundDispatcher.targetInterv = collider.targetInterv
+			collider.boundDispatcher.updatingDispFactor = collider.updatingDispFactor
+			# fluidCoupling.couplingModeParallel = False
 		O.run(nSteps, True)
 		return
 
@@ -1360,7 +1378,7 @@ def mpirun(nSteps, np=None, withMerge=False):
 	if FLUID_COUPLING:
 		fluidCoupling = typedEngine("FoamCoupling")
 		fluidCoupling.comm = comm
-		
+
 	# split if needed
 	initStep = O.iter
 	if not O.splitted:
@@ -1470,22 +1488,22 @@ def runOnSynchronouslPairs(workers, command):
 	'''
 	Locally (from one worker POV), this function runs interactive mpi tasks defined by 'command' on a list of other workers (typically the list of interacting subdomains).
 	Overall, peer-to-peer connexions are established so so that 'command' is executed symmetrically and simultaneously on both sides of each worker pair. I.e. if worker "i" executes "command" with argument "j" (index of another worker), then by design "j" will execute the same thing with argument "i" *simultaneously*.
-	
+
 	In many cases a similar series of data exchanges can be obtained more simply (and fastly) with asynchronous irecv+send like below.
 
 	for w in workers:
 		m=comm.irecv(w)
 		comm.send(data,dest=w)
-	
+
 	The above only works if the messages are all known in advance locally, before any communication. If the interaction with workers[1] depends on the result of a previous interaction with workers[0] OTOH, it needs synchronous execution, hence this function. Synchronicity is also required if more than one blocking call is present in 'command', else an obvious deadlock as if 'irecv' was replaced by 'recv' in that naive loop.
 	Both cases occur with the 'medianFilter' algorithm, hence why we need this synchronous method.
-	
+
 	In this function pair connexions are established by the workers in a non-supervized and non-deterministic manner. Each time an interactive communication (i,j) is established 'command' is executed simultaneously by i and j. It is guaranted that all possible pairs are visited.
-	
+
 	The function can be used for all-to-all operations (N^2 pairs), but more interestingly it works with workers=intersections[rank] (O(N) pairs). It can be tested with the dummy funtion 'pairOp': runOnSynchronouslPairs(range(numThreads),pairOp)
-	
+
 	command:
-		a function taking index of another worker as argument, can include blocking communications with the other worker since runOnSynchronouslPairs guarantee that the other worker will be running the command symmetrically. 
+		a function taking index of another worker as argument, can include blocking communications with the other worker since runOnSynchronouslPairs guarantee that the other worker will be running the command symmetrically.
 	'''
 	global t1
 	t1 = time.time()
@@ -1595,7 +1613,7 @@ def projectedBounds(i, j):
 def medianFilter(i, j, giveAway):
 	'''
 	Returns bodies in "i" to be assigned to "j" based on median split between the center points of subdomain's AABBs
-	If giveAway!=0, positive or negative, "i" will give/acquire this number to "j" with nothing in return (for load balancing purposes)    
+	If giveAway!=0, positive or negative, "i" will give/acquire this number to "j" with nothing in return (for load balancing purposes)
 	'''
 	bodiesToSend = []
 	if USE_CPP_REALLOC:

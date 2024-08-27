@@ -1,0 +1,54 @@
+
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      p;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    top
+    {
+
+
+            type groovyBC;
+        variables "xp=pos().x;k=15.71;rhoW=1;w=12.5664;A=0.014*3;";
+        valueExpression "(time() < 2 ? 0 : (time() < 4 ? A*9.81*rhoW*sin(k*xp-w*time())*(time()-2)/2 : A*9.81*rhoW*sin(k*xp-w*time())))";
+
+        value uniform 0;
+        
+    }
+
+
+    bottom
+    {
+        type            zeroGradient;
+    }
+
+    back
+    {
+        type            zeroGradient;
+    }
+    front
+    {
+        type            zeroGradient;
+    }
+    inlet
+    {
+        type            zeroGradient;
+    }
+    outlet
+    {
+        type            zeroGradient;
+    }
+
+}
+
+// ************************************************************************* //
