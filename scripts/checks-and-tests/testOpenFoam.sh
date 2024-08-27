@@ -14,13 +14,12 @@ if [ -z "$WM_PROJECT_VERSION" ]; then
 fi
 
 
-cp -rf trunk/pkg/openfoam/coupling Yade-OpenFOAM-coupling
+cp -rf ../../trunk/pkg/openfoam/coupling Yade-OpenFOAM-coupling
 cd Yade-OpenFOAM-coupling
 python3 setup.py
 
 #### testing icoFoamYade ####
-cp -rf trunk/examples/openfoam/example_icoFoamYade example_icoFoamYade
-cd ../example_icoFoamYade
+cd ../../../trunk/examples/openfoam/example_icoFoamYade
 echo `pwd`
 blockMesh
 decomposePar
@@ -29,7 +28,6 @@ mkdir spheres
 mpirun --allow-run-as-root -n 2 ../../../../install/bin/yade-ci scriptMPI.py
 
 #### testing pimpleFoamYade ####
-cp -rf trunk/examples/openfoam/example_pimpleFoamYade example_pimpleFoamYade
 cd ../example_pimpleFoamYade
 echo `pwd`
 blockMesh
