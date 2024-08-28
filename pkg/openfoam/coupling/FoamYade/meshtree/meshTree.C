@@ -6,6 +6,8 @@
 
 #include "meshTree.H"
 
+using namespace Foam;
+
 void Foam::meshTree::build_tree() 
 {
   std::vector<meshpt>  ptlist; 

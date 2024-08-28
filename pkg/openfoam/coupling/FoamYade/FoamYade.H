@@ -9,11 +9,33 @@
 #include <functional> 
 #include <map>
 
-#include "fvCFD.H" 
+// Check development branch, the foundation version reorganized classes after version 6
+#if foamVersion < 1000 && foamVersion > 6
+    #define newFoundationVersion 1
+#else
+    #define isFoundationVersion 0
+#endif
+
+#if (newFoundationVersion)
+   // The content of "fvCFD.H" has been splitted, pick what's necessary below
+//     #include "volFields.H"
+    #warning "FOUNDATION VERSION!!!!!!!!!!" 
+// #include "fvMesh.H"
+// #include "fvSchemes.H"
+// #include "fvSolution.H"
+// #include "surfaceFields.H"
+#include "uniformDimensionedFields.H"
+// #include "fvm.H"
+#else
+#warning "NOOOOOOOOO FOUNDATION VERSION!!!!!!!!!!" 
+    #include "fvCFD.H"
+#endif
+
 #include "meshTree.H" 
 #include "interpolation.H" 
 #include "interpolationCell.H" 
 #include <mpi.h>
+
 
 namespace Foam {
   

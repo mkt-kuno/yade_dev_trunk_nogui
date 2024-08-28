@@ -7,7 +7,8 @@ EXE_INC = \
     -IcommYade/lnInclude \
     -Imeshtree/lnInclude  \
     $(PFLAGS) $(PINC) \
-    -Wno-old-style-cast
+    -Wno-old-style-cast \
+    -DfoamVersion=$(shell echo $(WM_PROJECT_VERSION) | sed 's/v//g')
 
 
 LIB_LIBS = \
