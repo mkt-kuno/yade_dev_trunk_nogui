@@ -36,7 +36,10 @@ else
     echo 'File does not exist.'
 fi
 
-mpirun --allow-run-as-root -n 2 ../../../../install/bin/yade-ci scriptMPI.py
+mpirun --allow-run-as-root -n 2 ../../../install/bin/yade-ci scriptMPI.py
+echo -e "******************************************\n*** icoFoamYade test finished ***\n******************************************\n"
+
+sleep 1
 
 cd ../example_pimpleFoamYade
 echo `pwd`
@@ -51,4 +54,5 @@ else
    echo 'File does not exist.'
 fi
 
-mpirun --allow-run-as-root -n 2 ../../../../install/bin/yade-ci scriptMPI.py
+mpirun --allow-run-as-root -n 2 ../../../install/bin/yade-ci scriptMPI.py
+echo -e "******************************************\n*** pimpleFoamYade test finished ***\n******************************************\n"
