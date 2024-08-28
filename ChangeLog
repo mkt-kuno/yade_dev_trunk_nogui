@@ -39,6 +39,7 @@ Polyhedra / Facets
 
 PotentialParticles / Blocks
 ---------------------------
+   Add intactRock parameter in Ip2 and allow cohesion in KnKsPBlaw
 
 OpenMPI / OpenMP threads
 ************************
