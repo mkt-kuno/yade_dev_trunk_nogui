@@ -79,14 +79,20 @@ volScalarField alphac
 volVectorField divT(
       IOobject(
       "divT",
+#if (newFoundationVersion)
+      runTime.name(),
+#else
       runTime.timeName(),
+#endif
       mesh,
       IOobject::NO_READ,
       IOobject::NO_WRITE),
+#if (newFoundationVersion)
+      mesh
+#else
       fvc::laplacian(U)
+#endif
 );
-
-
 
 volTensorField vGrad(
     IOobject(
@@ -186,9 +192,15 @@ volVectorField ddtU_f (
 
 label pRefCell = 0;
 scalar pRefValue = 0.0;
-setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
-mesh.setFluxRequired(p.name());
 
+#if (newFoundationVersion)
+      setRefCell(p,piso.dict(), pRefCell, pRefValue);
+      mesh.schemes().setFluxRequired(p.name());
+#else
+      setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
+      mesh.setFluxRequired(p.name());
+#endif
+      
 
 //singlePhaseTransportModel laminarTransport(U, phi);
 //

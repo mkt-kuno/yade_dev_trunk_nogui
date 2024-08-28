@@ -6,8 +6,8 @@ EXE_INC = \
     -I../../FoamYade/lnInclude    \
     -I../../FoamYade/meshtree       \
     -I$(LIB_SRC)/Pstream/mpi/lnInclude  \
-    $(PFLAGS) $(PINC) -std=gnu++0x	\
-    
+    $(PFLAGS) $(PINC) \
+    -DfoamVersion=$(shell echo $(WM_PROJECT_VERSION) | sed 's/v//g')
     
 EXE_LIBS = \
     -lfiniteVolume \

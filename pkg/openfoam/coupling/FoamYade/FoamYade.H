@@ -19,7 +19,7 @@
 #if (newFoundationVersion)
    // The content of "fvCFD.H" has been splitted, pick what's necessary below
 //     #include "volFields.H"
-    #warning "FOUNDATION VERSION!!!!!!!!!!" 
+    #warning "FOUNDATION VERSION >10!" 
 // #include "fvMesh.H"
 // #include "fvSchemes.H"
 // #include "fvSolution.H"
@@ -27,7 +27,7 @@
 #include "uniformDimensionedFields.H"
 // #include "fvm.H"
 #else
-#warning "NOOOOOOOOO FOUNDATION VERSION!!!!!!!!!!" 
+#warning "FOUNDATION VERSION 6, or FOAM.COM" 
     #include "fvCFD.H"
 #endif
 

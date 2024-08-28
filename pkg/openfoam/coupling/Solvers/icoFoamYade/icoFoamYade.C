@@ -29,15 +29,58 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "fvCFD.H"
+// Check development branch, the foundation version reorganized classes after version 6
+#if foamVersion < 1000 && foamVersion > 6
+    #define newFoundationVersion 1
+#else
+    #define isFoundationVersion 0
+#endif
+
+#if (newFoundationVersion)
+   // The content of "fvCFD.H" has been splitted, pick what's necessary below
+    #include "argList.H"
+    #include "volFields.H"
+    #include "fvMesh.H"
+    #include "fvSchemes.H"
+    #include "fvSolution.H"
+    #include "surfaceFields.H"
+    #include "fvm.H"
+    
+#include "pressureReference.H"
+#include "findRefCell.H"
+#include "constrainPressure.H"
+#include "constrainHbyA.H"
+#include "adjustPhi.H"
+
+#include "fvcDdt.H"
+#include "fvcGrad.H"
+#include "fvcFlux.H"
+
+#include "fvmDdt.H"
+#include "fvmDiv.H"
+#include "fvmLaplacian.H"
+#include "polyMesh.H"
+
+    
+    
+#else
+    #include "fvCFD.H"
+#endif
+
 #include "pisoControl.H"
 #include "../../FoamYade/FoamYade.H"
+
+using namespace Foam;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCaseLists.H"
+    #if (newFoundationVersion)
+        #include "setRootCase.H"
+    #else
+        #include "setRootCaseLists.H"
+    #endif
     #include "createTime.H"
     #include "createMesh.H"
 
@@ -122,9 +165,13 @@ int main(int argc, char *argv[])
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
-
-                pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
-
+                
+            #if (newFoundationVersion)
+              pEqn.solve();
+            #else
+              pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
+            #endif
+              
                 if (piso.finalNonOrthogonalIter())
                 {
                     phi = phiHbyA - pEqn.flux();
