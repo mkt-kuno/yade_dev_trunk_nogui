@@ -36,19 +36,19 @@ else
     echo 'File does not exist.'
 fi
 
-mpirun --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py
+mpirun --allow-run-as-root -n 2 ../../../install/bin/yade-ci scriptMPI.py
 
-#cd ../example_pimpleFoamYade
-#echo `pwd`
-#blockMesh
-#decomposePar
-#mkdir yadep
-#mkdir spheres
-#
-#if [ -f pimpleFoamYade ]; then
-#    echo 'File exists.'
-#else
-#    echo 'File does not exist.'
-#fi
-#
-#mpirun --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py
+cd ../example_pimpleFoamYade
+echo `pwd`
+blockMesh
+decomposePar
+mkdir yadep
+mkdir spheres
+
+if [ -f pimpleFoamYade ]; then
+   echo 'File exists.'
+else
+   echo 'File does not exist.'
+fi
+
+mpirun --allow-run-as-root -n 2 ../../../install/bin/yade-ci scriptMPI.py
