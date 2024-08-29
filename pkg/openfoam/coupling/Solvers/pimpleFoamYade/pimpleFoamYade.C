@@ -39,7 +39,7 @@ Description
 
 int main(int argc, char *argv[])
 {
-  
+
     #include "postProcess.H"
 
     #include "setRootCaseLists.H"
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     #include "initContinuityErrs.H"
 
     bool gaussianInterp = true;
-    FoamYade yadeCoupling(mesh,Uc, gradP, vGrad, divT,ddtU_f,g,uSourceDrag,alphac,uSource,uParticle,gaussianInterp);
+    FoamYade yadeCoupling(mesh,Uc, gradP, vGrad, divT,ddtU_f,g,uSourceDrag,alphac, uSource, uParticle, uCoeff,uInterp, gaussianInterp);
     yadeCoupling.setScalarProperties(partDensity.value(), rhocValue.value(), nuValue.value());
 
 
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
         runTime++;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
-	
+
         continuousPhaseTransport.correct();
         muc = rhoc*continuousPhaseTransport.nu();
 
@@ -83,9 +83,9 @@ int main(int argc, char *argv[])
         alphac.correctBoundaryConditions();
         alphacf = fvc::interpolate(alphac);
 	alphaPhic = alphacf*phic;
-	
-	uSource.correctBoundaryConditions(); 
-	uSourceDrag.correctBoundaryConditions(); 
+
+	uSource.correctBoundaryConditions();
+	uSourceDrag.correctBoundaryConditions();
 
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
@@ -105,9 +105,9 @@ int main(int argc, char *argv[])
         }
 
         runTime.write();
-	
-	yadeCoupling.setSourceZero(); 
-	
+
+	yadeCoupling.setSourceZero();
+
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
