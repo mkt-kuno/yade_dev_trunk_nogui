@@ -1,5 +1,5 @@
 import os
-from yadeimport import *
+# from yadeimport import *
 from yade import mpy as mp
 
 parallelYade=True #mpirun --allow-run-as-root -n 2 python3 scriptMPI.py , if False  python3 scriptMPI.py
@@ -95,5 +95,6 @@ mp.fluidBodies = sphereIDs
 mp.DOMAIN_DECOMPOSITION = True
 mp.mpirun(NSTEPS)
 mp.mprint("RUN FINISH")
-fluidCoupling.killMPI()
-# exit()
+# fluidCoupling.killMPI()
+mp.disconnect()
+exit()
