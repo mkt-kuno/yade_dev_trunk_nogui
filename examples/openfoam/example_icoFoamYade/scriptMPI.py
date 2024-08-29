@@ -1,8 +1,9 @@
-# -*- encoding=utf-8 -*-
 import os
+from yadeimport import *
 from yade import mpy as mp
 
-numThreads = 4
+parallelYade=True #mpirun --allow-run-as-root -n 2 python3 scriptMPI.py , if False  python3 scriptMPI.py
+numProcOF=2
 
 O.periodic = True
 O.cell.setBox(0.1000005, 0.100005, 0.100005)
@@ -52,8 +53,8 @@ O.bodies.append(box(center=yplus, extents=(maxval, minval, maxval), fixed=True))
 #O.bodies.append(box(center=zplus,extents=(maxval, maxval, minval), fixed=True))
 # setup the openfoam coupling, more stuff is done in mpy.py
 fluidCoupling = FoamCoupling()
-fluidCoupling.couplingModeParallel = True
-fluidCoupling.isGaussianInterp = True
+fluidCoupling.couplingModeParallel = parallelYade
+fluidCoupling.isGaussianInterp = False
 #use pimpleFoamYade for gaussianInterp (only in serial mode)
 sphereIDs = [b.id for b in O.bodies if type(b.shape) == Sphere]
 
@@ -61,7 +62,7 @@ sphereIDs = [b.id for b in O.bodies if type(b.shape) == Sphere]
 # full path here, the scond argument, 2 is the number of FoamProcs. '''
 # fluidCoupling.SetOpenFoamSolver(os.environ.get('FOAM_USER_APPBIN')+'/icoFoamYade', 2)
 # it also work without path after sourcing OFoam's bashrc
-fluidCoupling.SetOpenFoamSolver("icoFoamYade", 2)
+fluidCoupling.SetOpenFoamSolver("icoFoamYade", numProcOF)
 
 # Integrator
 # add small damping in case of stability issues.. ~ 0.1 max, also note : If gravity is needed, set it in constant/g dir.
@@ -87,13 +88,12 @@ collider.verletDist = 0.00075
 mp.YADE_TIMING = False
 mp.FLUID_COUPLING = True
 mp.VERBOSE_OUTPUT = False
-mp.USE_CPP_INTERS = False
+mp.USE_CPP_INTERS = True
 mp.ERASE_REMOTE_MASTER = True
-mp.REALLOC_FREQUENCY = 12
+mp.REALLOC_FREQUENCY = 0
 mp.fluidBodies = sphereIDs
 mp.DOMAIN_DECOMPOSITION = True
 mp.mpirun(NSTEPS)
 mp.mprint("RUN FINISH")
-exit()
-#mp.mergeScene()
-#if mp.rank == 0: O.save('mergedScene.yade')
+fluidCoupling.killMPI()
+# exit()
