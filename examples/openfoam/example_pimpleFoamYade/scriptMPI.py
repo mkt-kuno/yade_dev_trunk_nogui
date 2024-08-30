@@ -1,5 +1,5 @@
 import os
-# from yadeimport import *
+from yadeimport import *
 from yade import mpy as mp
 
 parallelYade=True #mpirun --allow-run-as-root -n 2 python3 scriptMPI.py , if False  python3 scriptMPI.py
@@ -11,7 +11,7 @@ O.cell.setBox(1.005, 1.005, 1.005)
 numspheres = 2000
 young = 5e6
 density = 1000
-NSTEPS = 5000
+NSTEPS = 420
 
 O.materials.append(FrictMat(young=young, poisson=0.5, frictionAngle=radians(15), density=density, label='spheremat'))
 O.materials.append(FrictMat(young=young * 100, poisson=0.5, frictionAngle=0, density=0, label='wallmat'))

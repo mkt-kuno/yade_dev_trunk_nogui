@@ -48,7 +48,7 @@ PIMPLE
 {
     nOuterCorrectors 1;
     nCorrectors     2;
-    momentumPredictor yes;
+    momentumPredictor no;
     nNonOrthogonalCorrectors 0;
     pRefCell        0;
     pRefValue       0;
