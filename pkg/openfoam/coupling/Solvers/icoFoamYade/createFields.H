@@ -4,12 +4,12 @@ IOdictionary transportProperties
 {
   IOobject
   (
-   "transportProperties", 
-   runTime.constant(), 
-   mesh, 
-   IOobject::MUST_READ_IF_MODIFIED, 
+   "transportProperties",
+   runTime.constant(),
+   mesh,
+   IOobject::MUST_READ_IF_MODIFIED,
    IOobject::NO_WRITE )
-}; 
+};
 
 
 Info<< "Reading field p\n" << endl;
@@ -27,20 +27,20 @@ volScalarField p
 );
 
 dimensionedScalar nu (
- "nu", 
- dimViscosity, 
- transportProperties.lookup("nu") 
-); 
+ "nu",
+ dimViscosity,
+ transportProperties.lookup("nu")
+);
 
 dimensionedScalar partDensity (
-    "partDensity", 
-     dimDensity, 
+    "partDensity",
+     dimDensity,
      transportProperties.lookup("partDensity")
-); 
+);
 
-dimensionedScalar fluidDensity( 
+dimensionedScalar fluidDensity(
     "fluidDensity",
-    dimDensity, 
+    dimDensity,
     transportProperties.lookup("fluidDensity")
 );
 
@@ -76,22 +76,27 @@ volScalarField alphac
 );
 
 
+// volVectorField divT(
+//       IOobject(
+//       "divT",
+// #if (newFoundationVersion)
+//       runTime.name(),
+// #else
+//       runTime.timeName(),
+// #endif
+//       mesh,
+//       IOobject::NO_READ,
+//       IOobject::NO_WRITE),
+
 volVectorField divT(
       IOobject(
       "divT",
-#if (newFoundationVersion)
-      runTime.name(),
-#else
       runTime.timeName(),
-#endif
       mesh,
       IOobject::NO_READ,
       IOobject::NO_WRITE),
-#if (newFoundationVersion)
-      mesh
-#else
       fvc::laplacian(U)
-#endif
+
 );
 
 volTensorField vGrad(
@@ -149,7 +154,7 @@ volScalarField uCoeff(
       IOobject::NO_WRITE),
     mesh,
     dimensionedScalar("dragCoeffFluid", dimensionSet(0,0,-1,0,0,0,0), 0 )
-); 
+);
 
 volVectorField uInterp(
     IOobject(
@@ -200,7 +205,7 @@ scalar pRefValue = 0.0;
       setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
       mesh.setFluxRequired(p.name());
 #endif
-      
+
 
 //singlePhaseTransportModel laminarTransport(U, phi);
 //

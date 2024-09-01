@@ -1,36 +1,36 @@
-''' A Helper class to setup the compilation of the Yade-OpenFOAM coupling module and OpenFOAM associated solvers. 
-(c) 2024 Deepak Kunhappan, deepak.kn1990@gmail.com 
+''' A Helper class to setup the compilation of the Yade-OpenFOAM coupling module and OpenFOAM associated solvers.
+(c) 2024 Deepak Kunhappan, deepak.kn1990@gmail.com
 '''
 
 import os
-import argparse 
+import argparse
 
-#parser = argparse.ArgumentParser() 
-#parser.add_argument("build", default = "build", nargs = '?', help = "Compiles the coupling and solvers from scratch") 
+#parser = argparse.ArgumentParser()
+#parser.add_argument("build", default = "build", nargs = '?', help = "Compiles the coupling and solvers from scratch")
 #parser.add_argument("--clean", help = "Cleans existing build")
 
 #args = parser.parse_args()
 
 
-def getVersionNumber(foamVersionString): 
-    if foamVersionString[0] == 'v': 
+def getVersionNumber(foamVersionString):
+    if foamVersionString[0] == 'v':
         return int(foamVersionString.replace('v',''))
-    else: 
+    else:
         return int(foamVersionString)
 
 currentFoamVersion = ""
 rootDir = os.getcwd()
 print("Preparing Yade-OpenFOAM compilation")
-supportedFoamVersions = ['v2312','v2306', 
+supportedFoamVersions = ['v2312','v2306',
                          'v2212', 'v2206',
                          'v2112', 'v2106',
                          'v2012', 'v2006',
-                         'v1912', 'v1906', 
-                         '6'] #11 is not supported yet, maybe 2212 is also supported? 
+                         'v1912', 'v1906',
+                         '6','10'] #11 is not supported yet, maybe 2212 is also supported?
 
-try: 
-    currentFoamVersion = os.environ['WM_PROJECT_VERSION'] 
-except: 
+try:
+    currentFoamVersion = os.environ['WM_PROJECT_VERSION']
+except:
     print("Could not detect OpenFOAM version, have you sourced bashrc from $FOAM_SRC/etc/bashrc ?")
 
 versionNumber = getVersionNumber(currentFoamVersion)
@@ -49,7 +49,7 @@ if not currentFoamVersion in supportedFoamVersions:
 else: print("OpenFoam coupling will be compiled for OpenFOAM version", currentFoamVersion)
 
 
-# compile sources .. 
+# compile sources ..
 os.chdir(rootDir)
 
 # compile commYade
@@ -70,16 +70,21 @@ os.chdir(rootDir + '/FoamYade')
 os.system('wclean')
 os.system('wmake')
 
-# Solvers... 
+# Solvers...
 print("Compiling icoFoamYade solver")
 os.system('wclean')
 os.chdir(rootDir + '/Solvers/icoFoamYade')
 os.system('wclean')
 os.system('wmake')
 
-if versionNumber >= 2012: 
+if versionNumber >= 2012:
     print("Compiling pimpleFoamYade solver")
     os.chdir(rootDir + '/Solvers/pimpleFoamYadev2312')
+    os.system('wclean')
+    os.system('wmake')
+if versionNumber == 10:
+    print("Compiling pimpleFoamYade OF10 solver")
+    os.chdir(rootDir + '/Solvers/pimpleFoamYade_OF10')
     os.system('wclean')
     os.system('wmake')
 else :  # will probably need to handle for foundation versions > 10(?)
@@ -87,4 +92,3 @@ else :  # will probably need to handle for foundation versions > 10(?)
     os.chdir(rootDir + '/Solvers/pimpleFoamYade')
     os.system('wclean')
     os.system('wmake')
-    

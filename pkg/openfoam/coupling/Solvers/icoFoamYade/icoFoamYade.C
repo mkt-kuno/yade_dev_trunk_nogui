@@ -30,7 +30,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 // Check development branch, the foundation version reorganized classes after version 6
-#if foamVersion < 1000 && foamVersion > 6
+#if foamVersion < 1000 && foamVersion > 10
     #define newFoundationVersion 1
 #else
     #define isFoundationVersion 0
@@ -45,24 +45,24 @@ Description
     #include "fvSolution.H"
     #include "surfaceFields.H"
     #include "fvm.H"
-    
-#include "pressureReference.H"
-#include "findRefCell.H"
-#include "constrainPressure.H"
-#include "constrainHbyA.H"
-#include "adjustPhi.H"
 
-#include "fvcDdt.H"
-#include "fvcGrad.H"
-#include "fvcFlux.H"
+    #include "pressureReference.H"
+    #include "findRefCell.H"
+    #include "constrainPressure.H"
+    #include "constrainHbyA.H"
+    #include "adjustPhi.H"
 
-#include "fvmDdt.H"
-#include "fvmDiv.H"
-#include "fvmLaplacian.H"
-#include "polyMesh.H"
+    #include "fvcDdt.H"
+    #include "fvcGrad.H"
+    #include "fvcFlux.H"
 
-    
-    
+    #include "fvmDdt.H"
+    #include "fvmDiv.H"
+    #include "fvmLaplacian.H"
+    #include "polyMesh.H"
+
+
+
 #else
     #include "fvCFD.H"
 #endif
@@ -91,20 +91,20 @@ int main(int argc, char *argv[])
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    Info<< "\nStarting time loop\n" << endl; 
-  
-    bool gaussianInterp = false;  
+    Info<< "\nStarting time loop\n" << endl;
+
+    bool gaussianInterp = false;
 
 
     FoamYade yadeCoupling(mesh,U, gradP, vGrad, divT,ddtU_f,g,uSourceDrag,alphac, uSource, uParticle, uCoeff,uInterp, gaussianInterp);
 
     yadeCoupling.setScalarProperties(partDensity.value(), fluidDensity.value(), nu.value());
-    std::cout << "done set of part properties" << std::endl; 
+    std::cout << "done set of part properties" << std::endl;
 
    //shear flow velocity initialization    (Remember to re-comment these lines after testing. and compile.)
    forAll(U, cellI) {
-      U[cellI].x() = (1.0*mesh.C()[cellI].y()) - 0.05; 
-   } 
+      U[cellI].x() = (1.0*mesh.C()[cellI].y()) - 0.05;
+   }
 
 
 
@@ -113,13 +113,13 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
         #include "CourantNo.H"
 
-       
+
         vGrad = fvc::grad(U);
 
-        
+
         yadeCoupling.setParticleAction(runTime.deltaT().value());
-	
-	
+
+
         // Momentum predictor
 
         fvVectorMatrix UEqn
@@ -130,8 +130,8 @@ int main(int argc, char *argv[])
            ==uSource
           );
 
-         
-        
+
+
         if (piso.momentumPredictor())
         {
             solve(UEqn == -fvc::grad(p));
@@ -165,34 +165,34 @@ int main(int argc, char *argv[])
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
-                
+
             #if (newFoundationVersion)
               pEqn.solve();
             #else
               pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
             #endif
-              
+
                 if (piso.finalNonOrthogonalIter())
                 {
                     phi = phiHbyA - pEqn.flux();
                 }
             }
-          
+
 
             #include "continuityErrs.H"
 
             U = HbyA - rAU*fvc::grad(p);
             U.correctBoundaryConditions();
-       
+
 
         }
-   
+
         runTime.write();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
-	yadeCoupling.setSourceZero(); 
+	yadeCoupling.setSourceZero();
 
     }
 

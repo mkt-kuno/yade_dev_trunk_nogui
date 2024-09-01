@@ -10,12 +10,6 @@ if [ -z "$WM_PROJECT_VERSION" ]; then
         bashrcPath=/usr/lib/openfoam/openfoam2212/etc/bashrc # precompiled package (ubuntu22.04)
     elif [ -f "/usr/lib/openfoam/openfoam2312/etc/bashrc" ]; then
         bashrcPath=/usr/lib/openfoam/openfoam2312/etc/bashrc # precompiled package (ubuntu22.04)
-    elif [ -f "/usr/lib/openfoam/openfoam2312/etc/bashrc" ]; then
-        bashrcPath=/usr/lib/openfoam/openfoam2312/etc/bashrc # precompiled package (ubuntu22.04)
-    elif [ -f "/root/OpenFOAM/OpenFOAM-10/etc/bashrc" ]; then
-        bashrcPath=/root/OpenFOAM/OpenFOAM-10/etc/bashrc #
-    elif [ -f "/root/OpenFOAM/OpenFOAM-11/etc/bashrc" ]; then
-        bashrcPath=/root/OpenFOAM/OpenFOAM-11/etc/bashrc #
     else #assume OFOAM6, use older coupling code
         bashrcPath=/root/OpenFOAM/OpenFOAM-6/etc/bashrc
     fi
@@ -26,7 +20,7 @@ cp -rf trunk/pkg/openfoam/coupling Yade-OpenFOAM-coupling
 cd Yade-OpenFOAM-coupling
 python3 setup.py
 
-cd ../trunk/examples/openfoam/example_pimpleFoamYade
+cd ../trunk/examples/openfoam/example_icoFoamYade
 echo `pwd`
 blockMesh
 cp -r 0_org 0
@@ -43,10 +37,10 @@ else
 fi
 
 mpirun --allow-run-as-root -n 2 python3 scriptMPI.py
-echo -e "******************************************\n*** pimpleFoamYade test finished ***\n******************************************\n"
+echo -e "******************************************\n*** icoFoamYade test finished ***\n******************************************\n"
 
 
-cd ../example_icoFoamYade
+cd ../example_pimpleFoamYade
 echo `pwd`
 blockMesh
 cp -r 0_org 0
@@ -62,4 +56,4 @@ else
 fi
 
 mpirun --allow-run-as-root -n 2 python3 scriptMPI.py
-echo -e "******************************************\n*** icoFoamYade test finished ***\n******************************************\n"
+echo -e "******************************************\n*** pimpleFoamYade test finished ***\n******************************************\n"
