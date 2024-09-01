@@ -79,30 +79,16 @@ int main(int argc, char *argv[])
 
   #include "setRootCaseLists.H"
   #include "createTime.H"
-  Info<< "aaa" << endl;
-
   #include "createMesh.H"
-  Info<< "bbb" << endl;
-
   #include "createControl.H"
-  Info<< "cccc" << endl;
-
   #include "createTimeControls.H"
-  Info<< "d" << endl;
-
   #include "initContinuityErrs.H"
-  Info<< "eeee" << endl;
-
   #include "createFields.H"
   // #include "createUfIfPresent.H"
 
     bool gaussianInterp = true;
     FoamYade yadeCoupling(mesh,Uc, gradP, vGrad, divT,ddtU_f,g,uSourceDrag,alphac, uSource, uParticle, uCoeff,uInterp, gaussianInterp);
     yadeCoupling.setScalarProperties(partDensity.value(), rhocValue.value(), nuValue.value());
-
-
-
-
 
 
     Info<< "\nStarting time loop\n" << endl;
