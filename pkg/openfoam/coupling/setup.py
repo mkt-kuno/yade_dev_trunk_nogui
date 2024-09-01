@@ -26,7 +26,7 @@ supportedFoamVersions = ['v2312','v2306',
                          'v2112', 'v2106',
                          'v2012', 'v2006',
                          'v1912', 'v1906',
-                         '6','10'] #11 is not supported yet, maybe 2212 is also supported?
+                         '6'] #11 is not supported yet, maybe 2212 is also supported?
 
 try:
     currentFoamVersion = os.environ['WM_PROJECT_VERSION']
@@ -82,7 +82,7 @@ if versionNumber >= 2012:
     os.chdir(rootDir + '/Solvers/pimpleFoamYadev2312')
     os.system('wclean')
     os.system('wmake')
-if versionNumber == 10:
+elif versionNumber == 10:
     print("Compiling pimpleFoamYade OF10 solver")
     os.chdir(rootDir + '/Solvers/pimpleFoamYade_OF10')
     os.system('wclean')
