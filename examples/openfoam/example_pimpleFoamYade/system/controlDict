@@ -1,4 +1,3 @@
-
 FoamFile
 {
     version     2.0;
@@ -19,24 +18,25 @@ stopAt          endTime;
 
 endTime         0.034;
 
-deltaT          0.002;
+deltaT          5e-04;
 
-writeControl    runTime;
+writeControl    timeStep;
 
-writeInterval   0.2;
+writeInterval   50;
 
 purgeWrite      0;
 
-writeFormat     binary;
+writeFormat     ascii;
 
 writePrecision  6;
 
-writeCompression off;
+writeCompression on;
 
 timeFormat      general;
 
 timePrecision   6;
 
-runTimeModifiable yes;
+runTimeModifiable true;
+
 
 // ************************************************************************* //

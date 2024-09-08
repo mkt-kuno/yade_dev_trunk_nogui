@@ -82,7 +82,7 @@ O.engines = [
         GlobalStiffnessTimeStepper(timestepSafetyCoefficient=0.7, timeStepUpdateInterval=200, parallelMode=True, label="ts"),
         fluidCoupling,  #to be called after timestepper
         NewtonIntegrator(damping=0.0, label='newton', gravity=(0, 0.0, 0)),
-        VTKRecorder(fileName='spheres/3d-vtk-', recorders=['all'], parallelMode=True, iterPeriod=1000)
+        # VTKRecorder(fileName='spheres/3d-vtk-', recorders=['all'], parallelMode=True, iterPeriod=1000)
 ]
 collider.verletDist = 0.00075
 mp.YADE_TIMING = False
@@ -93,8 +93,7 @@ mp.ERASE_REMOTE_MASTER = True
 mp.REALLOC_FREQUENCY = 0
 mp.fluidBodies = sphereIDs
 mp.DOMAIN_DECOMPOSITION = True
+
 mp.mpirun(NSTEPS)
 mp.mprint("RUN FINISH")
-# fluidCoupling.killMPI()
-mp.disconnect()
 exit()
