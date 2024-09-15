@@ -3,7 +3,7 @@ import os
 from yade import mpy as mp
 
 parallelYade=True #mpirun --allow-run-as-root -n 2 python3 scriptMPI.py , if False  python3 scriptMPI.py
-numProcOF=4
+numProcOF=2
 
 O.periodic = True
 O.cell.setBox(0.1000005, 0.100005, 0.100005)
@@ -88,12 +88,13 @@ collider.verletDist = 0.00075
 mp.YADE_TIMING = False
 mp.FLUID_COUPLING = True
 mp.VERBOSE_OUTPUT = False
-mp.USE_CPP_INTERS = True
+mp.USE_CPP_INTERS = False
 mp.ERASE_REMOTE_MASTER = True
-mp.REALLOC_FREQUENCY = 0
+mp.REALLOC_FREQUENCY = 12
 mp.fluidBodies = sphereIDs
 mp.DOMAIN_DECOMPOSITION = True
-
 mp.mpirun(NSTEPS)
 mp.mprint("RUN FINISH")
+exit()
+
 exit()
