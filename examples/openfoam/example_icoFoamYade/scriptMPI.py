@@ -1,9 +1,9 @@
 import os
-from yadeimport import *
+# from yadeimport import *
 from yade import mpy as mp
 
 parallelYade=True #mpirun --allow-run-as-root -n 2 python3 scriptMPI.py , if False  python3 scriptMPI.py
-numProcOF=2
+numProcOF=4
 
 O.periodic = True
 O.cell.setBox(0.1000005, 0.100005, 0.100005)
