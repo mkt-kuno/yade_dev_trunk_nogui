@@ -77,7 +77,7 @@ os.chdir(rootDir + '/Solvers/icoFoamYade')
 os.system('wclean')
 os.system('wmake')
 
-if versionNumber >= 2012:
+if versionNumber >= 1906:
     print("Compiling pimpleFoamYade solver")
     os.chdir(rootDir + '/Solvers/pimpleFoamYadev2312')
     os.system('wclean')
