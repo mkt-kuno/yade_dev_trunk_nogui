@@ -296,7 +296,6 @@ test_18_foam1906:
     - apt install -y scotch
     - export OMPI_MCA_btl_vader_single_copy_mechanism=none
     - pwd
-    - source /root/OpenFOAM/OpenFOAM-v1906/etc/bashrc
     - scripts/checks-and-tests/testOpenFoam.sh
 
 test_22_foam2312:
