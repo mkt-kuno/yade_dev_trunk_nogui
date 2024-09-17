@@ -10,4 +10,4 @@ mkdir spheres
 #python3 scriptMPI.py
 
 #In yade parallel
-mpirun --allow-run-as-root -n 2 python3 scriptMPI.py
+mpirun --allow-run-as-root -n 4 /path/to/yade/install/bin/yade-exec scriptMPI.py

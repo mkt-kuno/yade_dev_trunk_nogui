@@ -59,6 +59,7 @@ Description
     #include "fvmDdt.H"
     #include "fvmDiv.H"
     #include "fvmLaplacian.H"
+    #include "fvcLaplacian.H"
     #include "polyMesh.H"
 
 
@@ -100,12 +101,6 @@ int main(int argc, char *argv[])
 
     yadeCoupling.setScalarProperties(partDensity.value(), fluidDensity.value(), nu.value());
     std::cout << "done set of part properties" << std::endl;
-
-   //shear flow velocity initialization    (Remember to re-comment these lines after testing. and compile.)
-   forAll(U, cellI) {
-      U[cellI].x() = (1.0*mesh.C()[cellI].y()) - 0.05;
-   }
-
 
 
     while (runTime.loop())
