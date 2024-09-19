@@ -26,7 +26,7 @@ private:
 	Real     distanceInterpolation(const Vector3r&, const int&, const int&, const int&) const; // trilinear interpolation of distance in a given cell
 	bool rayTraceInCell(const Vector3r&, const Vector3r&, const Vector3r&, const Vector3i&);   // handles the ray tracing from a given point in a given cell
 	void rayTrace(const Vector3r&); // recursively calls rayTraceInCell, walking accross the whole grid along a ray starting from center
-	Real smearedHeaviside(Real);
+	Real smearedHeaviside(Real) const;
 	struct mcData { // Structure for holding marching cubes triangulation of level set particle
 		vector<Vector3r> triangles;
 		vector<Vector3r> normals;

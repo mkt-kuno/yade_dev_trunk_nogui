@@ -26,9 +26,10 @@ Vector3r LevelSet::getCenter()
 // // vector<int> LevelSet::getNodesInCellCube(int i, int j, int k){ Vector3i ?
 // // 	return nodesIndicesInCell[Vector3i(i,j,k)];
 // // }
-Real LevelSet::smearedHeaviside(Real x)
+Real LevelSet::smearedHeaviside(Real x) const
 {
-	// Passing smoothly (increasing sine-sort) from y = 0 to 1 when x goes from -1 to 1, see Eq. (3) of Kawamoto2016.
+	// Passing smoothly (increasing sine-sort) from y = 0 to 1 when x goes from -1 to 1, see Eq. (3) of Kawamoto2016, middle part.
+	// For |x| beyond 1 returned value is outside of [0;1] so this is actually not really a smooth Heaviside, it is up to the developer to take care of this when using
 	return 0.5 * (1.0 + x + sin(Mathr::PI * x) / Mathr::PI);
 }
 
@@ -324,11 +325,8 @@ void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, bo
 	volume     = 0.0;      // Initializing volume to zero
 	Real     phi, dV(-1.); // Distance value and considered particle volume for the current cell (the latter can be less than Vcell due to smearing)
 	Vector3r gp;
-	// We will base our level set volume description upon the voxellised description using "inside" voxels.
-	// A voxel is said to be inside according to its minimum gridpoint only, boundary effects are thus unavoidable for now.
-	// To have a consistent voxellised point of view, we will compute the mean coordinates (center's one) from the inside voxels gridpoints. Think to a 2*2 grid (from 0 to 1 along both axes, with just 1 pixel) with a positive level set value at the (0,0) corner only. The only pixel at hand will said to be inside, let's then define the center at the non gridpoint (0.5,0.5). This would not be possible defining the mean from the positive gridpoints (as opposed to the inside voxels considered here).
-	for (int xIndex = 0; xIndex < nGPx - 1;
-	     xIndex++) { // to nGPx-1 to avoid counting twice the last voxel (or the first if the test would consider the level set value at the max gridpoint)
+	// Particle volume is now computed below based upon the voxellised description using "inside" voxels, where a voxel is said to be inside according to its minimum gridpoint only (boundary effects seem to be unavoidable)
+	for (int xIndex = 0; xIndex < nGPx - 1; xIndex++) { // necessarily stopping before the very last gridpoint
 		for (int yIndex = 0; yIndex < nGPy - 1; yIndex++) {
 			for (int zIndex = 0; zIndex < nGPz - 1; zIndex++) {
 				phi = distField[xIndex][yIndex][zIndex];
@@ -363,7 +361,7 @@ void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, bo
 		LOG_ERROR(
 		        "Incorrect LevelSet description: shape center is equal to " << center << " in local axes, instead of 0 (modulo a " << spac
 		                                                                    << " grid spacing).");
-	// Computing inertia in a 2nd loop, now that we firstd compute center above (in an unavoidable 1st loop):
+	// Computing inertia in a 2nd loop, now that we first computed center above (in an unavoidable 1st loop):
 	Real Ixx(0), Ixy(0), Ixz(0), Iyy(0), Iyz(0), Izz(0);
 	Real xV, yV, zV;
 	for (int xIndex = 0; xIndex < nGPx - 1; xIndex++) { // we will stop before the last grid points to avoid counting twice the last (or first) voxels
