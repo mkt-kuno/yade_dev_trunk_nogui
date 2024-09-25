@@ -488,7 +488,7 @@ void Foam::FoamYade::hydroDragForce(YadeParticle*  prt){
 
 	for (const auto& idwt : prt->interpCellWeight){
 		double ooCellVol = (prt->vol)/(rhoF*mesh.V()[idwt.first]);
-		uInterp[idwt.first] +=  (uf*idwt.second);
+		uInterp[idwt.first] +=  (U[idwt.first]*idwt.second);
 		uSourceDrag[idwt.first] += (-coeff*idwt.second*ooCellVol);
 	}
 
