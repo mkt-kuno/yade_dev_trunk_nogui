@@ -4,6 +4,7 @@ Sun, Aug 04 20:05:00 2024 +0100
 
 Bug Fixes
 *********
+  Fix #348 : remove missing boost's include (!1053)
 
 Code Formatting & Organization
 ******************************
