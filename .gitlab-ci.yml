@@ -975,23 +975,6 @@ check_SSE:
       - install
 
 # 4. doc stage
-doc_18_04:
-  <<: *doc_definition
-  <<: *skip_WIP
-  <<: *gitlab_runner_retry_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  dependencies:
-    - make_18_04
-  needs: ["make_18_04"]
-
-doc_22_04:
-  <<: *doc_definition
-  <<: *skip_WIP
-  <<: *gitlab_runner_retry_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04
-  dependencies:
-    - make_22_04
-  needs: ["make_22_04"]
 
 doc_24_04:
   <<: *doc_definition
@@ -1004,7 +987,7 @@ doc_24_04:
 
 # 5. pages stage; uploads documentation to the website
 pages:
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
   stage: pages
   <<: *gitlab_runner_retry_definition
   only:
@@ -1014,8 +997,8 @@ pages:
     - mv install/share/doc/yade-ci/Yade.pdf public
     - mv install/share/doc/yade-ci/Yade.epub public
   dependencies:
-    - doc_18_04
-  needs: ["doc_18_04"]
+    - doc_24_04
+  needs: ["doc_24_04"]
   artifacts:
     paths:
       - public
