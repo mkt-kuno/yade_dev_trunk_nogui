@@ -14,6 +14,9 @@ Documentation & Comments
 
   Alphabetical-ordered presentation of ENABLE_ cmake options in Installation page (!1045)
   Add new publications  (!1047)
+  two additional tutorial examples
+  remove some "utils." prefix in tutorial and clarify why
+  
 Examples
 ********
 

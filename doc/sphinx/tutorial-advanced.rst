@@ -16,11 +16,6 @@ Testing laws
 
 :yref:`LawTester`, :ysrc:`scripts/checks-and-tests/law-test.py`
 
-New law
--------
-
-
-
 Visualization
 -------------
 
