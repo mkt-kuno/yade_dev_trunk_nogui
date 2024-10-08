@@ -123,7 +123,7 @@ Writing complicated code inside *command* is awkward; in such case, we define a 
 	def myFunction():
 		'''Print step number, and pause the simulation is unbalanced force is smaller than 0.05.'''
 		print(O.iter)
-		if utils.unbalancedForce()<0.05:
+		if unbalancedForce()<0.05:
 			print('Unbalanced force is smaller than 0.05, pausing.')
 			O.pause()
 
@@ -173,7 +173,7 @@ Periodic storing of data is done with :yref:`PyRunner` and the :yref:`yade.plot.
 	O.trackEnergy=True
 	def addPlotData():
 		# this function adds current values to the history of data, under the names specified
-		plot.addData(t=O.time,Ek=utils.kineticEnergy(),coordNum=utils.avgNumInteractions(),unForce=utils.unbalancedForce())
+		plot.addData(t=O.time,Ek=kineticEnergy(),coordNum=avgNumInteractions(),unForce=unbalancedForce())
 
 Now this function can be added to :yref:`O.engines<Omega.engines>`::
 

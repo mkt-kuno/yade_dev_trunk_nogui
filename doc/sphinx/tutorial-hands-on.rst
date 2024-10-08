@@ -308,21 +308,21 @@ Particles are the "data" component of simulation; they are the objects that will
 Singles
 """""""""
 
-There is a number of pre-defined functions to create particles of certain type; in order to create a sphere, one has to (see the source of :yref:`yade.utils.sphere` for instance):
+There is a number of pre-defined functions to create particles of certain type; in order to create a sphere, one has to (see the source of :yref:`sphere<yade.utils.sphere>` for instance):
 
 #. Create :yref:`Body`
 #. Set :yref:`Body.shape` to be an instance of :yref:`Sphere` with some given radius
 #. Set :yref:`Body.material` (last-defined material is used, otherwise a default material is created)
 #. Set position and orientation in :yref:`Body.state`, compute mass and moment of inertia based on :yref:`Material` and :yref:`Shape`
 
-In order to avoid such tasks, shorthand functions are defined in the :yref:`yade.utils` module; to mention a few of them, they are :yref:`yade.utils.sphere`, :yref:`yade.utils.facet`, :yref:`yade.utils.wall`.
+In order to avoid such tasks, shorthand functions are defined in the :yref:`yade.utils` module; to mention a few of them, they are :yref:`yade.utils.sphere`, :yref:`yade.utils.facet`, :yref:`yade.utils.wall`. The :yref:`utils<yade.utils>` module is imported at startup in such a way that the ``utils.`` prefix is not necessary for accessing them. 
 
 .. ipython::
 
 	@suppress
-	Yade [1]: from yade import utils
-	
-	Yade [1]: s=utils.sphere((0,0,0),radius=1)    # create sphere particle centered at (0,0,0) with radius=1
+	Yade [1]: from yade.utils import *
+
+	Yade [1]: s=sphere((0,0,0),radius=1)    # create sphere particle centered at (0,0,0) with radius=1
 
 	Yade [1]: s.shape                       # s.shape describes the geometry of the particle
 
@@ -332,9 +332,9 @@ In order to avoid such tasks, shorthand functions are defined in the :yref:`yade
 
 	Yade [1]: s.state.pos                   # position is the one we prescribed
 
-	Yade [1]: s2=utils.sphere((-2,0,0),radius=1,fixed=True)     # explanation below
+	Yade [1]: s2=sphere((-2,0,0),radius=1,fixed=True)     # explanation below
 
-In the last example, the particle was fixed in space by the ``fixed=True`` parameter to :yref:`yade.utils.sphere`; such a particle will not move, creating a primitive boundary condition.
+In the last example, the particle was fixed in space by the ``fixed=True`` parameter to :yref:`sphere<yade.utils.sphere>`; such a particle will not move, creating a primitive boundary condition.
 
 A particle object is not yet part of the simulation; in order to do so, a special function :yref:`O.bodies.append<BodyContainer::append>` (also see :yref:`Omega::bodies` and :yref:`Scene`) is called:
 
@@ -364,13 +364,13 @@ There are functions to generate a specific arrangement of particles in the :yref
 Boundaries
 """"""""""
 
-:yref:`yade.utils.facet` (triangle :yref:`Facet`) and :yref:`yade.utils.wall` (infinite axes-aligned plane :yref:`Wall`) geometries are typically used to define boundaries. For instance, a "floor" for the simulation can be created like this:
+:yref:`facet<yade.utils.facet>` (triangle :yref:`Facet`), :yref:`wall<yade.utils.wall>` (infinite axes-aligned plane :yref:`Wall`) and :yref:`box<yade.utils.box>` (finite axes-aligned cuboids :yref:`Box`) geometries are typically used to define boundaries. For instance, a "floor" for the simulation can be created like this:
  
 .. ipython::
 
-	Yade [1]: O.bodies.append(utils.wall(-1,axis=2))
+	Yade [1]: O.bodies.append(wall(-1,axis=2))
 
-There are other conveinence functions (like :yref:`yade.utils.facetBox` for creating closed or open rectangular box, or family of :yref:`yade.ymport` functions)
+There are other convenience functions (like :yref:`aabbWall<yade.utils.aabbWall>` for creating closed or open rectangular box, or family of :yref:`yade.ymport` functions)
 
 Look inside
 ^^^^^^^^^^^^
@@ -405,11 +405,11 @@ Besides that, Yade says this at startup (the line preceding the command-line)::
    
    .. ipython::
 
-      Yade [1]: O.bodies.append([utils.sphere((2*i,0,0),1) for i in range(1,20)])
+      Yade [1]: O.bodies.append([sphere((2*i,0,0),1) for i in range(1,20)])
 
 #. Create a simple simulation with cloud of spheres enclosed in the box ``(0,0,0)`` and ``(1,1,1)`` with mean radius .1. (hint: :yref:`yade._packSpheres.SpherePack.makeCloud`)
 
-#. Enclose the cloud created above in box with corners ``(0,0,0)`` and ``(1,1,1)``; keep the top of the box open. (hint: :yref:`yade.utils.facetBox`; type ``utils.facetBox?`` or ``utils.facetBox??`` to get help on the command line)
+#. Enclose the cloud created above in box with corners ``(0,0,0)`` and ``(1,1,1)``; keep the top of the box open. (hint: :yref:`aabbWall<yade.utils.aabbWall>`; type ``aabbWall?`` or ``aabbWall??`` to get help on the command line)
 
 #. Open the 3D view, try zooming in/out; position axes so that $z$ is upwards, $y$ goes to the right and $x$ towards you.
 
@@ -425,9 +425,9 @@ Engines define processes undertaken by particles. As we know from the theoretica
 
 	Yade [1]: O.engines=[                   # newlines and indentations are not important until the brace is closed
 	   ...:    ForceResetter(),
-	   ...:    InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()]),
+	   ...:    InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	   ...:    InteractionLoop(           # dtto for the parenthesis here
-	   ...:        [Ig2_Sphere_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],
+	   ...:        [Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 	   ...:        [Ip2_FrictMat_FrictMat_FrictPhys()],
 	   ...:        [Law2_ScGeom_FrictPhys_CundallStrack()]
 	   ...:    ),
@@ -445,9 +445,9 @@ Instead of typing everything into the command-line, one can describe simulation 
 
 	O.engines=[                   # newlines and indentations are not important until the brace is closed
 		ForceResetter(),
-		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()]),
+		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 		InteractionLoop(           # dtto for the parenthesis here
-			 [Ig2_Sphere_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],
+			 [Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 			 [Ip2_FrictMat_FrictMat_FrictPhys()],
 			 [Law2_ScGeom_FrictPhys_CundallStrack()]
 		),
@@ -455,9 +455,9 @@ Instead of typing everything into the command-line, one can describe simulation 
 		NewtonIntegrator(damping=.2,label='newtonCustomLabel') # define a label under which we can access this engine easily
 	]
 
-Besides engines being run, it is likewise important to define how often they will run. Some engines can run only sometimes (we will see this later), while most of them will run always; the time between two successive runs of engines is *timestep* ($\Dt$). There is a mathematical limit on the timestep value, called *critical timestep*, which is computed from properties of particles. Since there is a function for that, we can just set timestep using :yref:`yade.utils.PWaveTimeStep`::
+Besides engines being run, it is likewise important to define how often they will run. Some engines can run only sometimes (we will see this later), while most of them will run always; the time between two successive runs of engines is *timestep* ($\Dt$). There is a mathematical limit on the timestep value, called *critical timestep*, which is computed from properties of particles. Since there is a function for that, we can just set timestep using :yref:`yade.PWaveTimeStep`::
 
-	O.dt=utils.PWaveTimeStep()
+	O.dt=PWaveTimeStep()
 
 Each time when the simulation loop finishes, time ``O.time`` is advanced by the timestep ``O.dt``:
 
@@ -481,15 +481,15 @@ For experimenting with a single simulations, it is handy to save it to memory; t
 #. Define *engines* as in the above example, run the *Inspector* and click through the engines to see their sequence.
 #. Write a simple script which will
 
-   #. define particles as in the previous exercise (cloud of spheres inside a box open from the top)
+   #. define particles as in the previous exercise (cloud of spheres inside a box open from the top) but with a smaller radius (*rMean*=.04)
    #. define a simple simulation loop, as the one given above
    #. set $\Dt$ equal to the critical P-Wave $\Dt$
    #. save the initial simulation state to memory
 
 #. Run the previously-defined simulation multiple times, while changing the value of timestep (use the :guilabel:`⟳` button to reload the initial configuration).
 
-   #. See what happens as you increase $\Dt$ above the P-Wave value.
    #. Try changing the :yref:`gravity<GravityEngine.gravity>` parameter, before running the simulation.
+   #. See what happens as you increase $\Dt$ above the P-Wave value.   
    #. Try changing :yref:`damping<NewtonIntegrator.damping>`
 
 #. Reload the simulation, open the 3d view, open the *Inspector*, select a particle in the 3d view (shift-click). Then run the simulation and watch how forces on that particle change; pause the simulation somewhere in the middle, look at interactions of this particle.

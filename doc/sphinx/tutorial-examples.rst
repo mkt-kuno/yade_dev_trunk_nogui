@@ -78,9 +78,21 @@ Following example is in file :ysrc:`doc/sphinx/tutorial/05-3d-postprocessing.py`
 Periodic triaxial test
 ----------------------
 
-Following example is in file :ysrc:`doc/sphinx/tutorial/06-periodic-triaxial-test.py`.
+Following example is in file :ysrc:`doc/sphinx/tutorial/06-periodic-triaxial-test.py`. A variant of this exemple includes capillary forces, see :ysrc:`doc/sphinx/tutorial/06-periodic-triaxial-test-capillarity.py`
 
 .. youtube:: utTDLZz0y_w
 
 .. literalinclude:: tutorial/06-periodic-triaxial-test.py
+
+
+
+Fluid injection
+---------------
+
+Following example is in file :ysrc:`doc/sphinx/tutorial/07-fluid-injection.py`.
+The video below results from post-processing with paraview
+
+.. youtube:: gH585XaQEcY
+
+.. literalinclude:: tutorial/07-fluid-injection.py
 
