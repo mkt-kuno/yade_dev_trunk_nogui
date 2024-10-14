@@ -93,10 +93,115 @@ def SpherePWaveTimeStep(radius, density, young):
 	return radius / sqrt(young / density)
 
 
+class YadeColorStyle:
+	"""
+	Parameters for default colors and 3D view parameters. Switch between styles with `colorStyle.setStyle("styleName")`. See also the :ref:`rendering section<rendering>` of user manual.
+	"""
+
+	def __init__(
+	        self,
+	        bgColor=(0.2, 0.2, 0.2),
+	        rgbMin=Vector3(0.405, 0.36, 0.135),
+	        rgbRange=Vector3(0.24, 0.24, 0.36),
+	        uniScale=False,
+	        wallColor=Vector3(0.8, 0.8, 0.6),
+	        stripes=True,
+	        quality=1
+	):
+		"""
+		Generic data class for defining color styles. rgbRange is the length of interval [min,max] for each (rgb) color.
+		If uniScale=True the random color is rgbMin+random*rgbRange, else each component is generated randomly.
+		"""
+		self.bgColor = bgColor
+		self.rgbMin = rgbMin
+		self.rgbRange = rgbRange
+		self.uniScale = uniScale
+		self.wallColor = wallColor
+		self.stripes = stripes
+		self.quality = quality
+
+	def setBackgroundColor(self):
+		yade.qt.Renderer().bgColor = self.bgColor
+
+	def randomColor(self):
+		"""
+		Generate a random RGB color between rgbMin and rgbMax.
+		"""
+		if self.uniScale:
+			return self.rgbMin + random.random() * self.rgbRange
+		else:
+			return self.rgbMin + numpy.multiply(self.rgbRange, Vector3(random.random(), random.random(), random.random()))
+
+	def applyBodyStyle(self, ids=None):
+		listBodies = [b for b in O.bodies] if ids == None else [O.bodies[id] for id in ids]
+		for b in listBodies:
+			b.shape.color = self.randomColor()
+
+	def applyAll(self, ids=None):
+		"""
+		
+		"""
+		self.applyBodyStyle(ids)
+		self.setBackgroundColor()
+		Gl1_Sphere.stripes = self.stripes
+		Gl1_Sphere.quality = self.quality
+
+
+# List styles
+__colorStyles__ = {
+        "sand":
+                YadeColorStyle(rgbMin=Vector3(0.405, 0.36, 0.135), rgbRange=Vector3(0.24, 0.24, 0.36)),
+        "old":
+                YadeColorStyle(bgColor=(0.2, 0.2, 0.2), rgbMin=Vector3(0, 0, 0), rgbRange=Vector3(1, 1, 1), wallColor=None, stripes=False, quality=1),
+        "figureColor":
+                YadeColorStyle(bgColor=(1, 1, 1), wallColor=Vector3(0.1, 0.1, 0.1), quality=2),
+        "figureGrey":
+                YadeColorStyle(
+                        bgColor=(1, 1, 1),
+                        rgbMin=Vector3(0.2, 0.2, 0.2),
+                        rgbRange=Vector3(0.5, 0.5, 0.5),
+                        uniScale=True,
+                        wallColor=Vector3(0.1, 0.1, 0.1),
+                        quality=2
+                ),
+        "blue":
+                YadeColorStyle(
+                        bgColor=(0.2, 0.2, 0.2),
+                        rgbMin=Vector3(0.1, 0.1, 0.3),
+                        rgbRange=Vector3(0.4, 0.4, 0.4),
+                        uniScale=True,
+                        wallColor=Vector3(0.1, 0.1, 0.1),
+                        quality=1
+                ),
+        "screenDisplayLowRes":
+                YadeColorStyle(stripes=False, quality=0.7),
+}
+
+
+class __colorStyle__:
+	"""
+	Color style of the 3D view. See function "setStyle", and "styles".
+	"""
+	styles = __colorStyles__  # available styles
+	current = "sand"  # style name
+	__current__ = __colorStyles__[current]  # pointer to the data
+
+	def setStyle(self, styleName="sand", updateView=False, ids=None):
+		"""
+		Set a style. Predefined ones are in 'styles'. If updateView=True, then the new style is updated immediately (else call colorStyle.current.applyAll(ids) later. Provide the ids of bodies which must get new color, if None they are all changed.
+		"""
+		self.current = styleName
+		self.__current__ = __colorStyles__[styleName]
+		if updateView:
+			self.__current__.applyAll(ids)
+
+
+colorStyle = __colorStyle__()
+
+
 def randomColor(seed=None):
-	"""Return random Vector3 with each component in interval 0…1 (uniform distribution)"""
-	random.seed(seed)
-	return Vector3(random.random(), random.random(), random.random())
+	"""Return random color from current style"""
+	return colorStyle.__current__.randomColor()
 
 
 def typedEngine(name):
@@ -228,7 +333,18 @@ def sphere(center, radius, dynamic=None, fixed=False, wire=False, color=None, hi
 	return b
 
 
-def box(center, extents, orientation=Quaternion(1, 0, 0, 0), dynamic=None, fixed=False, wire=False, color=None, highlight=False, material=-1, mask=1):
+def box(
+        center,
+        extents,
+        orientation=Quaternion(1, 0, 0, 0),
+        dynamic=None,
+        fixed=False,
+        wire=False,
+        color=colorStyle.__current__.wallColor,
+        highlight=False,
+        material=-1,
+        mask=1
+):
 	"""Create box (cuboid) with given parameters.
 
 	:param Vector3 extents: half-sizes along x,y,z axes. Use can be made of *orientation* parameter in case those box-related axes do not conform the simulation axes
@@ -247,7 +363,7 @@ def box(center, extents, orientation=Quaternion(1, 0, 0, 0), dynamic=None, fixed
 	return b
 
 
-def wall(position, axis, sense=0, color=None, material=-1, mask=1):
+def wall(position, axis, sense=0, color=colorStyle.__current__.wallColor, material=-1, mask=1):
 	"""Return ready-made wall body.
 
 	:param float-or-Vector3 position: center of the wall. If float, it is the position along given axis, the other 2 components being zero
@@ -268,7 +384,7 @@ def wall(position, axis, sense=0, color=None, material=-1, mask=1):
 	return b
 
 
-def facet(vertices, dynamic=None, fixed=True, wire=True, color=None, highlight=False, noBound=False, material=-1, mask=1):
+def facet(vertices, dynamic=None, fixed=True, wire=True, color=colorStyle.__current__.wallColor, highlight=False, noBound=False, material=-1, mask=1):
 	"""Create a :yref:`Facet`-shaped body with given parameters. Body center is chosen as the center of the inscribed circle of the *vertices* triangle
 
 	:param [Vector3,Vector3,Vector3] vertices: coordinates of vertices in the global coordinate system.
