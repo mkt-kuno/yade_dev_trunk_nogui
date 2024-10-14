@@ -105,8 +105,6 @@ O.engines = [
         newton
 ]
 
-#Display spheres with 2 colors for seeing rotations better
-Gl1_Sphere.stripes = 0
 if nRead == 0:
 	yade.qt.Controller(), yade.qt.View()
 

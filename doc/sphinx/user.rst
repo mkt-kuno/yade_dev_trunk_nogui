@@ -1505,7 +1505,24 @@ Postprocessing
 3d rendering & videos
 ======================
 
-There are multiple ways to produce a video of simulation:
+.. _rendering:
+
+3D rendering is available at runtime to inspect the simulation, it uses QGLViewer library.
+
+Many parameters of the rendering can be modified. See for instance background color `bgColor` in :yref:`OpenGLRenderer` - also visible in the "Display" tab of Qt Controller, and the keys listed in QGLViewer's help (hit "h" when the 3D window is active). For instance, hit "t" to switch between orthographic / perspective camera, or "m" to move particle around with the mouse.
+
+`colorStyle` helps to quickly switch between predefined styles for particle color, background color, and resolution of sphere representation. For images to be included in documents it is generally better to use a white background::
+
+	colorStyle.setStyle("figureColor",True)  # colorful particles on white background
+	colorStyle.setStyle("figureGrey",True)  # grey levels for everything
+
+These two styles also have higher resolution for displaying the spheres. The style that was used pre-2024 is `old`. The available styles are listed in `colorStyle.styles`:
+
+.. ipython::
+	
+	Yade [1]: colorStyle.styles
+
+3D rendering is one of several ways to produce videos of simulations:
 
 #. Capture screen output (the 3d rendering window) during the simulation − there are tools available for that (such as `Istanbul <http://www.linuceum.com/Desktop/istanbul.php>`_ or `RecordMyDesktop <http://recordmydesktop.sourceforge.net/about.php>`_, which are also packaged for most Linux distributions).  The output is "what you see is what you get", with all the advantages and disadvantages.
 
