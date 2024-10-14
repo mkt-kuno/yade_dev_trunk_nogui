@@ -16,6 +16,7 @@ Documentation & Comments
   Add new publications  (!1047)
   two additional tutorial examples
   remove some "utils." prefix in tutorial and clarify why
+  smallfix in documentation of mpy module
   
 Examples
 ********

@@ -31,14 +31,14 @@ The logic for an initially centralized scene is as follows:
 Rules:
 ------
 
-	#- intersections[0] has 0-bodies (to which we need to send force)
-	#- intersections[thisDomain] has ids of the other domains overlapping the current ones
-	#- intersections[otherDomain] has ids of bodies in _current_ domain which are overlapping with other domain (for which we need to send updated pos/vel)
+	- intersections[0] has 0-bodies (to which we need to send force)
+	- intersections[thisDomain] has ids of the other domains overlapping the current ones
+	- intersections[otherDomain] has ids of bodies in _current_ domain which are overlapping with other domain (for which we need to send updated pos/vel)
 
-Hints:
+Hint:
 ------
 
-	#- handle subD.intersections with care (same for mirrorIntersections). subD.intersections.append() will not reach the c++ object. subD.intersections can only be assigned (a list of list of int)
+handle subD.intersections with care (same for mirrorIntersections). subD.intersections.append() will not reach the c++ object. subD.intersections can only be assigned (a list of list of int)
 
 '''
 
