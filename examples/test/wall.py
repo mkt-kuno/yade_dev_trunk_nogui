@@ -8,6 +8,7 @@ O.bodies.append([wall(1, axis=2, sense=-1), wall(-5, axis=0, sense=1), wall(1, a
 Gl1_Wall(div=10)
 
 from yade import qt
+
 qt.Controller()
 qt.View()
 

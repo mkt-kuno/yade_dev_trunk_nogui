@@ -1,5 +1,6 @@
 import numpy as np
 import os, sys
+
 xtermTolerance = int(sys.argv[-1])
 scrDir = sys.argv[-2]
 refDir = sys.argv[-3]

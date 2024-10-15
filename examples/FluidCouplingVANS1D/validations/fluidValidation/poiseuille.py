@@ -71,6 +71,7 @@ upois = -dpdx * 1 / 2. / (kinematicViscoFluid * densFluid) * (fluidHeight * zSca
 from pylab import *
 from matplotlib import pyplot
 import matplotlib.gridspec as gridspec
+
 figure(1)
 ax1 = subplot(111)
 p1 = ax1.plot(vxFluid, zScale, '-ob', label='Yade 1D fluid res.')  #Simulation results = blue points

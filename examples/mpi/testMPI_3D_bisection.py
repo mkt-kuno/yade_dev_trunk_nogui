@@ -8,6 +8,7 @@ NSTEPS = 100  #turn it >0 to see time iterations, else only initilization TODO!H
 
 import os
 from yade import mpy as mp
+
 numThreads = 6
 
 #add spheres

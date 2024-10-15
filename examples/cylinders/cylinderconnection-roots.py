@@ -109,6 +109,7 @@ for j in range(-Nc, Nc + 1):
 
 #### For viewing ####
 from yade import qt
+
 qt.View()
 Gl1_Sphere.stripes = True
 

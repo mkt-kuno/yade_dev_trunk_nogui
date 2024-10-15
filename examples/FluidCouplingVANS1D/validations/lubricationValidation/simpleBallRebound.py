@@ -13,6 +13,7 @@
 #########################################################################################################################################################################
 from yade import plot
 import numpy as np
+
 effectiveRestitutionApproach = True
 lubricationForceApproach = False
 

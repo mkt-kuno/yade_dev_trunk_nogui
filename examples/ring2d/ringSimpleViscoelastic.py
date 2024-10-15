@@ -80,6 +80,7 @@ O.dt = 0.02 * tc
 O.saveTmp('init')
 
 from yade import qt
+
 renderer = qt.Renderer()
 renderer.wire = True
 #qt.Controller()

@@ -14,6 +14,7 @@
 
 # ------------------------------------------------------------------------------------------
 from yade import plot
+
 material = str(sys.argv[1]) if len(sys.argv) > 1 else 'aluminium_alloy'  #options are 'aluminium_alloy'|'magnesium_alloy'
 
 try:

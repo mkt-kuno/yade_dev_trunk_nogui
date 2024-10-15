@@ -4,6 +4,7 @@
 # [1] Yuan, C., & Chareyre, B. (2017). A pore-scale method for hydromechanical coupling in deformable granular media. Computer Methods in Applied Mechanics and Engineering, 318, 1066-1079. (http://www.sciencedirect.com/science/article/pii/S0045782516307216)
 
 import matplotlib
+
 matplotlib.rc('axes', grid=True)
 from yade import pack
 import pylab
@@ -80,6 +81,7 @@ si1 = -triax.stress(2)[1]
 si2 = -triax.stress(4)[2]
 
 from yade import plot
+
 O.engines = O.engines + [PyRunner(iterPeriod=20, command='history()', dead=1, label='recorder')]
 
 

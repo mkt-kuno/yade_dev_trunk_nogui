@@ -29,6 +29,7 @@ M = 50
 # Check MPI world
 # This is to know if it was run with or without mpi (see preamble of this script)
 import os
+
 rank = os.getenv('OMPI_COMM_WORLD_RANK')
 if rank is not None:  #mpi is used
 	rank = int(rank)
@@ -45,6 +46,7 @@ if len(sys.argv) > 1:  #we then assume N,M are provided as 1st and 2nd cmd line 
 
 # sequential grain colors
 import colorsys
+
 colorScale = (Vector3(colorsys.hsv_to_rgb(value * 1.0 / numThreads, 1, 1)) for value in range(0, numThreads))
 
 #add spheres

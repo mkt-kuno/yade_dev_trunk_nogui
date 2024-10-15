@@ -21,6 +21,7 @@ AttributeError: 'module' object has no attribute 'spheresToFile'
 """
 
 from os.path import exists
+
 sph = 'triax-identical-results'
 i = 0
 outSph = ''

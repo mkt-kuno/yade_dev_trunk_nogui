@@ -101,5 +101,6 @@ def startStepRotation():
 
 
 from yade import qt
+
 qt.View()
 r = qt.Renderer()

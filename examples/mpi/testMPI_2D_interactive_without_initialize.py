@@ -12,10 +12,12 @@ M = 50
 
 import os
 from yade import mpy as mp
+
 numThreads = 4
 
 # sequential grain colors
 import colorsys
+
 colorScale = (Vector3(colorsys.hsv_to_rgb(value * 1.0 / numThreads, 1, 1)) for value in range(0, numThreads))
 
 #add spheres

@@ -163,6 +163,7 @@ print()
 scoreIterVel = int(scoreIterVel)
 ## write output file for graph
 import subprocess
+
 cmd = "cat /proc/cpuinfo | grep \'model name\' | uniq"
 #processor = subprocess.check_output(cmd, shell=True).lstrip('model name\t:').strip() # needs python >=2.7.0
 process = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)

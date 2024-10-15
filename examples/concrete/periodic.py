@@ -65,6 +65,7 @@ if not os.path.exists(packingFile):
 # load the packing (again);
 #
 import pickle as pickle
+
 concreteId = O.materials.append(
         CpmMat(
                 young=young,
@@ -79,11 +80,13 @@ concreteId = O.materials.append(
 )
 sphDict = pickle.load(open(packingFile, 'rb'))
 from yade import pack
+
 sp = pack.SpherePack()
 sp.fromList(sphDict['spheres'])
 sp.cellSize = sphDict['cell']
 
 import numpy
+
 avgRadius = numpy.average([r for c, r in sp])
 O.bodies.append([sphere(c, r, color=randomColor()) for c, r in sp])
 O.periodic = True

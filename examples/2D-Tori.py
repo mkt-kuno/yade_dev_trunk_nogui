@@ -4,6 +4,7 @@
 #/!\ this is just a DISPLAY FEATURE, computed particles still are SPHERICAL.
 
 from yade import qt
+
 X = 1
 Y = 1
 Z = 1

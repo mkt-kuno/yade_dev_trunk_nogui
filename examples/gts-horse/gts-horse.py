@@ -58,6 +58,7 @@ O.saveTmp()
 O.timingEnabled = True
 O.trackEnergy = True
 from yade import plot
+
 plot.plots = {
         'i': (
                 'total',
@@ -74,4 +75,5 @@ plot.plot(subPlots=False)
 
 from yade import timing
 from yade import qt
+
 qt.View()

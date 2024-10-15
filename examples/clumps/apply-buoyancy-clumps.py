@@ -143,6 +143,7 @@ for ids in idsWaterFacets:
 #STEP3: simulate buoyancy with increasing water table condition
 O.dt = 3e-5
 from yade import qt
+
 qt.Controller()
 v = qt.View()
 v.eyePosition = (-7, 0, 2)

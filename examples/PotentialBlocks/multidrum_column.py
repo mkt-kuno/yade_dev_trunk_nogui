@@ -103,6 +103,7 @@ O.engines = O.engines + [HarmonicMotionEngine(A=[0.1, 0, 0], f=[3, 0, 0], fi=[pi
 # -----------------------------------------------------------------------------
 # Visualisation
 from yade import qt
+
 qt.Controller()
 v = qt.View()
 v.sceneRadius = 20

@@ -8,6 +8,7 @@ from yade import wrapper
 from yade._customConverters import *
 from yade import runtime
 from yade import config
+
 O = wrapper.Omega()
 
 

@@ -31,6 +31,7 @@ def unitCylinder(nDiv=24):
 
 
 from yade import pack, timing
+
 cyl = unitCylinder()
 sq = unitSquare()
 sq.translate(0, 0, -1)
@@ -67,5 +68,6 @@ O.timingEnabled = True
 timing.reset()
 
 from yade import qt
+
 qt.Controller()
 qt.View()

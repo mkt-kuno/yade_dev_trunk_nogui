@@ -40,6 +40,7 @@ O.dt = 1e-4
 #O.run()
 O.saveTmp('init')
 from yade import qt
+
 qt.Controller()
 qt.View()
 if 1:

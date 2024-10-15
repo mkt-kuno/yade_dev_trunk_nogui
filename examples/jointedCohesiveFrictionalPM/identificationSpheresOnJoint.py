@@ -76,6 +76,7 @@ O.engines = [
 O.dt = 0.001 * utils.PWaveTimeStep()
 
 from yade import qt
+
 v = qt.Controller()
 v = qt.View()
 

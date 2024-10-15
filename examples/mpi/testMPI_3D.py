@@ -24,6 +24,7 @@ NSTEPS = 1000  #turn it >0 to see time iterations, else only initilization
 # Check MPI world
 # This is to know if it was run with or without mpiexec (see preamble of this script)
 import os
+
 rank = os.getenv('OMPI_COMM_WORLD_RANK')
 if rank is not None:  #mpiexec was used
 	rank = int(rank)
@@ -51,6 +52,7 @@ globalDomain = dd.GlobaldomainCloud(
 
 # sequential grain colors
 import colorsys
+
 colorScale = (Vector3(colorsys.hsv_to_rgb(value * 1.0 / numThreads, 1, 1)) for value in range(0, numThreads))
 colors = []
 for i in range(numThreads):

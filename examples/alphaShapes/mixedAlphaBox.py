@@ -1,4 +1,5 @@
 import random
+
 N = 30
 
 
@@ -30,6 +31,7 @@ ag = TW.getAlphaGraph(alpha=a, shrinkedAlpha=shrinkedA, fixedAlpha=fixedA)
 graph = GlExtra_AlphaGraph(tesselationWrapper=TW, wire=True)
 
 from yade import qt
+
 rr = qt.Renderer()
 rr.extraDrawers = [graph]
 

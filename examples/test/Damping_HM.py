@@ -52,6 +52,7 @@ O.saveTmp('init')
 
 #__________________________________________________________________
 from yade import qt
+
 qt.View()
 qt.Controller()
 

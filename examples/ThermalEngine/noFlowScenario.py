@@ -23,6 +23,7 @@ from yade import pack, ymport
 from yade import timing
 import numpy as np
 import shutil
+
 timeStr = time.strftime('%m-%d-%Y')
 num_spheres = 1000  # number of spheres
 young = 1e9

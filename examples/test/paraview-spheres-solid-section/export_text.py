@@ -4,6 +4,7 @@ center = (5, 5, 5)
 normal = (1, 1, 1)
 
 from yade import pack, export
+
 pred = pack.inAlignedBox(Vector3.Zero, maxCorner)
 O.bodies.append(pack.randomDensePack(pred, radius=1., rRelFuzz=.5, spheresInCell=500))
 

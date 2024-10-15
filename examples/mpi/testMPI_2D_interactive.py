@@ -46,6 +46,7 @@ else:
 import os
 #import yade's mpi module
 from yade import mpy as mp
+
 rank, numThreads = mp.initialize()  #fixme: prefix and prog should be accessed directly from mpy.py, but how ?
 
 if (rank == None):  #non-mpi execution, numThreads will still be used as multiplier for the problem size (2 => multiplier is 1)
@@ -60,6 +61,7 @@ if len(sys.argv) > 1:  #we then assume N,M are provided as 1st and 2nd cmd line 
 
 # sequential grain colors
 import colorsys
+
 colorScale = (Vector3(colorsys.hsv_to_rgb(value * 1.0 / numThreads, 1, 1)) for value in range(0, numThreads))
 
 #add spheres

@@ -39,6 +39,7 @@ O.bodies.append(pack.gtsSurface2Facets(s12, color=(0, 0, 1)))
 
 qt.View()
 from time import time
+
 t0 = time()
 O.bodies.append(pack.regularHexa(pack.inGtsSurface(s1) | pack.inGtsSurface(s2), radius, gap=0, color=(0, 1, 0)))
 t1 = time()

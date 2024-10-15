@@ -5,6 +5,7 @@
 ##### the screenshot parameters       #####
 ############################################
 from testGuiHelper import TestGUIHelper
+
 yade.log.setLevel("Default", yade.log.ERROR)
 # FIXME: it should deduce the name automatically, it's the end of the filename. See also testGui.sh
 #        if you add a new file, you have to manually add it into scripts/checks-and-tests/gui/testGui.sh

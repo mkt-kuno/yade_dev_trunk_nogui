@@ -162,6 +162,7 @@ O.dt = 0.2 * sqrt(particleMass / (2. * kn))
 
 #### to see it
 from yade import qt
+
 v = qt.Controller()
 v = qt.View()
 rr = qt.Renderer()

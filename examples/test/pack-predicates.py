@@ -1,5 +1,6 @@
 # -*- encoding=utf-8 -*-
 from yade.pack import *
+
 s1 = inSphere((0, 0, 0), 1)
 s2 = inSphere((0, 0, 1), 1)
 # construct using explicit composition

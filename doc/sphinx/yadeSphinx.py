@@ -6,6 +6,7 @@
 
 import sys, os, os.path
 from importlib import reload
+
 reload(sys)
 
 writer = sys.argv[1]
@@ -341,6 +342,7 @@ def genReferences():
 
 
 import sphinx, sys, shutil
+
 sys.path.append('.')  # for bib2rst
 
 genReferences()

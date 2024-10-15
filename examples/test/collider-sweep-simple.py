@@ -16,8 +16,10 @@ collider.verletDist = .5
 O.dt = 8e-2 * PWaveTimeStep()
 O.saveTmp()
 from yade import timing
+
 O.timingEnabled = True
 from yade import qt
+
 r = qt.Renderer()
 #r['Body_bounding_volume']=True
 v = qt.View()

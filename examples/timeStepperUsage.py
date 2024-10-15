@@ -3,6 +3,7 @@
 "Test and demonstrate the use of timestepper and density scaling."
 
 from yade import pack, qt, timing
+
 O.periodic = True
 
 O.cell.hSize = Matrix3(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1)

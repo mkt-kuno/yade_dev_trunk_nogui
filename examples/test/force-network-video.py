@@ -7,6 +7,7 @@ TriaxialTest(noFiles=True).load()
 yade.qt.View()
 
 from yade import qt
+
 O.engines = O.engines + [
         qt.SnapshotEngine(fileBase=O.tmpFilename(), label='snapshotter', iterPeriod=5, ignoreErrors=False),
         PyRunner(iterPeriod=500, command='finito()')

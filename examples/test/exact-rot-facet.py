@@ -22,6 +22,7 @@ O.bodies.append(sphere([0, 0, .99 * scale], 1 * scale, color=[0, 1, 0], wire=Tru
 
 O.dt = .4 * PWaveTimeStep()
 from yade import qt
+
 qt.View()
 renderer = qt.Renderer()
 renderer.intrGeom = True

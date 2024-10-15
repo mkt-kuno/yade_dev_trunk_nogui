@@ -1,6 +1,7 @@
 # -*- encoding=utf-8 -*-
 from yade import pack
 import random
+
 random.seed(1)
 
 # a cube

@@ -46,6 +46,7 @@ import sys, os, inspect
 import time
 import numpy as np
 import yade.runtime
+
 this = sys.modules[__name__]
 
 #from yade import *
@@ -53,6 +54,7 @@ from yade.utils import *
 from yade.wrapper import *
 #import yade.runtime
 from yade import timing
+
 timing.mpi = {}  #prepare a dictionnary for mpi-related stats
 
 # for coloring bodies

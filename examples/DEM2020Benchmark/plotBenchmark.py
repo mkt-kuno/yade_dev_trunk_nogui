@@ -1,4 +1,5 @@
 import matplotlib as mpl
+
 mpl.use('Agg')  # so it runs without a X server (e.g. HPC)
 
 import matplotlib.pyplot as plt

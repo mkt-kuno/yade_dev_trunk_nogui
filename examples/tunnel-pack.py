@@ -29,5 +29,6 @@ sp.toSimulation()
 
 # to see it
 from yade import qt
+
 qt.Controller()
 qt.View()

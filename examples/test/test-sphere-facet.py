@@ -74,6 +74,7 @@ except ImportError:
 	pass
 
 from yade import timing
+
 O.run(100000, True)
 timing.stats()
 timing.reset()

@@ -42,5 +42,6 @@ O.engines = [
 Gl1_Sphere.stripes = 1
 
 from yade import qt
+
 qt.View()
 print('Press PLAY button')

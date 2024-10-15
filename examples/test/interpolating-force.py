@@ -58,6 +58,7 @@ O.run(int((nPulses / freq) / O.dt), True)
 
 # plot the time-series of force magnitude
 import pylab
+
 pylab.plot(times, magnitudes, label='Force magnitude over 1 pulse')
 pylab.legend(('Force magnitude',))
 pylab.xlabel('t')

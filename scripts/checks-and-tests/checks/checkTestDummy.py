@@ -3,6 +3,7 @@
 # A dummy test, just to give an example, and detect possible path problems
 from yade import pack, export, plot
 import math, os, sys
+
 print('checkTest mechanism')
 
 #Typical structure of a checkTest:

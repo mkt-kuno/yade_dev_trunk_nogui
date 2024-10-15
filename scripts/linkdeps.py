@@ -88,6 +88,7 @@ for dir, f in sources:
 	plugin = '.'.join(f.split('.')[:-1])
 	pluginLinks[plugin], pluginFeats[plugin], pluginSrcs[plugin] = link, feats, dir + '/' + f
 import shelve
+
 cache = shelve.open('linkdeps.cache')
 cache['pluginLinks'], cache['pluginFeats'], cache['pluginSrcs'] = pluginLinks, pluginFeats, pluginSrcs
 pluginLinks, pluginFeats, pluginSrcs = cache['pluginLinks'], cache['pluginFeats'], cache['pluginSrcs']

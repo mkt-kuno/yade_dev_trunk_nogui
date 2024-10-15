@@ -10,6 +10,7 @@ from yade.wrapper import *
 from math import sin, cos, tan, sqrt, pi, radians  # atan, atan2
 
 import logging
+
 logging.basicConfig(level=logging.INFO)
 
 from numpy import array

@@ -84,6 +84,7 @@ O.engines = [
 
 O.saveTmp()
 from yade import qt
+
 v = qt.View()
 v.eyePosition = (3, .8, .96)
 v.upVector = (-.4, -.4, .8)

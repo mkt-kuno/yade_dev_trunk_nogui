@@ -32,6 +32,7 @@ O.dt = .2 * PWaveTimeStep()
 O.saveTmp('Mindlin')
 
 from yade import qt
+
 qt.View()
 qt.Controller()
 

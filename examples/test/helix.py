@@ -18,4 +18,5 @@ O.engines = [
 O.dt = 4e-6
 O.saveTmp('initial')
 from yade import qt
+
 qt.Controller()

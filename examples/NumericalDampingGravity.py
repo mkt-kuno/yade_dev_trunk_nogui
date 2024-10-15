@@ -16,6 +16,7 @@ dampGrav = True
 
 import matplotlib.pyplot as pyplot
 from yade import qt, plot
+
 qt.View()  #open the controlling and visualization interfaces
 
 box_x = 0.05

@@ -66,6 +66,7 @@ else:
 O.dt = 0.5 * PWaveTimeStep()
 
 from yade import qt
+
 qt.View()
 print('Press PLAY button')
 #O.run(10000,True)

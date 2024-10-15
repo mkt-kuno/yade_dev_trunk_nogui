@@ -64,7 +64,7 @@ O.engines = [
         #qt.SnapshotEngine(fileBase='W',iterPeriod=50,label='snapshot')
 ]
 
-O.dt=.5*PWaveTimeStep()
+O.dt = .5 * PWaveTimeStep()
 O.saveTmp()
 
 #O.run()

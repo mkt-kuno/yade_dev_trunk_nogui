@@ -173,6 +173,7 @@ plot.plots = {'time': ('Energy'), 'uT': ('SigmaT'), 'uL': ('SigmaL'), 'uB': ('Si
 plot.plot()
 
 from yade import qt
+
 qt.Controller()
 V = qt.View()
 

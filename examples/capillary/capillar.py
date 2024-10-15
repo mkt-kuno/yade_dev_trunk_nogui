@@ -4,6 +4,7 @@
 # Parameters are set like in experiments of [Willett2000]
 
 from yade import utils, plot
+
 o = Omega()
 fr = 0.5
 rho = 2000
@@ -102,6 +103,7 @@ plot.plot()
 
 O.step()
 from yade import qt
+
 qt.View()
 
 O.run(250000, True)

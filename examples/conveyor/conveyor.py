@@ -26,6 +26,7 @@ sp.makeCloud((-0.3, 0.05, 0.05), (0.3, 0.7, 0.5), rMean=0.03, rRelFuzz=0.001)
 particles = O.bodies.append([sphere(c, r, mask=3) for c, r in sp])
 
 from yade import ymport
+
 fctIds = O.bodies.append(ymport.gmsh('conveyor.mesh', scale=0.001, color=(1, 0, 0)))
 voxIds = O.bodies.append(geom.facetBunker(center=[0, 1.5, -0.7], dBunker=1.1, dOutput=0.2, hBunker=0.2, hOutput=0.2, hPipe=0.1, mask=5))
 
@@ -49,6 +50,7 @@ O.engines = [
 ]
 
 from yade import qt
+
 qt.View()
 #O.saveTmp()
 #O.run()

@@ -37,6 +37,7 @@ O.engines = [
 ]
 
 from yade import qt
+
 qt.View()
 O.saveTmp()
 #O.run()

@@ -16,6 +16,7 @@ else:
 	print("Packing found (%s), using it." % spheresFile)
 
 from yade import timing
+
 O.timingEnabled = True
 
 TriaxialTest(importFilename=spheresFile, fast=fast, noFiles=True).load()

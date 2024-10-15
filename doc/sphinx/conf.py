@@ -453,6 +453,7 @@ import sys, os
 #
 # HACK: change ipython console regexp from ipython_console_highlighting.py
 import re
+
 sys.path.append(os.path.abspath('.'))
 
 import yade.config

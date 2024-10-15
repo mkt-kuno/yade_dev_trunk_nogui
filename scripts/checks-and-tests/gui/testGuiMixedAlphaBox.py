@@ -1,5 +1,6 @@
 import random
 from testGuiHelper import TestGUIHelper
+
 yade.log.setLevel("Default", yade.log.ERROR)
 # Must match the filename without starting "testGui" otherwise test fails because an indiation of a passed test is
 # the existence of file called testGui_MixedAlphaBox_OK_or_Skipped.txt, where "MixedAlphaBox" comes from this line.
@@ -55,6 +56,7 @@ ag = TW.getAlphaGraph(alpha=a, shrinkedAlpha=shrinkedA, fixedAlpha=fixedA)
 graph = GlExtra_AlphaGraph(tesselationWrapper=TW, wire=True)
 
 from yade import qt
+
 rr = qt.Renderer()
 rr.extraDrawers = [graph]
 

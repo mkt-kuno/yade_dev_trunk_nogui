@@ -20,6 +20,7 @@ from yade import pack
 from yade import timing
 import numpy as np
 import shutil
+
 timeStr = time.strftime('%m-%d-%Y')
 num_spheres = 1000  # number of spheres
 young = 1e6
@@ -207,6 +208,7 @@ plot.plot()
 O.saveTmp()
 O.timingEnabled = 1
 from yade import timing
+
 print("starting oedometer simulation")
 O.run(200, 1)
 timing.stats()
