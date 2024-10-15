@@ -102,7 +102,7 @@ Real TimeAverager::getInstantNbContact(const shared_ptr<Body>& b) const
 
 Vector3r TimeAverager::getInstantContactForce(const shared_ptr<Body>& b) const
 {
-	Vector3r                instantContactForce = Vector3r::Zero();
+	Vector3r instantContactForce = Vector3r::Zero();
 	for (Body::MapId2IntrT::iterator it = b->intrs.begin(), end = b->intrs.end(); it != end; ++it) {
 		const shared_ptr<Interaction>& I = (*it).second;
 		if (!I->isReal()) continue;
@@ -114,7 +114,7 @@ Vector3r TimeAverager::getInstantContactForce(const shared_ptr<Body>& b) const
 
 Vector3r TimeAverager::getInstantContactTorque(const shared_ptr<Body>& b) const
 {
-	Vector3r                instantContactTorque = Vector3r::Zero();
+	Vector3r instantContactTorque = Vector3r::Zero();
 	for (Body::MapId2IntrT::iterator it = b->intrs.begin(), end = b->intrs.end(); it != end; ++it) {
 		const shared_ptr<Interaction>& I = (*it).second;
 		if (!I->isReal()) continue;
@@ -129,7 +129,7 @@ Vector3r TimeAverager::getInstantContactTorque(const shared_ptr<Body>& b) const
 
 vector<Vector3r> TimeAverager::getInstantContactForceField(const shared_ptr<Body>& b) const
 {
-	vector<Vector3r>        instantContactForceField(grid.size(), Vector3r::Zero());
+	vector<Vector3r> instantContactForceField(grid.size(), Vector3r::Zero());
 	// Loop on interaction map
 	for (Body::MapId2IntrT::iterator it = b->intrs.begin(), end = b->intrs.end(); it != end; ++it) {
 		// Retrieve Interaction object from the current map pair

@@ -20,7 +20,7 @@ public:
 	        const shared_ptr<Interaction>& c,
 	        const Scene*                   scene); // static because also used in e.g., Ig2_Box_LevelSet_ScGeom
 	std::pair<std::pair<Vector3r, Vector3r>, std::pair<bool, bool>>
-	                                boundOverlap(bool single, const State&, const State&, const shared_ptr<Interaction>&, const Vector3r&);
+	     boundOverlap(bool single, const State&, const State&, const shared_ptr<Interaction>&, const Vector3r&);
 	bool goSingleOrMulti(
 	        bool single,
 	        const shared_ptr<Shape>&,

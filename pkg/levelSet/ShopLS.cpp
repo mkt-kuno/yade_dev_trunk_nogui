@@ -225,7 +225,8 @@ ShopLS::lsSimpleShape(int shape, const AlignedBox3r& aabb, const Real& step, con
 		Vector3r nInt(
 		        ceil(maxBod[0] / step) + 1 // no need to try to make it a one-liner Vector3i
 		        ,
-		        ceil(maxBod[1] / step) + 1 // it might require complex switching from Eigen::Array to Matrix such as Vector3i nInt(( (( (maxBod/step).array() ).ceil()).rint()).matrix() + Vector3i::Ones())
+		        ceil(maxBod[1] / step)
+		                + 1 // it might require complex switching from Eigen::Array to Matrix such as Vector3i nInt(( (( (maxBod/step).array() ).ceil()).rint()).matrix() + Vector3i::Ones())
 		        ,
 		        ceil(maxBod[2] / step)
 		                + 1); // but this will anyway be multiplied by a Real below and multiplying Real with Vector3i (logically) does not seem to exist
@@ -354,7 +355,7 @@ void ShopLS::handleNonTouchingNodeForMulti(shared_ptr<MultiScGeom>& geomMulti, s
 	// Implemented here to avoid code duplication in a number of Ig2_*_MultiScGeom
 	const auto findIt(geomMulti->iteratorToNode(nodeIdx));
 	if (findIt != geomMulti->nodesIds.end()) // we do need findIt below, so we can not use geomMulti->hasNode (unless computing twice the same iterator)
-	{   // that node was contacting before, we need to remove it
+	{                                        // that node was contacting before, we need to remove it
 		// we avoid the swap - pop_back method used in FastMarchingMethod since https://stackoverflow.com/a/4442529/9864634 mentions a not understood relation about order of elements (which is important here)
 		// erase-remove idiom (https://stackoverflow.com/a/3385251/9864634) to test even though we do not want to remove by value ?
 		const auto distanceInItera(std::distance(geomMulti->nodesIds.begin(), findIt));
@@ -365,35 +366,27 @@ void ShopLS::handleNonTouchingNodeForMulti(shared_ptr<MultiScGeom>& geomMulti, s
 	}
 }
 
-void ShopLS::handleTouchingNodeForMulti(shared_ptr<MultiScGeom>& geomMulti, shared_ptr<MultiFrictPhys>& physMulti, int nodeIdx,
-	Vector3r                       ctctPt,
-	Real                           un,
-	Real                           rad1,
-	Real                           rad2,
-	const State&                   state1,
-	const State&                   state2,
-	const Scene*                   scene,
-	const shared_ptr<Interaction>& c,
-	const Vector3r&                currentNormal,
-	const Vector3r&                shift2
-	)
+void ShopLS::handleTouchingNodeForMulti(
+        shared_ptr<MultiScGeom>&       geomMulti,
+        shared_ptr<MultiFrictPhys>&    physMulti,
+        int                            nodeIdx,
+        Vector3r                       ctctPt,
+        Real                           un,
+        Real                           rad1,
+        Real                           rad2,
+        const State&                   state1,
+        const State&                   state2,
+        const Scene*                   scene,
+        const shared_ptr<Interaction>& c,
+        const Vector3r&                currentNormal,
+        const Vector3r&                shift2)
 {
 	const auto findIt(geomMulti->iteratorToNode(nodeIdx));
 	if (findIt != geomMulti->nodesIds.end()) // same remark as in handleNonTouchingNodeForMulti
 	{
 		// we update the geom:
 		geomMulti->contacts[std::distance(geomMulti->nodesIds.begin(), findIt)]->doIg2Work(
-			ctctPt,
-			un,
-			rad1,rad2,
-			state1,
-	        state2,
-	        scene,
-	        c,
-	        currentNormal,
-			shift2,
-			false,
-			false);
+		        ctctPt, un, rad1, rad2, state1, state2, scene, c, currentNormal, shift2, false, false);
 		// and have nothing to do for what concerns the phys
 	} else { // that node was not contacting before
 		// we store the information of contact for that node in Multi* geom and phys:
@@ -402,18 +395,7 @@ void ShopLS::handleTouchingNodeForMulti(shared_ptr<MultiScGeom>& geomMulti, shar
 		// we then create a new ScGeom shared_ptr:
 		shared_ptr<ScGeom> scGeomPtr(new ScGeom);
 		// filled with appropriate data:
-		scGeomPtr->doIg2Work(
-			ctctPt,
-			un,
-			rad1,rad2,
-			state1,
-	        state2,
-	        scene,
-	        c,
-	        currentNormal,
-			shift2,
-			true,
-			false);
+		scGeomPtr->doIg2Work(ctctPt, un, rad1, rad2, state1, state2, scene, c, currentNormal, shift2, true, false);
 		// that we store in MultiScGeom::contacts:
 		geomMulti->contacts.push_back(scGeomPtr);
 		// we also have to create a new FrictPhys shared_ptr:

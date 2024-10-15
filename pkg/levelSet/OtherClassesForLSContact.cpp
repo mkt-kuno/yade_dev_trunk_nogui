@@ -15,9 +15,7 @@ CREATE_LOGGER(Ip2_FrictMat_FrictMat_MultiFrictPhys);
 void Bo1_LevelSet_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*)
 { //TODO: use Eigen Aligned Box.extend to avoid the 2*6 if below ?
 	// NB: see BoundDispatcher::processBody() (called by BoundDispatcher::action(), called by InsertionSortCollider::action()) in pkg/common/Dispatching.cpp for the attributes used upon calling
-	if (!bv) {
-		bv = shared_ptr<Bound>(new Aabb);
-	}
+	if (!bv) { bv = shared_ptr<Bound>(new Aabb); }
 	Aabb*     aabb    = static_cast<Aabb*>(bv.get()); // no need to bother deleting that raw pointer: e.g. https://stackoverflow.com/q/53908753/9864634
 	LevelSet* lsShape = static_cast<LevelSet*>(cm.get());
 	Real      inf     = std::numeric_limits<Real>::infinity();

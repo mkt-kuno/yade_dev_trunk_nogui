@@ -71,7 +71,19 @@ public:
 	Vector3r getRelAngVel_py(shared_ptr<Interaction> i) const;
 
 	// method to be called in Ig2:
-	void doIg2Work(Vector3r ctctPt, Real un, Real rad1, Real rad2, const State& rbp1, const State& rbp2, const Scene* scene, const shared_ptr<Interaction>& c, const Vector3r& currentNormal, const Vector3r& shift2, bool newScGeom, bool avoidGranularRatcheting = true);
+	void doIg2Work(
+	        Vector3r                       ctctPt,
+	        Real                           un,
+	        Real                           rad1,
+	        Real                           rad2,
+	        const State&                   rbp1,
+	        const State&                   rbp2,
+	        const Scene*                   scene,
+	        const shared_ptr<Interaction>& c,
+	        const Vector3r&                currentNormal,
+	        const Vector3r&                shift2,
+	        bool                           newScGeom,
+	        bool                           avoidGranularRatcheting = true);
 
 	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ScGeom,GenericSpheresContact,

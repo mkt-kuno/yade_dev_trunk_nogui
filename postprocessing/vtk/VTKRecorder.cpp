@@ -139,11 +139,11 @@ void VTKRecorder::action()
 			recActive[REC_CLUMPID] = true;
 		else if (rec == "materialId")
 			recActive[REC_MATERIALID] = true;
-		else if (rec == "stress"){
-			LOG_WARN("'stress' recorder deprecated as of July 2024 and replaced by the more meaningfull 'bstresses', you may need to adapt your post-processing workflow");
+		else if (rec == "stress") {
+			LOG_WARN("'stress' recorder deprecated as of July 2024 and replaced by the more meaningfull 'bstresses', you may need to adapt your "
+			         "post-processing workflow");
 			recActive[REC_BSTRESS] = true;
-		}
-		else if (rec == "force")
+		} else if (rec == "force")
 			recActive[REC_FORCE] = true;
 		else if (rec == "jcfpm")
 			recActive[REC_JCFPM] = true;
