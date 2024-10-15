@@ -24,6 +24,7 @@ The number of subdomains depends on argument 'n' of mpiexec. Since rank=0 is not
 '''
 readParamsFromTable(noTableOk=True, N=100, M=100)
 from yade.params.table import *
+
 tiles = 50  # 500k spheres
 
 NSTEPS = 2000  #turn it >0 to see time iterations, else only initilization
@@ -80,6 +81,7 @@ else:  #non-mpi execution, numThreads will still be used as multiplier for the p
 
 # sequential grain colors
 import colorsys
+
 colorScale = (Vector3(colorsys.hsv_to_rgb(value * 1.0 / numThreads, 1, 1)) for value in range(0, numThreads))
 
 #add spheres

@@ -61,6 +61,7 @@ O.dt = 0.02 * PWaveTimeStep()
 O.saveTmp('init')
 
 from yade import qt
+
 renderer = qt.Renderer()
 renderer.wire = True
 #qt.Controller()

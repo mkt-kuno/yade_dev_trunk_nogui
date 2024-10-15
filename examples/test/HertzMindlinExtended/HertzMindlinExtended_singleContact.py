@@ -18,6 +18,7 @@ from yade import plot
 import numpy as np
 
 from yade import qt
+
 qt.View()  # To visualize the system!
 
 #------------------------choose contact law:

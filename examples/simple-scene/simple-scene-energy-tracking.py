@@ -18,6 +18,7 @@ rotate_in_two_directions = True
 ############################################
 
 import matplotlib
+
 matplotlib.use('Qt5Agg')
 O.materials.append(
         CohFrictMat(

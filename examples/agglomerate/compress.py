@@ -5,6 +5,7 @@
 ######################################################################
 from yade import export, ymport
 import random
+
 random.seed(1)
 
 # add walls first

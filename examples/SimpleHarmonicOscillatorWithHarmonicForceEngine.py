@@ -10,6 +10,7 @@
 
 import matplotlib.pyplot as pyplot
 from yade import qt, plot
+
 qt.View()  #open the controlling and visualization interfaces
 
 #box dimensions intentionally smaller than the particle diameter to create an interference fit (clearance would result in

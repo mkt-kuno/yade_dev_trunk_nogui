@@ -11,6 +11,7 @@ $ firefox /tmp/aa.html
 """
 
 import collections
+
 Dispatch = collections.namedtuple('Dispatch', ['basename', 'types'])
 
 dispatches = [

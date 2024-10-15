@@ -4,8 +4,10 @@
 #
 ## read parameters from table here
 from yade import plot
+
 readParamsFromTable(gravity=-9.81, density=2400, initialSpeed=10, noTableOk=True)
 from yade.params.table import *
+
 print(gravity, density, initialSpeed)
 
 O.materials.append(FrictMat(young=30e9, density=density, poisson=.3))  ## use the 'density' parameter here

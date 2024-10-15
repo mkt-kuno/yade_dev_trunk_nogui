@@ -29,6 +29,7 @@
 ## this was reason for bogus gts imports
 ## adding to woo main does not solve the problem for some reason
 import locale
+
 locale.setlocale(locale.LC_NUMERIC, 'C')
 
 ## PY3K compatibility

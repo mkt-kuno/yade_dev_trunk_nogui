@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import *
 
 import re, itertools
 import logging
+
 logging.trace = logging.debug
 logging.basicConfig(level=logging.INFO)
 

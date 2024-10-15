@@ -29,6 +29,7 @@ O.cell.setBox(10, 10, 10)
 O.dt = .1 * PWaveTimeStep()
 O.saveTmp()
 from yade import qt
+
 qt.Controller()
 qt.View()
 #O.timingEnabled=True; timing.reset(); O.run(200000,True); timing.stats()

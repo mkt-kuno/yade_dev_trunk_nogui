@@ -49,6 +49,7 @@ O.engines = [
 ]
 
 from yade import plot
+
 O.engines = O.engines[0:5] + [PyRunner(iterPeriod=20, command='history()', label='recorder')] + O.engines[5:7]
 
 

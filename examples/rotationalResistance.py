@@ -1,5 +1,6 @@
 # -*- encoding=utf-8 -*-
 from yade import utils, plot
+
 o = Omega()
 fr = 0.5
 rho = 2000
@@ -45,4 +46,5 @@ plot.plots = {'sc': ('fc1', 'fc2')}
 plot.plot()
 
 from yade import qt
+
 qt.View()

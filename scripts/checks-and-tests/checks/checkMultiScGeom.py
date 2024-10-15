@@ -19,7 +19,7 @@ if ('LS_DEM' in features):
 	#######################################################################
 	# NB: because of the LStwin shape, physics is actually in a bifurcation regime and the exact dynamics may vary (e.g., on compilation options)
 
-	for repeat in range(2): # we will repeat twice ~ the same thing, with either a LSbox or a true Wall for the ground
+	for repeat in range(2):  # we will repeat twice ~ the same thing, with either a LSbox or a true Wall for the ground
 		# The bodies
 		############
 		O.bodies.appendClumped([sphere((0, 0, z), 1) for z in [-0.5, 0.5]])  # a 3*1*1 long body
@@ -50,22 +50,30 @@ if ('LS_DEM' in features):
 		                [Ip2_FrictMat_FrictMat_MultiFrictPhys(kn=knVal, ks=ksVal)],
 		                [Law2_MultiScGeom_MultiFrictPhys_CundallStrack(sphericalBodies=False)]
 		        ),
-		        NewtonIntegrator(gravity=Vector3(-9.8, 0, 0), label='ni', damping = 0.3)
+		        NewtonIntegrator(gravity=Vector3(-9.8, 0, 0), label='ni', damping=0.3)
 		]
-		O.dt = 0.7 * (lsClump.shape.volume() * lsClump.mat.density / knVal)**0.5 # 0.8 * .. ~ the maximum value for some numeric settings and above maximum for others. We use 0.7
-		O.run(2500, True) # 2200 ~ the smallest value with O.dt = 0.8 * .. possible to lead to equilibrium. Using 2500 with 0.7 * ..
+		O.dt = 0.7 * (
+		        lsClump.shape.volume() * lsClump.mat.density / knVal
+		)**0.5  # 0.8 * .. ~ the maximum value for some numeric settings and above maximum for others. We use 0.7
+		O.run(2500, True)  # 2200 ~ the smallest value with O.dt = 0.8 * .. possible to lead to equilibrium. Using 2500 with 0.7 * ..
 
 		if not O.interactions.has(bId, lsClump.id, True):
-			raise YadeCheckError("We're missing the",O.bodies[bId].shape,"-",lsClump.shape,"expected interaction (while being in repeat =",repeat,"step of the script)")
+			raise YadeCheckError(
+			        "We're missing the", O.bodies[bId].shape, "-", lsClump.shape, "expected interaction (while being in repeat =", repeat,
+			        "step of the script)"
+			)
 		cont = O.interactions[bId, lsClump.id]
 		weight = lsClump.shape.volume() * lsClump.mat.density * ni.gravity
 		if not equalVectors(O.forces.f(bId), weight, 0.05):
 			raise YadeCheckError("Incorrect equilibrium state between applied force onto the ground =", O.forces.f(bId), "and weight", weight)
-		expectedCtctPts = [2, 3, 4] # while 2 is the true answer, imperfect script (and variable compilation) conditions may induce 1 or 2 extra contacting nodes
+		expectedCtctPts = [
+		        2, 3, 4
+		]  # while 2 is the true answer, imperfect script (and variable compilation) conditions may induce 1 or 2 extra contacting nodes
 		obtainedCtctPts = len(cont.geom.contacts)
 		if not obtainedCtctPts in expectedCtctPts:
 			raise YadeCheckError(
-			        "Changed behavior in MultiScGeom, got :", len(cont.geom.contacts), "vs", str(expectedCtctPts[0]), "expected (with a +2 tolerance)"
+			        "Changed behavior in MultiScGeom, got :", len(cont.geom.contacts), "vs", str(expectedCtctPts[0]),
+			        "expected (with a +2 tolerance)"
 			)
 		O.reset()
 else:

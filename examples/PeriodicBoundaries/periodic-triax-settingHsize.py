@@ -2,6 +2,7 @@
 # 2011 ©Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
 "Demonstrate the compression of a periodic cell with non-trivial initial geometry."
 from yade import pack, qt
+
 O.periodic = True
 
 O.cell.hSize = Matrix3(1.0, -0.15, -0.10, -0.2, 1.5, 0.3, 0.3, -0.3, 1.0)

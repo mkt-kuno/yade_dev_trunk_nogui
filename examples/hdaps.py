@@ -15,5 +15,6 @@ O.engines = [
 O.dt = PWaveTimeStep()
 
 import yade.qt
+
 yade.qt.View()
 O.run()

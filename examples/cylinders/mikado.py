@@ -87,6 +87,7 @@ O.bodies.append(pfacet(n0, n2, n3, wire=False, material='fMat', color=color))
 
 #### For viewing ####
 from yade import qt
+
 qt.View()
 Gl1_Sphere.stripes = True
 

@@ -108,6 +108,7 @@ O.engines = [
 
 O.saveTmp()
 from yade import qt
+
 qt.Controller()
 qt.View()
 r = qt.Renderer()

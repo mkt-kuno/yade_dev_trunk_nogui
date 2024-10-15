@@ -47,7 +47,7 @@ O.engines = [
         PyRunner(command='checkUnbalanced()', realPeriod=3, label='checker')
 ]
 
-O.dt=0.5*PWaveTimeStep()
+O.dt = 0.5 * PWaveTimeStep()
 
 qt.Controller()
 V = qt.View()

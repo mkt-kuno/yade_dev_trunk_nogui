@@ -18,6 +18,7 @@ initStateFilename = "confined_N=" + table.key + str(table.num_spheres) + "_fric=
 
 ## Check if a saved state exists and proceed to function/variable declarations as usual.
 import os.path
+
 savedState = os.path.exists(initStateFilename)
 
 ## user defined variables
@@ -33,6 +34,7 @@ young = 5e6
 mn, mx = Vector3(0, 0, 0), Vector3(1, 1, 1)
 
 import time
+
 startTime = time.time()
 
 ## user function saving variables, it will not be saved with the simulation; which is ok since it is always re-defined here.
@@ -62,6 +64,7 @@ wallIds = O.bodies.append(walls)
 ## materials defined hereabove will also be replaced by the the reloaded ones (which are identical) with no real impact on
 ## initialization time, hence no real need for a condition in that case
 from yade import pack
+
 sp = pack.SpherePack()
 if not savedState:
 	sp.makeCloud(mn, mx, -1, 0.3333, num_spheres, False, 0.95, seed=1)

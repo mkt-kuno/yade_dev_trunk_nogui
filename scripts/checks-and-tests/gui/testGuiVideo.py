@@ -2,6 +2,7 @@
 
 import os, sys
 from testGuiHelper import TestGUIHelper
+
 TriaxialTest(noFiles=True).load()
 
 #yade.qt.View() # cannot open 3D View. Must allow testGuiHelper do this.

@@ -8,6 +8,7 @@
 ######################################################################
 from yade import export, ymport
 import random
+
 random.seed(1)  # to make colors always the same
 
 # load macroparticles

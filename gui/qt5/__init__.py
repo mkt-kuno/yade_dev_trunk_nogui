@@ -13,6 +13,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+
 USE_QT_WEB_ENGINE = False
 try:
 	from PyQt5 import QtWebKit, QtWebKitWidgets

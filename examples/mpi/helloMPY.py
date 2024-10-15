@@ -4,6 +4,7 @@
 # Check other examples for concrete usage of mpy in DEM simulations
 
 from yade import mpy as mp
+
 mp.initialize(3)
 #mp.VERBOSE_OUTPUT = True # to see more of what happens behind the scene
 

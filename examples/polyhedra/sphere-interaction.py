@@ -34,4 +34,5 @@ for s in (sph1, sph2, sph3):
 	s.state.vel = -10 * (s.state.pos + Vector3(r(), r(), r()))
 
 from yade import qt
+
 qt.View()

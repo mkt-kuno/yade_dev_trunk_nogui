@@ -2,6 +2,7 @@
 
 from yade import pack, export, plot
 import math, os, sys
+
 print('checkColliderCorrectness for InsertionSortCollider')
 
 #### This is useful for printing the linenumber in the script

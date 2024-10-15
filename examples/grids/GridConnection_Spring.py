@@ -82,6 +82,7 @@ yade.qt.View()
 
 #plot some results
 from yade import plot
+
 plot.plots = {'t': ('pos1', None, 'vel1')}
 
 

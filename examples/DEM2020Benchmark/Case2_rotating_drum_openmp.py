@@ -56,6 +56,7 @@ F_gs = atan(f_M1_St)  # Friction Angle between granular material (g) and steel (
 # Load particles from .txt file
 
 from yade import ymport
+
 wallFile = 'Case2_Drum_Walls.txt'
 spheres_M1 = 'Case2_Drum_PartCoordinates_M1.txt'
 spheres_M2 = 'Case2_Drum_PartCoordinates_M2.txt'
@@ -165,6 +166,7 @@ def getNumParticlesInQuadrants():
 
 
 from yade import plot
+
 plot.plots = {'time1': ('zone1_M1_count', 'zone1_M2_count', 'zone2_M1_count', 'zone2_M2_count')}
 
 

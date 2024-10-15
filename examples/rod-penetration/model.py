@@ -62,6 +62,7 @@ print("Start simulation: " + mesh)
 nbIter = 10000
 
 from yade import qt
+
 qt.View()
 
 O.stopAtIter = nbIter

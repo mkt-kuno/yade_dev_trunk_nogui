@@ -15,6 +15,7 @@
 # ------------------------------------------------------------------------------------------
 import math
 from yade import plot
+
 material = str(sys.argv[1]) if len(sys.argv) > 1 else 'aluminium_oxide'  # options are 'aluminium_oxide'|'cast_iron'
 en = float(str(sys.argv[2])) if len(sys.argv) > 2 else 1.0  # options are 0.2, 0.4, 0.6, 0.8, 1.0
 use_en = (sys.argv[3]) if len(sys.argv) > 3 else 'False'  # optional parameter, whether to define en/es or betan/betas

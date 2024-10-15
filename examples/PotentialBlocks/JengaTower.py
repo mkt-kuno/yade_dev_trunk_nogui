@@ -109,6 +109,7 @@ O.bodies.append(bbb)
 # ────────────────────────────────────────────────────────────────────────────────────────────────────────── #
 # Visualisation
 from yade import qt
+
 qt.Controller()
 v = qt.View()
 

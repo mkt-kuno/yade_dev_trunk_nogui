@@ -30,6 +30,7 @@ def mat():
 
 # definition of a predicate
 from yade import pack
+
 Lx = 10
 Ly = 10
 Lz = 6
@@ -45,6 +46,7 @@ print('Sphere sample generated !')
 
 # --- The joint surface : half of the height
 import gts
+
 v1 = gts.Vertex(0, 0, Lz / 2.0)
 v2 = gts.Vertex(Lx, 0, Lz / 2.0)
 v3 = gts.Vertex(Lx, Ly, Lz / 2.0)
@@ -147,6 +149,7 @@ def dataCollector():
 
 
 from yade import plot
+
 plot.plots = {'un': ('Fz')}
 
 # --- Simulation !

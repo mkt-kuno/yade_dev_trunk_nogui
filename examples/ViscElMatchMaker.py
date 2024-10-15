@@ -4,6 +4,7 @@
 # set the parameters of ViscoElastic model.
 
 from yade import utils, plot
+
 o = Omega()
 fr = 0.5
 rho = 2000
@@ -63,6 +64,7 @@ plot.plot()
 
 O.step()
 from yade import qt
+
 qt.View()
 
 print("Friction coefficient for id11 and id12 is %g" % (math.atan(O.interactions[id11, id12].phys.tangensOfFrictionAngle)))

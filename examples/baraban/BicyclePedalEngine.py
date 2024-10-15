@@ -16,6 +16,7 @@ es = 0.3
 facetMat = O.materials.append(ViscElMat(frictionAngle=frictionAngle, tc=tc, en=en, et=es))  # **params sets kn, cn, ks, cs
 sphereMat = O.materials.append(ViscElMat(density=Density, frictionAngle=frictionAngle, tc=tc, en=en, et=es))
 from yade import ymport
+
 fctIds = O.bodies.append(ymport.stl('baraban.stl', color=(1, 0, 0), material=facetMat))
 ## Spheres
 sphereRadius = 0.2
@@ -58,6 +59,7 @@ O.engines = [
 ]
 
 from yade import qt
+
 qt.View()
 #O.saveTmp()
 #O.run()

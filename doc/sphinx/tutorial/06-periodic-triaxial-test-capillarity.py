@@ -27,7 +27,6 @@ sigmaIso = -1e5
 # download input data from yade-data package
 os.system("wget -O capillaryfile.txt -nc https://gitlab.com/yade-dev/yade-data/-/raw/main/capillaryFiles/capillaryfile.txt?ref_type=heads&inline=false")
 
-
 #import matplotlib
 #matplotlib.use('Agg')
 
@@ -52,7 +51,10 @@ sp.toSimulation()
 O.engines = [
         ForceResetter(),
         InsertionSortCollider([Bo1_Sphere_Aabb()]),
-        InteractionLoop([Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=1.2)], [Ip2_FrictMat_FrictMat_CapillaryPhysDelaunay()], [Law2_ScGeom_FrictPhys_CundallStrack(neverErase=True)]),
+        InteractionLoop(
+                [Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=1.2)], [Ip2_FrictMat_FrictMat_CapillaryPhysDelaunay()],
+                [Law2_ScGeom_FrictPhys_CundallStrack(neverErase=True)]
+        ),
         PeriTriaxController(
                 label='triax',
                 # specify target values and whether they are strains or stresses
@@ -67,13 +69,14 @@ O.engines = [
                 # call this function when goal is reached and the packing is stable
                 doneHook='compactionFinished()'
         ),
-		######################     INSERT CAPILLARITY ENGINE HERE ############################################
+        ######################     INSERT CAPILLARITY ENGINE HERE ############################################
         CapillarityEngine(capillaryPressure=1000, liquidTension=10000, dead=True, label="capillarity"),
         ######################################################################################################
         NewtonIntegrator(damping=.2),
         PyRunner(command='addPlotData()', iterPeriod=100),
 ]
 O.dt = .5 * PWaveTimeStep()
+
 
 def addPlotData():
 	plot.addData(
@@ -126,5 +129,7 @@ def triaxFinished():
 	print('Finished')
 	O.pause()
 
+
 from yade import timing
-O.timingEnabled=True
+
+O.timingEnabled = True

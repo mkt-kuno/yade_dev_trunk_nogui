@@ -5,6 +5,7 @@ from PyQt4 import QtGui
 
 import re
 import logging
+
 logging.basicConfig(level=logging.INFO)
 #from logging import debug,info,warning,error
 

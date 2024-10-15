@@ -68,6 +68,7 @@ for i in range(0, 4):
 
 #### For viewing ####
 from yade import qt
+
 qt.View()
 
 #### Set a time step ####

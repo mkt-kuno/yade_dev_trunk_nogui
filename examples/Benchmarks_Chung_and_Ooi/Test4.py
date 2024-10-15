@@ -16,6 +16,7 @@
 import math
 from yade import plot
 import sys
+
 material = str(sys.argv[1]) if len(sys.argv) > 1 else 'aluminium_oxide'  # options are 'aluminium_oxide'|'aluminium_alloy'
 angle = float(str(sys.argv[2])) if len(sys.argv) > 2 else 5  # Incident angle (degrees)
 use_en = sys.argv[3] if len(sys.argv) > 3 else 'False'  # optional parameter, whether to define en/es or betan/betas

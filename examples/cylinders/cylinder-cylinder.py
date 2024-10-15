@@ -72,6 +72,7 @@ cylinder((L, L / 3, L), (L, -2 * L / 3, L), radius=r, nodesIds=nodesIds, cylIds=
 
 #### For viewing ####
 from yade import qt
+
 qt.View()
 Gl1_Sphere.stripes = True
 

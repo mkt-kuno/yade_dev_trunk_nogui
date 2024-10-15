@@ -559,6 +559,7 @@ def myAddPlotData():
 
 
 from yade import plot
+
 plot.plots = {'timeStep1': ('unbalancedForce'), 'timeStep2': ('kineticEn'), 'time': ('outsideNo')}
 #plot.plot() #Uncomment to view plots
 O.engines = O.engines + [PyRunner(iterPeriod=10, command='myAddPlotData()')]
@@ -579,6 +580,7 @@ O.dt = 0.2 * sqrt(0.3 * O.bodies[0].state.mass / 1.0e8)
 #Gl1_PotentialParticle.sizeZ=30
 
 from yade import qt
+
 qt.Controller()
 v = qt.View()
 

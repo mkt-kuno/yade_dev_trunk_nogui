@@ -188,6 +188,7 @@ def eraseEscapedParticles():
 #Record time-dependent number of retained particles and vtk export
 
 from yade import plot
+
 plot.plots = {'time': (('retained', 'bo--'), None, ('Cu', "kx--"))}
 
 numErased = 0
@@ -198,6 +199,7 @@ def addPlotData(Cu):
 
 
 from yade import export
+
 vtk = export.VTKExporter("spheresFinal")
 
 # -------------------------------------------------------------------- #

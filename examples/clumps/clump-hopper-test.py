@@ -117,6 +117,7 @@ def state():
 addBodies()
 
 from yade import qt
+
 qt.View()
 O.saveTmp()
 

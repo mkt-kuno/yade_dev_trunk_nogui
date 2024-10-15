@@ -8,6 +8,7 @@
 from yade.yexecfile import execfile
 
 from yade import pack
+
 dimModele = 10.0
 pred = pack.inAlignedBox((0, 0, 0), (dimModele, dimModele, dimModele))
 
@@ -126,6 +127,7 @@ O.engines = [
 
 #### dataCollector
 from yade import plot
+
 plot.plots = {'iterations': 'v', 'x': 'z'}
 
 

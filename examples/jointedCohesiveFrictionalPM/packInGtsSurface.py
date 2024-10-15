@@ -46,4 +46,5 @@ export.text(mesh + '_' + str(int(sizeRatio)) + '.spheres')
 
 #### VIEW
 from yade import qt
+
 qt.View()

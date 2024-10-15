@@ -4,6 +4,7 @@
 # show the difference between size-based and mass-based (≡ volume-based in our case) PSD
 #
 import matplotlib
+
 matplotlib.rc('axes', grid=True)
 from yade import pack
 import pylab

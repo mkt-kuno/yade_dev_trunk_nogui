@@ -30,4 +30,5 @@ sp2 = pack.randomDensePack(pack.inGtsSurface(surf), radius=3e-2, rRelFuzz=1e-1, 
 sp2.toSimulation()
 
 from yade import qt
+
 qt.View()

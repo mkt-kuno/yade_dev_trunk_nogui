@@ -15,6 +15,7 @@ O.step()
 
 # test of export.VTKExporter
 from yade import export
+
 vtk1 = export.VTKExporter('/tmp/vtkPeriodicCell-VTKExporter')
 vtk1.exportSpheres()
 vtk1.exportPeriodicCell()

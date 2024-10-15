@@ -23,6 +23,7 @@ import math
 import numpy as np
 import numpy.linalg as la
 import time
+
 timeStr = time.strftime('%m-%d-%Y')
 
 readParamsFromTable(
@@ -216,6 +217,7 @@ O.dt = 0.004 * utils.PWaveTimeStep()
 
 # collect data for active plotting and post processing
 from yade import plot
+
 O.engines = O.engines[0:8] + [PyRunner(dead=0, iterPeriod=int(iterper / 4), command='stressStrainHist()', label='dataCollector')] + O.engines[8:9]
 
 O.engines = O.engines[0:9] + [PyRunner(dead=0, iterPeriod=iterper, command='stopifDamaged()', label='damageCheck')] + O.engines[9:10]

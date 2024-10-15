@@ -33,6 +33,7 @@ for scene in 0, 1:
 	O.switchScene()
 from hashlib import md5
 import difflib, sys
+
 print("Identical at steps ", end=' ')
 for i in range(0, stopIter / nSteps):
 	sys.stdout.flush()

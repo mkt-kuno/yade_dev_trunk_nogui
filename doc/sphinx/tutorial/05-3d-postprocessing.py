@@ -7,6 +7,7 @@
 
 # generate loose packing
 from yade import pack, qt
+
 sp = pack.SpherePack()
 sp.makeCloud((0, 0, 0), (2, 2, 2), rMean=.1, rRelFuzz=.6, periodic=True)
 # add to scene, make it periodic

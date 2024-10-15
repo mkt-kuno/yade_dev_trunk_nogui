@@ -36,6 +36,7 @@ o.engines = [
 ]
 O.step()
 from yade import qt
+
 qt.View()
 r = qt.Renderer()
 r.bgColor = 1, 1, 1

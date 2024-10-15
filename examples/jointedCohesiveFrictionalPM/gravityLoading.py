@@ -155,6 +155,7 @@ def jointStrengthDegradation():
 
 #### YADE windows
 from yade import qt
+
 v = qt.Controller()
 v = qt.View()
 

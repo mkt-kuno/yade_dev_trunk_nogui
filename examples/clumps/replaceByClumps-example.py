@@ -14,6 +14,7 @@ O.engines = [
 ]
 
 from yade import qt
+
 qt.Controller()
 qt.View()
 

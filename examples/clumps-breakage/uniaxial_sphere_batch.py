@@ -2,6 +2,7 @@ from bf import stressTensor, checkFailure, replaceSphere, evalClump
 from yade import pack, plot
 import numpy as np
 import os
+
 sys.path.append('.')
 ########################
 # FUNCTIONS

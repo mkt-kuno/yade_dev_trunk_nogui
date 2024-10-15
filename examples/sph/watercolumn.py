@@ -1,6 +1,7 @@
 # -*- encoding=utf-8 -*-
 
 from yade import utils, plot, qt, ymport
+
 o = Omega()
 
 # Physical parameters

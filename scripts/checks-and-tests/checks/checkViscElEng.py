@@ -7,6 +7,7 @@
 # This check-simulation checks the correctness of ViscoElasticEngine
 
 from yade import plot
+
 o = Omega()
 fr = 0.5
 rho = 2000

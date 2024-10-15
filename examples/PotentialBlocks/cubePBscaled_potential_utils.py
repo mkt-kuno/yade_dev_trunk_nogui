@@ -114,6 +114,7 @@ def myAddPlotData():
 
 
 from yade import plot
+
 plot.plots = {'timeStep1': ('unbalancedForce'), 'timeStep2': ('kineticEn'), 'time': ('outsideNo')}
 #plot.plot() #Uncomment to view plots
 O.engines = O.engines + [PyRunner(iterPeriod=10, command='myAddPlotData()')]
@@ -142,6 +143,7 @@ if recordVTK:
 	O.engines = O.engines + [PyRunner(iterPeriod=500, command='vtkExport()')]
 
 from yade import qt
+
 qt.Controller()
 v = qt.View()
 

@@ -13,6 +13,7 @@
 #
 from yade import utils, plot
 import random
+
 random.seed()
 
 # sphere's radii

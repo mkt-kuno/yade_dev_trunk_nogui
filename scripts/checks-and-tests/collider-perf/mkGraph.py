@@ -38,6 +38,7 @@ QSstep = [dta['QS'][N][1] for N in QS_N]
 ISinit = [dta['IS'][N][0] for N in IS_N]
 ISstep = [dta['IS'][N][1] for N in IS_N]
 from pylab import *
+
 plot(IS_N, ISinit, 'y', ISS_N, ISSinit)
 gca().set_yscale('log')
 xlabel("Number of spheres")

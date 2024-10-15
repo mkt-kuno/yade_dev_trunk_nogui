@@ -4,6 +4,7 @@ It prints strain and average stress (computed from total volume force)
 once in a while."""
 
 from yade import timing
+
 O.engines = [
         ForceResetter(),
         InsertionSortCollider([Bo1_Sphere_Aabb()], allowBiggerThanPeriod=True),
@@ -24,6 +25,7 @@ O.cell.setBox(cubeSize, cubeSize, cubeSize)
 O.dt = PWaveTimeStep()
 O.saveTmp()
 from yade import qt
+
 qt.Controller()
 qt.View()
 O.run(200, True)

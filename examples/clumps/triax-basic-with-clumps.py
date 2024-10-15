@@ -38,6 +38,7 @@ walls = aabbWalls(material='frictionless')
 wallIds = O.bodies.append(walls)
 
 from yade import qt
+
 qt.Controller()
 qt.View()
 

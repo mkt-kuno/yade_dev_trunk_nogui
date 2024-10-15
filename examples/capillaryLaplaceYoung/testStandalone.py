@@ -44,5 +44,6 @@ for pp in np.linspace(0, 10, Nsolve):
 dt = (time.time() - t1)
 
 from matplotlib import pyplot as plt
+
 plt.plot(p, v)
 plt.show(False)

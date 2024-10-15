@@ -2,6 +2,7 @@
 
 # This example allows to test different kernel functions
 from yade import utils, plot, qt
+
 o = Omega()
 
 # Physical parameters

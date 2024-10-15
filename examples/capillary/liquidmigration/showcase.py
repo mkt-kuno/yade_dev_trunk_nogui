@@ -2,6 +2,7 @@
 
 # The script implements the show case in this article [Mani2013]
 from yade import utils, plot
+
 o = Omega()
 fr = 0.5
 rho = 2000
@@ -126,4 +127,5 @@ O.bodies[id4].state.vel = [vel, 0, 0]
 O.bodies[id5].state.vel = [vel, 0, 0]
 
 from yade import qt
+
 qt.View()

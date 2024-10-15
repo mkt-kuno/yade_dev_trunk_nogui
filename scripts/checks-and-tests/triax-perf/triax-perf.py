@@ -19,5 +19,6 @@ O.run(10, True)  # filter out initialization
 O.timingEnabled = True
 O.run(200, True)
 from yade import timing
+
 timing.stats()
 print('ForceContainer synced %d times' % (O.bexSyncCount))

@@ -21,6 +21,7 @@ O.dt = .01 * PWaveTimeStep()
 O.saveTmp()
 #o.run(100000); o.wait(); print o.iter/o.realtime,'iterations/sec'
 from yade import qt
+
 qt.View()
 renderer = qt.Renderer()
 renderer.intrGeom = True

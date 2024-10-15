@@ -164,11 +164,13 @@ O.engines = O.engines + [PyRunner(iterPeriod=200, command='history()', label='re
 #O.engines=O.engines+[PyRunner(iterPeriod=200,command='flow.saveVtk()')]
 
 from yade import plot
+
 plot.plots = {'t': (('e22', 'b--'), ('e22_theory', 'b-'), None, ('s22', 'g--'), ('p', 'g-'))}
 plot.plot()
 O.saveTmp()
 O.timingEnabled = 1
 from yade import timing
+
 print("starting oedometer simulation")
 O.run(200, 1)
 timing.stats()

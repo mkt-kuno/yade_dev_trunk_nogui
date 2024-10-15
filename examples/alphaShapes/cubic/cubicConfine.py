@@ -129,6 +129,7 @@ print("###      Confining Pressure Achieved      ###")
 ### VTK SPHERES AND POWER DIAGRAM   ###
 #######################################
 import yade.export
+
 vtkExporter = yade.export.VTKExporter('vtkConfined')
 vtkExporter.exportSpheres()
 

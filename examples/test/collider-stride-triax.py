@@ -3,6 +3,7 @@
 
 from yade import timing
 import os.path
+
 loadFrom = '/tmp/triax.xml'
 #if not os.path.exists(loadFrom):
 TriaxialTest(numberOfGrains=2000, noFiles=True).generate(loadFrom)

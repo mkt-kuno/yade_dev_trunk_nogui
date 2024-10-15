@@ -12,6 +12,7 @@ o = Omega()
 # In present test these parameters are in fact not used, because the spheres are only falling down.
 # However for good measure let us use the full precision Real here also.
 from yade.math import toHP1, radiansHP1
+
 Density = toHP1(2400)
 frictionAngle = radiansHP1(35)
 sphereRadius = toHP1('0.05')

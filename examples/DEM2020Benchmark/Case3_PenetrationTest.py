@@ -96,6 +96,7 @@ if not os.path.exists(wallFileName):
 # -------------------------------------------------------------------- #
 # Load facets making the box
 from yade import ymport
+
 facets = ymport.textFacets(wallFileName, color=(0, 1, 0), material=Steel)
 fctIds = range(len(facets))
 O.bodies.append(facets)
@@ -140,6 +141,7 @@ bSphere.state.blockedDOFs = 'xyzXYZ'
 # -------------------------------------------------------------------- #
 # Record time-dependent position of the large sphere (bSphere)
 from yade import plot
+
 plot.plots = {'time1': 'z'}
 
 

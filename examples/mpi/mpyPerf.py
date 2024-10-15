@@ -10,6 +10,7 @@
 '''
 
 from yade import mpy as mp
+
 numThreads = mp.numThreads  # 13 is the default, 'mpirun -n' overrides
 np = numThreads - 1  #remember to set odd number of cores to make the number of domains even
 
@@ -48,6 +49,7 @@ Nz *= np
 #add spheres
 subdNo = 0
 import itertools
+
 _id = 0  #will be used to count total number of bodies regardless of subdomain attribute, so that same ids are not reused for different bodies
 for x, y, z in itertools.product(range(int(Nx)), range(int(Ny)), range(int(Nz))):
 	subdNo += 1

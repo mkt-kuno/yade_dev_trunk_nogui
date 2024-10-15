@@ -30,6 +30,7 @@ O.dt = PWaveTimeStep()
 O.saveTmp()
 #print(O.cell.refSize)
 from yade import qt
+
 qt.Controller()
 qt.View()
 O.run()
