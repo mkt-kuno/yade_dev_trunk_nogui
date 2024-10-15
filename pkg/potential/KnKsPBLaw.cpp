@@ -910,10 +910,8 @@ void Ip2_FrictMat_FrictMat_KnKsPBPhys::go(const shared_ptr<Material>& b1, const 
 	//	contactPhysics->maxClosure = maxClosure;
 	contactPhysics->cohesionBroken = cohesionBroken;
 	contactPhysics->tensionBroken  = tensionBroken;
-	contactPhysics->intactRock  = intactRock;
-	if (intactRock) {
-		contactPhysics->cohesion  = cohesion;
-	}
+	contactPhysics->intactRock     = intactRock;
+	if (intactRock) { contactPhysics->cohesion = cohesion; }
 	//	contactPhysics->unitWidth2D = unitWidth2D;
 	contactPhysics->frictionAngle = math::min(fa, fb);
 	if (!useFaceProperties) {

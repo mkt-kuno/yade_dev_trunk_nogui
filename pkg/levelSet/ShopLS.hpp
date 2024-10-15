@@ -10,8 +10,8 @@
 #include <lib/base/Math.hpp>
 #include <core/Clump.hpp>
 #include <pkg/levelSet/LevelSet.hpp>
+#include <pkg/levelSet/LevelSetIGeom.hpp>            // MultiScGeom
 #include <pkg/levelSet/OtherClassesForLSContact.hpp> // MultiFrictPhys
-#include <pkg/levelSet/LevelSetIGeom.hpp> // MultiScGeom
 
 namespace yade { // Cannot have #include directive inside.
 class ShopLS {
@@ -64,8 +64,11 @@ public:
                 std::array<Real, 2>,
                 std::array<Real, 2>,
                 std::array<std::array<Real, 2>, 2>); // bi-interpolation in a plane, used in LevelSet.distance()
-	static void     handleNonTouchingNodeForMulti(shared_ptr<MultiScGeom>&, shared_ptr<MultiFrictPhys>&, int);
-	static void     handleTouchingNodeForMulti(shared_ptr<MultiScGeom>&, shared_ptr<MultiFrictPhys>&, int,
+	static void handleNonTouchingNodeForMulti(shared_ptr<MultiScGeom>&, shared_ptr<MultiFrictPhys>&, int);
+	static void handleTouchingNodeForMulti(
+	        shared_ptr<MultiScGeom>&,
+	        shared_ptr<MultiFrictPhys>&,
+	        int,
 	        Vector3r                       ctctPt,
 	        Real                           un,
 	        Real                           rad1,
@@ -75,8 +78,7 @@ public:
 	        const Scene*                   scene,
 	        const shared_ptr<Interaction>& c,
 	        const Vector3r&                currentNormal,
-			const Vector3r&                shift2
-				  );
+	        const Vector3r&                shift2);
 };
 } // namespace yade
 #endif //YADE_LS_DEM

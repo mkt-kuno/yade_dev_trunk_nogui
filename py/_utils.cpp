@@ -285,12 +285,12 @@ void wireNoSpheres() { wireSome("noSpheres"); }
  */
 bool pointInsidePolygon(py::tuple xy, py::object vertices)
 {
-	Real           testx = py::extract<Real>(xy[0])(), testy = py::extract<Real>(xy[1])();
-	char**         vertData;
-	int            rows, cols;
+	Real   testx = py::extract<Real>(xy[0])(), testy = py::extract<Real>(xy[1])();
+	char** vertData;
+	int    rows, cols;
 	if (PyArray_API == NULL) import_array();
 	if (!PyArray_Check(vertices.ptr())) throw invalid_argument("Vertices must be a NumPy array");
-	PyArrayObject* vert   = (PyArrayObject*)vertices.ptr();
+	PyArrayObject* vert = (PyArrayObject*)vertices.ptr();
 	if (PyArray_NDIM(vert) != 2) throw invalid_argument("Input array must be 2-dimensional");
 	npy_intp dims[2] = { PyArray_DIM(vert, 0), PyArray_DIM(vert, 1) };
 	rows = (int)dims[0], cols = (int)dims[1];
@@ -595,7 +595,8 @@ try {
 	py::def("initMPI", initMPI, "Initialize MPI communicator, for Foam Coupling");
 	py::def("PWaveTimeStep",
 	        PWaveTimeStep,
-	        "Get timestep accoring to the velocity of P-Wave propagation; computed for spheres and/or polyhedra based on their sizes, rigidities and masses.");
+	        "Get timestep accoring to the velocity of P-Wave propagation; computed for spheres and/or polyhedra based on their sizes, rigidities and "
+	        "masses.");
 	py::def("RayleighWaveTimeStep", RayleighWaveTimeStep, "Determination of time step according to Rayleigh wave speed of force propagation.");
 	py::def("getSpheresVolume",
 	        Shop__getSpheresVolume,

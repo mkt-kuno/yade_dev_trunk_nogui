@@ -23,9 +23,9 @@
 #include <core/Engine.hpp>
 #include <pkg/common/KinematicEngines.hpp>
 #include <pkg/common/MatchMaker.hpp>
-#include <preprocessing/dem/SpherePack.hpp>
-#include <pkg/dem/ScGeom.hpp>
 #include <pkg/dem/FrictPhys.hpp>
+#include <pkg/dem/ScGeom.hpp>
+#include <preprocessing/dem/SpherePack.hpp>
 #ifdef YADE_OPENGL
 #include <pkg/common/GLDrawFunctors.hpp>
 #include <pkg/common/OpenGLRenderer.hpp>
@@ -419,7 +419,7 @@ try {
 		VECTOR_SEQ_CONV(shared_ptr<LawFunctor>);
 		VECTOR_SEQ_CONV(shared_ptr<IntrCallback>);
 		VECTOR_SEQ_CONV(shared_ptr<Interaction>);
-		VECTOR_SEQ_CONV(shared_ptr<ScGeom>); // MultiScGeom.contacts
+		VECTOR_SEQ_CONV(shared_ptr<ScGeom>);    // MultiScGeom.contacts
 		VECTOR_SEQ_CONV(shared_ptr<FrictPhys>); // MultiFrictPhys.contacts
 #ifdef YADE_BODY_CALLBACK
 		VECTOR_SEQ_CONV(shared_ptr<BodyCallback>);
