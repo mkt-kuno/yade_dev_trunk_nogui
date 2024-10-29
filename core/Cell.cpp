@@ -2,7 +2,7 @@
 #include "core/Scene.hpp"
 #include <pkg/common/InsertionSortCollider.hpp>
 
-namespace yade { // Cannot have #include directive inside.
+namespace yade {
 
 CREATE_LOGGER(Cell);
 
@@ -118,6 +118,12 @@ void Cell::fillGlShearTrsfMatrix(double m[16])
 	m[7]  = 0;
 	m[11] = 0;
 	m[15] = 1;
+}
+
+Vector3r Cell::bodyFluctuationVelPy(const shared_ptr<Body>& b)
+{
+	if (b) return bodyFluctuationVel(b->state->pos,b->state->vel,prevVelGrad);
+	else return Vector3r::Zero();
 }
 
 } // namespace yade
