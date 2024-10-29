@@ -402,6 +402,8 @@ Summary force $\vec{F}=\vec{F}_N+\vec{F}_T$ is then applied to both particles --
 		\vec{T}_1&+=d_1(-\vec{n})\times \vec{F} & \vec{T}_2&+=d_2 \vec{n} \times \vec{F}.
 	\end{align*}
 
+.. _sect-motion-integration:
+
 Motion integration
 ==================
 Each particle accumulates generalized forces (forces and torques) from the contacts in which it participates. These generalized forces are then used to integrate motion equations for each particle separately; therefore, we omit $i$ indices denoting the $i$-th particle in this section.
