@@ -16,6 +16,7 @@ Documentation & Comments
 
   Alphabetical-ordered presentation of ENABLE_ cmake options in Installation page (!1045)
   Add new publications  (!1047)
+  Doc hyperlink (!1051)
   two additional tutorial examples
   remove some "utils." prefix in tutorial and clarify why
   smallfix in documentation of mpy module
@@ -63,7 +64,8 @@ Small Enhancements
 ******************
   Add a new engine TimeAverager to average data over time for specific spheres identified by their IDs (!1040)
   VTKRecorder updates with more documentation and a bit less of not-so-meaningful quanitities regarding recorders (!1027)
-  change default look in 3D view and provide predefined styles
+  Correcting computation of State.rot (!1051)
+  Change default look in 3D view and provide predefined styles
   Add python function to (periodic) Cell to get fluctuation velocity
 
 Testing & Continuous Integration

@@ -39,7 +39,7 @@ public:
 	//! Return rotation (current-reference orientation, as Vector3r)
 	const Vector3r rot() const
 	{
-		Quaternionr relRot = refOri.conjugate() * ori;
+		Quaternionr relRot = ori * refOri.conjugate();
 		AngleAxisr  aa(relRot);
 		return aa.axis() * aa.angle();
 	}
