@@ -17,6 +17,9 @@ The transformation is split between "normal" part and "rotation/shear" part for 
 #include <lib/serialization/Serializable.hpp>
 
 namespace yade { // Cannot have #include directive inside.
+	
+class Body;
+
 
 class Cell : public Serializable {
 public:
@@ -119,6 +122,8 @@ public:
 	Vector3r intrShiftVel(const Vector3i& cellDist) const { return _vGradTimesPrevH * cellDist.cast<Real>(); }
 	// return body velocity while taking away mean field velocity (coming from velGrad) if the mean field velocity is applied on velocity
 	Vector3r bodyFluctuationVel(const Vector3r& pos, const Vector3r& vel, const Matrix3r& prevVelGrad2) const { return (vel - prevVelGrad2 * pos); }
+	// python version
+	Vector3r bodyFluctuationVelPy(const shared_ptr<Body>& b);
 
 	// get/set current shape; setting resets trsf to identity
 	Matrix3r getHSize() const { return hSize; }
@@ -261,6 +266,7 @@ public:
 		.def("unshearPt",&Cell::unshearPt,"Apply inverse shear on the point (removes skew+rot of the cell)")
 		.def("shearPt",&Cell::shearPt,"Apply shear (cell skew+rot) on the point")
 		.def("wrapPt",&Cell::wrapPt_py,"Wrap point inside the reference cell, assuming the cell has no skew+rot.")
+		.def("getFluctuationVelocity",&Cell::bodyFluctuationVelPy,(py::arg("b")),"get velocity fluctuation of a body, i.e. the velocity relative to mean field velocity: $\\tilde{\\vec{v} }= \\vec{v} - (\\nabla \\vec{v}_m)\\cdot \\vec{x}$")
 		.def("getDefGrad",&Cell::getDefGrad,"Returns :yref:`trsf<Cell.trsf>` = deformation gradient tensor $\\mat{F}$ of the cell deformation (http://en.wikipedia.org/wiki/Finite_strain_theory)")
 		.def("getSmallStrain",&Cell::getSmallStrain,"Returns small strain tensor $\\mat{\\varepsilon}=\\frac{1}{2}(\\mat{F}+\\mat{F}^T)-\\mat{I}$ of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
 		.def("getRCauchyGreenDef",&Cell::getRCauchyGreenDef,"Returns right Cauchy-Green deformation tensor $\\mat{C}=\\mat{F}^T\\mat{F}$ of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
