@@ -21,7 +21,7 @@ Packages
 **Stable packages**
 
 
-Since 2011, all Ubuntu (starting from 11.10, Oneiric; not Ubuntu 24.04 noble) and Debian (starting from Wheezy) versions
+Since 2011, all Ubuntu (starting from 11.10, Oneiric; and with the exception of Ubuntu 24.04 noble which requires using either daily packages or source code, see below) and Debian (starting from Wheezy) versions
 have Yade in their main repositories. There are only stable releases in place.
 To install Yade, run the following::
 
@@ -114,7 +114,7 @@ Docker
 ----------
 
 Yade can be installed using docker images, which are daily built.
-Images contain both stable and daily versions of packages.
+Images contain both stable and daily versions of packages, except for Ubuntu 24.04 (see below).
 Docker images are based on supported distributions:
 
 
@@ -142,6 +142,10 @@ Docker images are based on supported distributions:
 - Ubuntu 22.04 **jammy**::
 
 	docker run -it registry.gitlab.com/yade-dev/docker-prod:ubuntu22.04
+
+- Ubuntu 24.04 **noble**:: (with only the `yadedaily` version)
+
+	docker run -it registry.gitlab.com/yade-dev/docker-prod:ubuntu24.04
 
 
 After the container is pulled and is running, Yade functionality can be checked::
@@ -221,7 +225,7 @@ Following dependencies are for instance mandatory:
 
 They can be installed from the command line of your Linux distribution, assuming you have root privileges.
 
-**For Ubuntu 20.04, 18.04**, **Debian 9, 10, 11** and their derivatives, just copy&paste to the terminal the following code block for installing all mandatory and optional dependencies (for Ubuntu 16.04 ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev`` and ``python3-ipython`` by ``ipython3``)::
+**For Ubuntu 20.04, 18.04**, **Debian 9, 10, 11** and their derivatives, just copy&paste to the terminal the following code block for installing all mandatory and optional dependencies::
 
 		sudo apt install cmake git freeglut3-dev libboost-all-dev fakeroot \
 		dpkg-dev build-essential g++ python3-dev python3-ipython python3-matplotlib \
@@ -233,7 +237,7 @@ They can be installed from the command line of your Linux distribution, assuming
 		libmetis-dev python3-bibtexparser python3-future coinor-clp coinor-libclp-dev \
 		python3-mpmath libmpfr-dev libmpfrc++-dev libmpc-dev texlive-xetex python3-pickleshare python3-ipython-genutils
 
-Note: on Ubuntu 22.04, the VTK library should be ``libvtk9-dev``.
+Note: on Ubuntu 22.04 and newer, the VTK library should be ``libvtk9-dev`` instead of ``libvtk6-dev``.
 
 Most of the list above is very likely already packaged for your distribution. In case you are still confronted
 with some errors concerning not available packages (e.g., package ``libmetis-dev`` is not available) it may be necessary
@@ -306,7 +310,7 @@ As a more precise alternative to the above ``DISABLE_*`` options, other ``cmake`
 	* ENABLE_SPH: enable Smoothed Particle Hydrodynamics (OFF by default)
 	* ENABLE_THERMAL : enable :yref:`ThermalEngine` (ON by default, experimental)
 	* ENABLE_TWOPHASEFLOW: enable :yref:`TwoPhaseFlowEngine` (ON by default)
-	* ENABLE_VTK: enable exports of data using the `VTK <http://www.vtk.org/>`_ library, e.g. :yref:`VTKRecorder` engine, requires ``libvtk6-dev`` package (ON by default)
+	* ENABLE_VTK: enable exports of data using the `VTK <http://www.vtk.org/>`_ library, e.g. :yref:`VTKRecorder` engine, requires a ``libvtk*-dev`` (e.g., ``libvtk9-dev`` on Ubuntu 22.04) package (ON by default)
 
 Maintaining a consistent choice for options values, in addition to using the same version of source code, is often necessary for successfully reloading previous Yade saves, see :yref:`O.load<Omega.load>`.
 
