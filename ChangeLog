@@ -59,6 +59,7 @@ Packaging & Build Improvements
   Small fix in ChangeLog checker & review categories for changelog for new development cycle (!1039)
   Tune RPATH setting, fix some cmake warnings & broken symlink, allow to make doc without yade properly installed, and fix build failure for suitesparse>=6.0.0 (!1041)
   Switch to ubuntu24.04 for generating yade doc
+  Fix depreciation warnings in cgal-6.0 (!1066)
 
 Small Enhancements
 ******************
