@@ -12,9 +12,16 @@
 #ifdef YADE_CGAL
 
 #include <lib/high-precision/Real.hpp>
+#if CGAL_VERSION_MAJOR >= 6
+#include <CGAL/AABB_traits_3.h>
+#include <CGAL/AABB_triangle_primitive_3.h>
+#define AABB_traits AABB_traits_3
+#define AABB_triangle_primitive AABB_triangle_primitive_3
+#else
 #include <CGAL/AABB_traits.h>
-#include <CGAL/AABB_tree.h>
 #include <CGAL/AABB_triangle_primitive.h>
+#endif
+#include <CGAL/AABB_tree.h>
 #include <CGAL/Delaunay_triangulation_3.h>
 #include <CGAL/Filtered_kernel.h>
 #include <CGAL/Polyhedron_3.h>
