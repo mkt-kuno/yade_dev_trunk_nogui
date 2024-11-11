@@ -4,6 +4,7 @@
 *************************************************************************/
 
 #ifdef YADE_LS_DEM
+#include <pkg/common/Sphere.hpp>
 #include <pkg/levelSet/LevelSetIGeom.hpp>
 #include <pkg/levelSet/LevelSetIg2.hpp>
 #include <pkg/levelSet/OtherClassesForLSContact.hpp>
@@ -11,13 +12,76 @@
 #include <preprocessing/dem/Shop.hpp>
 
 namespace yade {
-YADE_PLUGIN(
-        (Ig2_Box_LevelSet_ScGeom)(Ig2_Wall_LevelSet_ScGeom)(Ig2_Wall_LevelSet_MultiScGeom)(Ig2_LevelSet_LevelSet_ScGeom)(Ig2_LevelSet_LevelSet_MultiScGeom));
+YADE_PLUGIN((
+        Ig2_Sphere_LevelSet_ScGeom)(Ig2_Box_LevelSet_ScGeom)(Ig2_Wall_LevelSet_ScGeom)(Ig2_Wall_LevelSet_MultiScGeom)(Ig2_LevelSet_LevelSet_ScGeom)(Ig2_LevelSet_LevelSet_MultiScGeom));
+CREATE_LOGGER(Ig2_Sphere_LevelSet_ScGeom);
 CREATE_LOGGER(Ig2_Box_LevelSet_ScGeom);
 CREATE_LOGGER(Ig2_LevelSet_LevelSet_ScGeom);
 CREATE_LOGGER(Ig2_LevelSet_LevelSet_MultiScGeom);
 CREATE_LOGGER(Ig2_Wall_LevelSet_ScGeom);
 CREATE_LOGGER(Ig2_Wall_LevelSet_MultiScGeom);
+
+bool Ig2_Sphere_LevelSet_ScGeom::go(
+        const shared_ptr<Shape>&       shape1,
+        const shared_ptr<Shape>&       shape2,
+        const State&                   state1,
+        const State&                   state2,
+        const Vector3r&                shift2,
+        const bool&                    force,
+        const shared_ptr<Interaction>& c)
+{
+	shared_ptr<Sphere>   sphereSh = YADE_PTR_CAST<Sphere>(shape1);
+	shared_ptr<LevelSet> lsSh     = YADE_PTR_CAST<LevelSet>(shape2);
+	Vector3r             lsPos(state2.pos + shift2), spherePos(state1.pos);
+
+	// Orientation of the level set (sphere orientation doesn't matter).
+	// ori = rotation from reference configuration (local axes) to current one (global axes)
+	// ori.conjugate() from the current configuration (global axes) to the reference one (local axes)
+	Quaternionr rotLS(state2.ori), rotConjLS(state2.ori.conjugate());
+
+	// Position of the sphere relative to the level set, then rotate to local coordinates of the LS grid
+	Vector3r spherePosLocal = rotConjLS * (lsPos - spherePos);
+
+	// Evaluate the level set and the normal, sphere centre may be outside so set true.
+	Real     lev         = lsSh->distance(spherePosLocal, true);
+	Vector3r normalLocal = lsSh->normal(spherePosLocal, true);
+
+	// Compute the maximum overlap
+	Real rad(sphereSh->radius); // The sphere radius
+	Real maxOverlap = rad - lev;
+
+	// Bring normal back to local coordinates, adjust to point from body 1 to body 2
+	Vector3r normal = (rotLS * normalLocal).normalized();
+
+	// Determine contact point. Middle of overlapping volumes, as usual.
+	Vector3r contactPoint = spherePos + (rad - maxOverlap / 2.) * normal;
+
+	if (maxOverlap < 0 && !c->isReal() && !force)
+		return false; // We won't create the interaction in this case (but it is not our job here to delete it in case it already exists).
+
+	shared_ptr<ScGeom> geomPtr;
+	bool               isNew = !c->geom;
+
+	if (isNew) {
+		geomPtr = shared_ptr<ScGeom>(new ScGeom());
+		c->geom = geomPtr;
+	} else
+		geomPtr = YADE_PTR_CAST<ScGeom>(c->geom);
+	geomPtr->doIg2Work(
+	        contactPoint,
+	        maxOverlap, // Doesn't work for maxOverlap > R, like how pretty much any contact law doesn't.
+	        rad, // Inconsequential value since the contact point to centre distance is used for the torque anyway.
+	        rad, // Inconsequential value since the contact point to centre distance is used for the torque anyway.
+	        state1,
+	        state2,
+	        scene,
+	        c,
+	        normal,
+	        shift2,
+	        isNew,
+	        false);
+	return true;
+}
 
 bool Ig2_Box_LevelSet_ScGeom::go(
         const shared_ptr<Shape>&       shape1,
