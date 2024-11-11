@@ -303,6 +303,7 @@ Documentation / Comments              (26 MRs)
   +1 paper (!912)
   mention ubuntu20.04 virtual machine (!915)
   Yade on Twitter (!920)
+  Explanations on creating cohesive bonds
 
 Bug fixes                             (12 MRs)
   small fix: correct shebang and follow XDG specification  (!831)
@@ -373,6 +374,7 @@ Examples                              ( 4 MRs)
   Partial fix bug #228, use yapf3 python code formatting on  some of examples (not all of them yet) (!715)
   A capillary example: A better location of GSTS before NI  (thanks Guo Chang) (!878)
   fixed outdated mill.py example (!899)
+  Example of creating cohesive bonds between distant bodies
 
 Tests & checks & CI                   ( 4 MRs)
   increase ccache size to 500G for nova runners (!845)
