@@ -540,6 +540,24 @@ It is possible to create an interaction between a pair of particles independentl
 
 This method will be rather slow if many interactions are to be created (the functor lookup will be repeated for each of them). In such case, ask on yade-dev@lists.launchpad.net to have the :yref:`createInteraction<yade._utils.createInteraction>` function accept list of pairs id's as well.
 
+Assigning cohesive bonds (possibly between distant bodies)
+----------------------------------------------------------
+
+A particular case of interactions on demand is when cohesive strength needs to be assigned to interactions when using :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`. 
+
+* For existing interactions, it can be done using :yref:`setCohesion<Ip2_CohFrictMat_CohFrictMat_CohFrictPhys.setCohesion>`. If `physFunctor` is physics functor of type :yref:`Ip2_CohFrictMat_CohFrictMat_CohFrictPhys` and `i` an existing, cohesionless, interaction, this line would assign cohesion without changing the current contact force/moments::
+
+	physFunctor.setCohesion(i,cohesive=True,resetDisp=False)
+
+* For creating new interactions (particularly when the interaction needs to be created between distant bodies), the interaction needs to be created, first, then cohesion can be assigned::
+
+	i=createInteraction(i.id1,i.id2)
+	physFunctor.setCohesion(i,cohesive=True,resetDisp=False)
+
+If the above lines are executed between distant bodies, the interaction will be initially in traction. In order to make it force free we need to use current distance as equilibrium distance, this is achieved with `resetDisp=True`.
+
+* Creating cohesive bonds with this method between many thousand of distant bodies can be a challenge since it needs to identify the candidate pairs. In such situation, it is suggested to exploit the collision detection engine to establish the list of close - though distant - neighbours. Indeed, the collider can be executed outside the time-integration loop, with a user-defined detection distance, in order to produce that list. This technique is examplified in :ysrc:`examples/cohesion/assignCohesionRemote.py`.
+
 Base engines
 =============
 
