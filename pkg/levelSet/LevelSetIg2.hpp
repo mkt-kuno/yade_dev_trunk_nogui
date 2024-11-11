@@ -7,11 +7,43 @@
 #pragma once
 #include <core/Dispatching.hpp>
 #include <pkg/common/Box.hpp>
+#include <pkg/common/Sphere.hpp>
 #include <pkg/common/Wall.hpp>
 #include <pkg/dem/ScGeom.hpp>
 #include <pkg/levelSet/LevelSet.hpp>
 
 namespace yade {
+
+class Ig2_Sphere_LevelSet_ScGeom : public IGeomFunctor {
+public:
+	bool go(const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r&, const bool&, const shared_ptr<Interaction>&)
+	        override;
+	bool goReverse(
+	        const shared_ptr<Shape>&       cm1,
+	        const shared_ptr<Shape>&       cm2,
+	        const State&                   state1,
+	        const State&                   state2,
+	        const Vector3r&                shift2,
+	        const bool&                    force,
+	        const shared_ptr<Interaction>& c) override
+	{
+		c->swapOrder();
+		return go(cm2, cm1, state2, state1, -shift2, force, c);
+	};
+	// clang-format off
+	YADE_CLASS_BASE_DOC(Ig2_Sphere_LevelSet_ScGeom,IGeomFunctor,R"""(
+	Creates or updates a :yref:`ScGeom` instance representing the intersection of one :yref:`LevelSet`-shaped body with one :yref:`Sphere`-shaped body, where overlap is always chosen to occur inside the level set body (i.e. spheres will always be expelled). 
+	:yref:`Contact normal<ScGeom.normal>` $\vec{n}$ is given by the level set normal at the centre of the sphere $\vec{c}$ while :yref:`overlap<ScGeom.penetrationDepth>` is given by $R - \varphi$ with $R$ the radius and $\varphi$ the level set value. 
+	And :yref:`contact points<ScGeom.contactPoint>` is defined as $\vec{c}-\varphi \vec{n}$. This functionality does not require the level set to have surface nodes. 
+	Approximations for $\phi$ outside the level set may become inaccurate if the spheres are of similar size or larger than the level set body. 
+	Accuracy is guaranteed it the largest sphere is around the same size, or smaller than, the smallest grid cell in the level set.)""");
+	// clang-format on
+	DECLARE_LOGGER;
+	FUNCTOR2D(Sphere, LevelSet);
+	DEFINE_FUNCTOR_ORDER_2D(Sphere, LevelSet);
+};
+REGISTER_SERIALIZABLE(Ig2_Sphere_LevelSet_ScGeom);
+
 class Ig2_LevelSet_LevelSet_ScGeom : public IGeomFunctor {
 public:
 	static void geomPtrForLaterRemoval(
@@ -169,5 +201,6 @@ public:
 	DEFINE_FUNCTOR_ORDER_2D(Wall, LevelSet);
 };
 REGISTER_SERIALIZABLE(Ig2_Wall_LevelSet_MultiScGeom);
+
 } // namespace yade
 #endif // YADE_LS_DEM
