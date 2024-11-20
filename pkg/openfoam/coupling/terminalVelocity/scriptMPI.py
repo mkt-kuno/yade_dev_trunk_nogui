@@ -28,13 +28,14 @@ porosity=0.6
 restitCoef=0.91
 
 density = 1000
-NSTEPS = 10000000
+NSTEPS = 100
 saveVTK=10000
+
 O.materials.append(ViscElMat(en=restitCoef, et=1., young=young, poisson=poissonR, density=densitySpheres, frictionAngle=compFricCoef, label='spheremat'))
 O.materials.append(ViscElMat(en=restitCoef, et=1., young=young, poisson=poissonR, density=0, frictionAngle=wallFricCoef, label='walls'))
 
 O.bodies.append(sphere((L/2., H*3/4., L/2.),Radius, material='spheremat'))
-
+# O.bodies[-1].state.blockedDOFs = 'xyzXYZ'
 print ("Numer of particles:", len(O.bodies))
 
 
@@ -49,7 +50,7 @@ sphereIDs = [b.id for b in O.bodies if type(b.shape) == Sphere]
 # full path here, the scond argument, 2 is the number of FoamProcs. '''
 # fluidCoupling.SetOpenFoamSolver(os.environ.get('FOAM_USER_APPBIN')+'/icoFoamYade', 2)
 # it also work without path after sourcing OFoam's bashrc
-fluidCoupling.SetOpenFoamSolver("pimpleFoamYade", numProcOF)
+fluidCoupling.SetOpenFoamSolver("interFoamYadev2312", numProcOF)
 
 
 with open('data.txt', 'a') as f:
@@ -66,8 +67,26 @@ def saveData():
     return
 
 
+with open('dataForces.txt', 'a') as f:
+            f.write("Time" + " " +"Fx"  + " " +"Fy" + " " +"Fz"  "\n")
+            f.close
 
-newton=NewtonIntegrator(gravity=(-0,-g,0),damping=0.4)
+
+2401/2631
+
+def forceAnalysis():
+    for b in O.bodies:
+        if type(b.shape) == Sphere:
+                with open('dataForces.txt', 'a') as f:
+                            f.write(str(O.time) + " "+ str(O.forces.f(b.id)[0]) + " " +str(O.forces.f(b.id)[1]) + " " +str(O.forces.f(b.id)[2]) + "\n")
+                            f.close
+
+    return
+
+
+
+
+newton=NewtonIntegrator(gravity=(-0,-g,0),damping=0.0)
 
 O.engines=[
  ForceResetter(),
@@ -83,7 +102,8 @@ O.engines=[
         fluidCoupling,  #to be called after timestepper
         newton,
         VTKRecorder(fileName='spheres/3d-vtk-', recorders=['spheres','boxes'], parallelMode=parallelYade, iterPeriod=saveVTK),
-        PyRunner(iterPeriod=10,command='saveData()',dead=0,label="data")]
+        PyRunner(iterPeriod=10,command='saveData()',dead=0,label="data"),
+        PyRunner(iterPeriod=10,command='forceAnalysis()',dead=0,label="data2")]
 
 
 collider.verletDist = 0.0075
@@ -102,8 +122,12 @@ O.dt = 1e-6
 O.dynDt = False
 
 # dataFProfile.dead=0
+for i in range(NSTEPS):
+    # mp.mpirun(NSTEPS)
+    mp.mpirun(1)
+    mp.mprint(i)
 
-mp.mpirun(NSTEPS)
+fluidCoupling.killMPI()
 mp.mprint("RUN FINISH")
-#fluidCoupling.killMPI()
-exit()
+
+# exit()

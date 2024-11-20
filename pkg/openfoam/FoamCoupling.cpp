@@ -141,13 +141,6 @@ std::vector<int> FoamCoupling::getIdList(){
 	return bodyList;
 }
 
-void FoamCoupling::castTerminate() {
-	int value = 10;
-	MPI_Bcast(&value, 1, MPI_INT, rank, INTRACOMM);
-
-}
-
-
 void FoamCoupling::exchangeDeltaT() {
 
 	// Recv foamdt  first and broadcast;
@@ -321,6 +314,7 @@ void FoamCoupling::sendIntersectionToFluidProcs(){
 	int buffSz = fluidDomains.size();
 
 	//MPI_Send ..
+	std::cout << " yade - b1 " << std::endl;
 
 	for (int rnk = 0; rnk != foamCommSize; ++ rnk){
 		MPI_Send(&sendRecvRanks.front(), buffSz, MPI_INT, rnk+stride, TAG_SZ_BUFF, INTRACOMM);
@@ -564,10 +558,10 @@ void FoamCoupling::getParticleForce(){
 		 std::vector<double>& tmpForce = recvForce.second;
 		 int recvRank = recvForce.first;
 		 int buffSz = tmpForce.size();
-		// std::cout << "recvng forces" << std::endl;
-		//  MPI_Status status;
-		 /* fluid procs having no particles (those in inCommunicationProc) will send 0 force, torque */
+
+				 /* fluid procs having no particles (those in inCommunicationProc) will send 0 force, torque */
 		 MPI_Recv(&tmpForce.front(),buffSz, MPI_DOUBLE, recvRank, TAG_FORCE, INTRACOMM, &status);
+
 	}
 }
 
@@ -640,6 +634,11 @@ void FoamCoupling::exchangeDeltaTParallel() {
 }
 
 void FoamCoupling::runCoupling(){
+	std::cout << " yade - 0 " << std::endl;
+	std::cout << " localRank " << localRank << std::endl;
+	std::cout << " yadeMaster " << yadeMaster << std::endl;
+	std::cout << " serialYade " << serialYade << std::endl;
+
 	if (localRank > yadeMaster or serialYade) {
 		buildLocalIds();
 		buildSharedIdsMap();
@@ -669,9 +668,17 @@ bool FoamCoupling::exchangeData(){
 
 }
 
+
 void FoamCoupling::killMPI() {
-	castTerminate();
-	if (serialYade) MPI_Finalize();
+    int value = 1;  // Use the same value as in OpenFOAM
+    MPI_Bcast(&value, 1, MPI_INT, 0, INTRACOMM);  // Broadcast from rank 0 in Yade
+    std::cout << "Yade value: " << value << std::endl;
+
+    // Now sync all processes
+		std::cout << "yade Reaching barrier..." << std::endl;
+		MPI_Barrier(INTRACOMM);
+		std::cout << "yade Passed barrier!" << std::endl;
+    MPI_Finalize();  // Finalize MPI
 }
 
 void FoamCoupling::checkFoamVersion() {

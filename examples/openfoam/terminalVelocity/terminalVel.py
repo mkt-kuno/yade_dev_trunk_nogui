@@ -26,7 +26,7 @@ densityF=1000
 nu=0.0001
 mu=1000*nu
 densityParticle=1500
-Radius=0.001
+Radius=0.0005
 g=-9.81
 
 TermVel_analytical=(2*Radius*Radius*(densityParticle-densityF)*g)/(9*mu)

@@ -7,7 +7,8 @@ mkdir spheres data
 #ln -s /path/to/yade/install/bin/yade-exec yadeimport.py
 
 #In yade serial:
-python3 scriptMPI.py > log&
+#python3 scriptMPI.py > log&
 
 #In yade parallel
 #mpirun --allow-run-as-root -n 2 python3 scriptMPI.py > log&
+mpiexec -n 2 ../../../../install/bin/yade-2024-09-15.git-382de81 scriptMPI.py
