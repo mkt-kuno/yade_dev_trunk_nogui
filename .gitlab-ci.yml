@@ -941,7 +941,7 @@ ckHP_mpfr150:
   dependencies:
     - mkHP_mpfr150
   needs: ["mkHP_mpfr150"]
-  timeout: 5 hours
+  timeout: 9 hours
 
 ckHP_bf45:
   <<: *check_definition
@@ -1082,6 +1082,7 @@ deb_bookworm_mpfr150:
     - rm -rf ./deb
     - export PREC_NAME="-mpfr150"
     - ./scripts/ppa_ci/builddeb.py -d "bookworm" -p "mpfr150"
+  timeout: 9 hours
 
 deb_trixie:
   <<: *deb_definition
@@ -1113,6 +1114,7 @@ deb_trixie_mpfr150:
     - rm -rf ./deb
     - export PREC_NAME="-mpfr150"
     - ./scripts/ppa_ci/builddeb.py -d "trixie" -p "mpfr150"
+  timeout: 9 hours
 
 deb_bionic:
   <<: *deb_definition
@@ -1158,6 +1160,7 @@ deb_jammy_mpfr150:
     - rm -rf ./deb
     - export PREC_NAME="-mpfr150"
     - ./scripts/ppa_ci/builddeb.py -d "jammy" -p "mpfr150"
+  timeout: 9 hours
 
 deb_noble:
   <<: *deb_definition
