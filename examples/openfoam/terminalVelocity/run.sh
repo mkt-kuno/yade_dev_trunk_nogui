@@ -11,4 +11,4 @@ mkdir spheres data
 
 #In yade parallel
 #mpirun --allow-run-as-root -n 2 python3 scriptMPI.py > log&
-mpiexec -n 2 ../../../../install/bin/yade-2024-09-15.git-382de81 scriptMPI.py
+mpirun --allow-run-as-root -n 2 /path/to/yade/install/bin/yade-exec scriptMPI.py >log&

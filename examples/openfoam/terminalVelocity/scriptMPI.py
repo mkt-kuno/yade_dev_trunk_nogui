@@ -2,12 +2,7 @@ import os
 # from yadeimport import *
 from yade import mpy as mp
 
-# path = "spheres"
-# isExist = os.path.exists(path)
-# if not isExist:
-#    os.makedirs(path)
-#    print("The new directory"+path+" is created!")
-
+### example to test the hydrodynamic forces and correct OF-YADE coupling  ###
 
 compFricCoef = 0.0 # initial contact friction during the confining phase
 finalFricCoef = 0.47 # contact friction during the deviatoric loading
@@ -29,7 +24,7 @@ restitCoef=0.91
 
 density = 1000
 NSTEPS = 10000000
-saveVTK=10000
+saveVTK=1000
 O.materials.append(ViscElMat(en=restitCoef, et=1., young=young, poisson=poissonR, density=densitySpheres, frictionAngle=compFricCoef, label='spheremat'))
 O.materials.append(ViscElMat(en=restitCoef, et=1., young=young, poisson=poissonR, density=0, frictionAngle=wallFricCoef, label='walls'))
 
@@ -98,7 +93,7 @@ mp.fluidBodies = sphereIDs
 mp.DOMAIN_DECOMPOSITION = True
 
 
-O.dt = 1e-6
+O.dt = 1e-5
 O.dynDt = False
 
 # dataFProfile.dead=0

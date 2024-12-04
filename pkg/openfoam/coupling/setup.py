@@ -71,24 +71,6 @@ os.system('wclean')
 os.system('wmake')
 
 
-# compile commYade
-print("Compiling communications module")
-os.chdir(rootDir + '/FoamYade_two_phase/commYade')
-os.system('wclean')
-os.system('wmake')
-
-# mesh tree
-print("Compiling mesh tree module")
-os.chdir(rootDir + '/FoamYade_two_phase/meshtree')
-os.system('wclean')
-os.system('wmake')
-
-# FoamYade coupling
-print("Compiling Yade-OpenFOAM coupling module")
-os.chdir(rootDir + '/FoamYade_two_phase')
-os.system('wclean')
-os.system('wmake')
-
 # # Solvers...
 print("Compiling icoFoamYade solver")
 os.system('wclean')
@@ -96,12 +78,6 @@ os.chdir(rootDir + '/Solvers/icoFoamYade')
 os.system('wclean')
 os.system('wmake')
 
-# # Solvers...
-print("Compiling interFoamYADEv2321 solver")
-os.system('wclean')
-os.chdir(rootDir + '/Solvers/interFoamYade')
-os.system('wclean')
-os.system('wmake')
 
 if versionNumber >= 2012:
     print("Compiling pimpleFoamYade solver")

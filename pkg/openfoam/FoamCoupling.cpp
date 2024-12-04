@@ -313,8 +313,6 @@ void FoamCoupling::sendIntersectionToFluidProcs(){
 	//
 	int buffSz = fluidDomains.size();
 
-	//MPI_Send ..
-	std::cout << " yade - b1 " << std::endl;
 
 	for (int rnk = 0; rnk != foamCommSize; ++ rnk){
 		MPI_Send(&sendRecvRanks.front(), buffSz, MPI_INT, rnk+stride, TAG_SZ_BUFF, INTRACOMM);
@@ -634,10 +632,6 @@ void FoamCoupling::exchangeDeltaTParallel() {
 }
 
 void FoamCoupling::runCoupling(){
-	std::cout << " yade - 0 " << std::endl;
-	std::cout << " localRank " << localRank << std::endl;
-	std::cout << " yadeMaster " << yadeMaster << std::endl;
-	std::cout << " serialYade " << serialYade << std::endl;
 
 	if (localRank > yadeMaster or serialYade) {
 		buildLocalIds();
@@ -672,12 +666,10 @@ bool FoamCoupling::exchangeData(){
 void FoamCoupling::killMPI() {
     int value = 1;  // Use the same value as in OpenFOAM
     MPI_Bcast(&value, 1, MPI_INT, 0, INTRACOMM);  // Broadcast from rank 0 in Yade
-    std::cout << "Yade value: " << value << std::endl;
 
     // Now sync all processes
-		std::cout << "yade Reaching barrier..." << std::endl;
+
 		MPI_Barrier(INTRACOMM);
-		std::cout << "yade Passed barrier!" << std::endl;
     MPI_Finalize();  // Finalize MPI
 }
 

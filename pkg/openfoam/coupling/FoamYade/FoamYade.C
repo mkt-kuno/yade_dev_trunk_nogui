@@ -410,11 +410,9 @@ void Foam::FoamYade::calcInterpWeightGaussian(std::vector<std::shared_ptr<YadePa
 			const double& ds2 = mesh.C()[prt->cellIds[i]].y() - prt-> pos.y();
 			const double& ds3 = mesh.C()[prt->cellIds[i]].z() - prt-> pos.z();
 			distsq = (ds1*ds1)+ (ds2*ds2) + (ds3*ds3);
-			// std::cout << "distsq = " << distsq << std::endl;
-			// std::cout << "sigmaInterp = " << sigmaInterp << std::endl;
-			// std::cout << "sigmaPi = " << sigmaPi << std::endl;
+
 			double weight = exp(-distsq/(2*std::pow(interpRange, 2)))*sigmaPi;
-			// std::cout << "weight = " << weight << std::endl;
+
 			allwt += weight;
 			prt -> interpCellWeight.push_back(std::make_pair(prt->cellIds[i], weight));
 		}
