@@ -61,6 +61,7 @@ Packaging & Build Improvements
   Switch to ubuntu24.04 for generating yade doc
   Fix depreciation warnings in cgal-6.0 (!1066)
   Increase timeout on MPFR builds in CI. (!1068)
+  Fix build failure for python 3.13. (!1069)
 
 Small Enhancements
 ******************
