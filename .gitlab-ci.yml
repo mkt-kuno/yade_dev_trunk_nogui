@@ -119,7 +119,7 @@ variables:
                   echo "CHANGED_LINES = "$CHANGED_LINES ;
                   if [[ ${CHANGED_LINES} -ge "150" ]] ; then
                           echo -e "\n\e[91m===\n*** ERROR *** formating with clang and yapf produces very different output.\nYou can use command\n\n    scripts/clang-formatter.sh \$YOUR_FILE\n\nor for Python scripts\n\n    scripts/python-formatter.sh \$YOUR_PYTHON_FILE\n\nto fix this.\nIt is possible that some other files will be modified, because apparently different versions of clang-format have (very small) differences in the output.\n===\e[0m\n \n";
-                          echo -e "\n\e[96m===\n*** NOTE *** if your formatting is better than what clang-format or yapf provides, you can use:\n\n    // clang-format off\n    ......\n    // clang-format on\n\nfor C++ files (like it is done with YADE_CLASS_* macros in all .hpp files),\n\nor for Python code:\n\n    # yapf: disable\n    ......\n    # yapf: enable\n\n===\e[0m\n";                        
+                          echo -e "\n\e[96m===\n*** NOTE *** if your formatting is better than what clang-format or yapf provides, you can use:\n\n    // clang-format off\n    ......\n    // clang-format on\n\nfor C++ files (like it is done with YADE_CLASS_* macros in all .hpp files),\n\nor for Python code:\n\n    # yapf: disable\n    ......\n    # yapf: enable\n\n===\e[0m\n";
                           echo -e "\n \n\e[95m*** See the most affected files below ***\e[0m\n \n" ;
                           git diff --stat ;
                           git diff -w --stat ;
@@ -167,8 +167,8 @@ variables:
     - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
     - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
     - ld --version
-    - if grep -q "Arch Linux" /etc/issue; then echo "skip ld setting"; else update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" $LINK_GOLD   ; fi
-    - if grep -q "Arch Linux" /etc/issue; then echo "skip ld setting"; else update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" $LINK_REGULAR ; fi
+    - if grep -q "Arch Linux" /etc/lsb-release; then echo "skip ld setting"; else update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" $LINK_GOLD   ; fi
+    - if grep -q "Arch Linux" /etc/lsb-release; then echo "skip ld setting"; else update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" $LINK_REGULAR ; fi
     - ld --version
     # 4pak has 64cores 256GB RAM, and has concurrent = 5 ← amount of simultaneous gitlab jobs
     # 6pak has 48cores 128GB RAM, and has concurrent = 3 , but 6pak must have a little smaller load than the maximum
@@ -209,7 +209,7 @@ variables:
     - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then xvfb-run -a -s "-screen 0 1600x1200x24" scripts/checks-and-tests/gui/testGui.sh; fi
     - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then install/bin/yade-ci --quickperformance -j8; fi
     - cat /etc/os-release
-    - if grep -q "Arch Linux" /etc/issue; then /usr/sbin/uname -m; else  /usr/bin/dpkg --print-architecture ; fi
+    - if grep -q "Arch Linux" /etc/lsb-release; then /usr/sbin/uname -m; else  /usr/bin/dpkg --print-architecture ; fi
     - echo -e "\n\e[93m===\n(make_minimal only) scripts/clang-formatter.sh and scripts/python-formatter.sh report CHANGED_LINES = "$CHANGED_LINES"\n===\e[0m\n";
     - echo -e "\n\e[93m===\n(make_minimal only) ChangeLog diff had CHANGELOG_LINES = "$CHANGELOG_LINES" lines added in this merge request\n===\e[0m\n";
   tags:
@@ -529,7 +529,7 @@ make_SSE:
     - if [[ ${NO_GUI} == "NO_GUI" ]] ; then echo -e "\n\e[93m===\nSkipping GUI test.\n===\e[0m\n"; else xvfb-run -a -s "-screen 0 1600x1200x24" scripts/checks-and-tests/gui/testGui.sh; fi
     - install/bin/yade-ci --quickperformance -j8
     - cat /etc/os-release
-    - if grep -q "Arch Linux" /etc/issue; then /usr/sbin/uname -m; else  /usr/bin/dpkg --print-architecture ; fi
+    - if grep -q "Arch Linux" /etc/lsb-release; then /usr/sbin/uname -m; else  /usr/bin/dpkg --print-architecture ; fi
   timeout: 30 minutes
   artifacts:
     when: always
@@ -769,7 +769,7 @@ test_SSE:
     - echo -e "\n===\n\e[44mParallel check yade -j4 --checkall\e[0m\n===\n"
     - install/bin/yade-ci -j4 --checkall
     - cat /etc/os-release
-    - if grep -q "Arch Linux" /etc/issue; then /usr/sbin/uname -m; else  /usr/bin/dpkg --print-architecture ; fi
+    - if grep -q "Arch Linux" /etc/lsb-release; then /usr/sbin/uname -m; else  /usr/bin/dpkg --print-architecture ; fi
   timeout: 35 minutes
 
 check_18_04:
@@ -1168,4 +1168,3 @@ deb_noble:
   before_script:
     - rm -rf ./deb
     - ./scripts/ppa_ci/builddeb.py -d "noble"
-

@@ -22,9 +22,8 @@ FUNCTION(FIND_PYTHON_MODULE module)
   ENDIF(ARGC GREATER 1 AND ARGV1 STREQUAL "REQUIRED")
 
   EXECUTE_PROCESS(COMMAND "${PYTHON_EXECUTABLE}" "-c"
-    #Use future module for compatibility of the print function with python 2
     #Since tkinter does not have __version__ attribute, use TkVersion attribute instead to get the version
-    "from __future__ import print_function; import re, ${module}; \
+    "import re, ${module}; \
     location = re.compile('/__init__.py.*').sub('', ${module}.__file__); \
     include_dir = ${module}.get_include() if hasattr(${module}, 'get_include') else None; \
     version = ${module}.TkVersion if hasattr(${module}, 'TkVersion') else ${module}.__version__; \

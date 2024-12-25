@@ -4,7 +4,7 @@
 # vim: syntax=python
 # portions © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-import os, sys, _thread, time, logging, pipes, socket, xmlrpc.client, re, shutil, random
+import os, sys, _thread, time, logging, shlex, socket, xmlrpc.client, re, shutil, random
 
 # Add search path for yade Python-modules
 # It allows to use both Yade-versions (packaged and self-compiled one).
@@ -513,7 +513,7 @@ for i,l in enumerate(useLines):
 		if table: env+='<a href="jobs/%d/table">%s:%d</a>'%(jobNum,table,l) # keep YADE_BATCH empty (but still defined) if running a single simulation
 		env+=' DISPLAY= %s '%(' '.join(envVars))
 		cmd='%s%s [threadspec] %s -x <a href="jobs/%d/script">%s</a>'%(jobExecutable,'','--nice=%s'%nice if nice!=None else '',i,script)
-		log='> <a href="jobs/%d/log">%s</a> 2>&1'%(jobNum,pipes.quote(logFile2))
+		log='> <a href="jobs/%d/log">%s</a> 2>&1'%(jobNum,shlex.quote(logFile2))
 		hrefCmd=env+cmd+log
 		fullCmd=re.sub('(<a href="[^">]+">|</a>)','',hrefCmd)
 		desc=params[l]['description']

@@ -335,7 +335,7 @@ struct custom_mask_from_long {
 		new (storage) mask_t;
 		mask_t* mask = (mask_t*)storage;
 #if PY_MAJOR_VERSION >= 3
-		obj_ptr = _PyLong_Format(obj_ptr, 2);
+		obj_ptr = PyNumber_ToBase(obj_ptr, 2);
 		std::string s(PyUnicode_AsUTF8(obj_ptr));
 #else
 		obj_ptr = _PyLong_Format(obj_ptr, 2, 0, 0);

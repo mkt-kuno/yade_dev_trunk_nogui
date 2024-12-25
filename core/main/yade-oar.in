@@ -7,7 +7,7 @@
 # This script is to be used with OAR task scheduler. May be an example to use use with other task scheduler for clusters
 # Adapted from yade-batch
 
-import os, sys, _thread, time, logging, pipes, socket, xmlrpc.client, re, shutil, random
+import os, sys, _thread, time, logging, shlex, socket, xmlrpc.client, re, shutil, random
 
 # Add search path for yade Python-modules
 # It allows to use both Yade-versions (packaged and self-compiled one).
