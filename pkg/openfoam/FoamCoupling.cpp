@@ -671,7 +671,7 @@ void FoamCoupling::killMPI() {
 
 		//MPI_Barrier(INTRACOMM);
    // MPI_Finalize();  // Finalize MPI
-	MPI_Abort();
+	MPI_Abort(INTRACOMM,-100);
 }
 
 void FoamCoupling::checkFoamVersion() {
