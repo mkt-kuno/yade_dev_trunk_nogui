@@ -664,13 +664,14 @@ bool FoamCoupling::exchangeData(){
 
 
 void FoamCoupling::killMPI() {
-    int value = 1;  // Use the same value as in OpenFOAM
-    MPI_Bcast(&value, 1, MPI_INT, 0, INTRACOMM);  // Broadcast from rank 0 in Yade
+  //  int value = 1;  // Use the same value as in OpenFOAM
+   // MPI_Bcast(&value, 1, MPI_INT, 0, INTRACOMM);  // Broadcast from rank 0 in Yade
 
     // Now sync all processes
 
-		MPI_Barrier(INTRACOMM);
-    MPI_Finalize();  // Finalize MPI
+		//MPI_Barrier(INTRACOMM);
+   // MPI_Finalize();  // Finalize MPI
+	MPI_Abort();
 }
 
 void FoamCoupling::checkFoamVersion() {

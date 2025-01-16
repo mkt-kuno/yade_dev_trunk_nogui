@@ -95,6 +95,6 @@ mp.fluidBodies = sphereIDs
 mp.DOMAIN_DECOMPOSITION = True
 mp.mpirun(NSTEPS)
 mp.mprint("RUN FINISH")
-exit()
+fluidCoupling.killMPI()
 
 exit()

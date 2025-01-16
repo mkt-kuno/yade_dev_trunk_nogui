@@ -100,5 +100,6 @@ O.dynDt = False
 
 mp.mpirun(NSTEPS)
 mp.mprint("RUN FINISH")
-#fluidCoupling.killMPI()
+fluidCoupling.killMPI()
+
 exit()
