@@ -264,7 +264,7 @@ class SimpleTests(unittest.TestCase):
 		self.digs0 = self.getDigitsHP(N)
 		# tolerance = 1.2×10⁻ᵈ⁺¹, where ᵈ==self.digs0
 		# so basically we store one more decimal digit, and expect one less decimal digit. That amounts to ignoring one (two, if the extra one is counted) least significant digits.
-		self.tolerance = (MPn.mpf(10)**(-self.digs0 + 1)) * MPn.mpf("1.2")
+		self.tolerance = HPn.Real((MPn.mpf(10)**(-self.digs0 + 1)) * MPn.mpf("1.2"))
 		#self.bits       = MPn.ceil(MPn.mpf(self.digs0)/(MPn.log(2)/MPn.log(10)))+1 # Maybe a bug report against MPFR + cpp_bin_float? They don't use this formula for number of bits
 		self.bits = MPn.ceil(
 		        MPn.mpf(self.digs0) / (0.301)
@@ -388,7 +388,7 @@ class SimpleTests(unittest.TestCase):
 		# This strange behavior is explained by the error in the remainder(…) for which I do not restrict arguments (so you can look up its error in the table). These trig
 		# functions try to remove periodicity by calculating remainder from division by Pi, but they can only be as good as the remainder calculation itself. And this calculation
 		# cannot produce more precision than the number already has, after its first few digits are cut-off by the remainder calculation.
-		cut1 = HPn.roundTrip(r % self.getMpmath().pi * 4)  # the HPn.identity(…) call is to cut the digits to those representible in HPn
+		cut1 = HPn.roundTrip(r % HPn.Real(self.getMpmath().pi * 4))  # the HPn.identity(…) call is to cut the digits to those representible in HPn
 		cut2 = HPn.roundTrip(r % 20)
 		self.checkRelativeError(HPn.sin(cut1), MPn.sin(cut1), functionName="sin")
 		self.checkRelativeError(HPn.sinh(r), MPn.sinh(r), functionName="sinh")
@@ -493,15 +493,15 @@ class SimpleTests(unittest.TestCase):
 			print("Skipping inf,nan regular test\n")
 			print("\033[91m *** Warning: usually YADE needs Inf and NaN for most of the calculations. *** \033[0m")
 			return
-		self.assertEqual(HPn.isinf(MPn.mpf(1)), False)
-		self.assertEqual(HPn.isinf(MPn.mpf('nan')), False)
-		self.assertEqual(HPn.isinf(MPn.mpf('inf')), True)
-		self.assertEqual(HPn.isnan(MPn.mpf(1)), False)
-		self.assertEqual(HPn.isnan(MPn.mpf('nan')), True)
-		self.assertEqual(HPn.isnan(MPn.mpf('inf')), False)
-		self.assertEqual(HPn.isfinite(MPn.mpf(1)), True)
-		self.assertEqual(HPn.isfinite(MPn.mpf('nan')), False)
-		self.assertEqual(HPn.isfinite(MPn.mpf('inf')), False)
+		self.assertEqual(HPn.isinf(HPn.Real(1)), False)
+		self.assertEqual(HPn.isinf(HPn.Real('nan')), False)
+		self.assertEqual(HPn.isinf(HPn.Real('inf')), True)
+		self.assertEqual(HPn.isnan(HPn.Real(1)), False)
+		self.assertEqual(HPn.isnan(HPn.Real('nan')), True)
+		self.assertEqual(HPn.isnan(HPn.Real('inf')), False)
+		self.assertEqual(HPn.isfinite(HPn.Real(1)), True)
+		self.assertEqual(HPn.isfinite(HPn.Real('nan')), False)
+		self.assertEqual(HPn.isfinite(HPn.Real('inf')), False)
 
 	def testRealHPDiagnostics(self):
 		for N in self.testLevelsHP:
@@ -692,47 +692,49 @@ class SimpleTests(unittest.TestCase):
 		self.checkCgalNumTraits(HPn, MPn, 0.5)
 		self.checkCgalNumTraits(HPn, MPn, -1.5)
 		self.checkCgalNumTraits(HPn, MPn, 55.5)
-		self.assertEqual(HPn.CGAL_Is_valid(MPn.mpf(1)), True)
-		self.assertEqual(HPn.CGAL_Is_valid(MPn.mpf('nan')), False)
-		self.assertEqual(HPn.CGAL_Is_valid(MPn.mpf('inf')), True)
-		self.assertEqual(HPn.CGAL_Is_finite(MPn.mpf(1)), True)
-		self.assertEqual(HPn.CGAL_Is_finite(MPn.mpf('nan')), False)
-		self.assertEqual(HPn.CGAL_Is_finite(MPn.mpf('inf')), False)
+		self.assertEqual(HPn.CGAL_Is_valid(HPn.Real(1)), True)
+		self.assertEqual(HPn.CGAL_Is_valid(HPn.Real('nan')), False)
+		self.assertEqual(HPn.CGAL_Is_valid(HPn.Real('inf')), True)
+		self.assertEqual(HPn.CGAL_Is_finite(HPn.Real(1)), True)
+		self.assertEqual(HPn.CGAL_Is_finite(HPn.Real('nan')), False)
+		self.assertEqual(HPn.CGAL_Is_finite(HPn.Real('inf')), False)
 		self.assertEqual(HPn.CGAL_simpleTest(), MPn.mpf("3.0"))
 
 	def twoArgMathCheck(self, HPn, MPn, r1, r2):
 		# same order of complex functions as in lib/high-precision/MathComplexFunctions.hpp , py/high-precision/_math.cpp
-		self.checkRelativeComplexError(HPn.conj(MPn.mpc(r1, r2)), MPn.conj(MPn.mpc(r1, r2)), functionName="Complex conj")
-		self.checkRelativeComplexError(HPn.real(MPn.mpc(r1, r2)), r1, functionName="Complex real")
-		self.checkRelativeComplexError(HPn.imag(MPn.mpc(r1, r2)), r2, functionName="Complex imag")
-		self.checkRelativeComplexError(HPn.abs(MPn.mpc(r1, r2)), abs(MPn.mpc(r1, r2)), functionName="Complex abs")
+		self.checkRelativeComplexError(HPn.conj(HPn.Complex(r1, r2)), MPn.conj(MPn.mpc(r1, r2)), functionName="Complex conj")
+		self.checkRelativeComplexError(HPn.real(HPn.Complex(r1, r2)), r1, functionName="Complex real")
+		self.checkRelativeComplexError(HPn.imag(HPn.Complex(r1, r2)), r2, functionName="Complex imag")
+		self.checkRelativeComplexError(HPn.abs(HPn.Complex(r1, r2)), abs(MPn.mpc(r1, r2)), functionName="Complex abs")
 
-		self.checkRelativeError(HPn.arg(MPn.mpc(r1, r2)), MPn.phase(MPn.mpc(r1, r2)), functionName="Complex arg")
-		self.checkRelativeError(HPn.squaredNorm(MPn.mpc(r1, r2)), MPn.norm(MPn.mpc(r1, r2)) * MPn.norm(MPn.mpc(r1, r2)), functionName="Complex norm")
+		self.checkRelativeError(HPn.arg(HPn.Complex(r1, r2)), MPn.phase(MPn.mpc(r1, r2)), functionName="Complex arg")
+		self.checkRelativeError(
+		        HPn.squaredNorm(HPn.Complex(r1, r2)), MPn.norm(MPn.mpc(r1, r2)) * MPn.norm(MPn.mpc(r1, r2)), functionName="Complex norm"
+		)
 		# for now skip testing C++ std::proj, see note in py/tests/testMathHelper.py
 		self.checkRelativeComplexError(HPn.polar(r1, r2), MPn.rect(r1, r2), functionName="Complex polar")
 
-		self.checkRelativeComplexError(HPn.sin(MPn.mpc(r1, r2)), MPn.sin(MPn.mpc(r1, r2)), functionName="Complex sin")
-		self.checkRelativeComplexError(HPn.sinh(MPn.mpc(r1, r2)), MPn.sinh(MPn.mpc(r1, r2)), functionName="Complex sinh")
-		self.checkRelativeComplexError(HPn.cos(MPn.mpc(r1, r2)), MPn.cos(MPn.mpc(r1, r2)), functionName="Complex cos")
-		self.checkRelativeComplexError(HPn.cosh(MPn.mpc(r1, r2)), MPn.cosh(MPn.mpc(r1, r2)), functionName="Complex cosh")
-		self.checkRelativeComplexError(HPn.tan(MPn.mpc(r1, r2)), MPn.tan(MPn.mpc(r1, r2)), functionName="Complex tan")
-		self.checkRelativeComplexError(HPn.tanh(MPn.mpc(r1, r2)), MPn.tanh(MPn.mpc(r1, r2)), functionName="Complex tanh")
+		self.checkRelativeComplexError(HPn.sin(HPn.Complex(r1, r2)), MPn.sin(MPn.mpc(r1, r2)), functionName="Complex sin")
+		self.checkRelativeComplexError(HPn.sinh(HPn.Complex(r1, r2)), MPn.sinh(MPn.mpc(r1, r2)), functionName="Complex sinh")
+		self.checkRelativeComplexError(HPn.cos(HPn.Complex(r1, r2)), MPn.cos(MPn.mpc(r1, r2)), functionName="Complex cos")
+		self.checkRelativeComplexError(HPn.cosh(HPn.Complex(r1, r2)), MPn.cosh(MPn.mpc(r1, r2)), functionName="Complex cosh")
+		self.checkRelativeComplexError(HPn.tan(HPn.Complex(r1, r2)), MPn.tan(MPn.mpc(r1, r2)), functionName="Complex tan")
+		self.checkRelativeComplexError(HPn.tanh(HPn.Complex(r1, r2)), MPn.tanh(MPn.mpc(r1, r2)), functionName="Complex tanh")
 
-		self.checkRelativeComplexError(HPn.asin(MPn.mpc(r1, r2)), MPn.asin(MPn.mpc(r1, r2)), functionName="Complex asin")
-		self.checkRelativeComplexError(HPn.asinh(MPn.mpc(r1, r2)), MPn.asinh(MPn.mpc(r1, r2)), functionName="Complex asinh")
-		self.checkRelativeComplexError(HPn.acos(MPn.mpc(r1, r2)), MPn.acos(MPn.mpc(r1, r2)), functionName="Complex acos")
-		self.checkRelativeComplexError(HPn.acosh(MPn.mpc(r1, r2)), MPn.acosh(MPn.mpc(r1, r2)), functionName="Complex acosh")
-		self.checkRelativeComplexError(HPn.atan(MPn.mpc(r1, r2)), MPn.atan(MPn.mpc(r1, r2)), functionName="Complex atan")
-		self.checkRelativeComplexError(HPn.atanh(MPn.mpc(r1, r2)), MPn.atanh(MPn.mpc(r1, r2)), functionName="Complex atanh")
+		self.checkRelativeComplexError(HPn.asin(HPn.Complex(r1, r2)), MPn.asin(MPn.mpc(r1, r2)), functionName="Complex asin")
+		self.checkRelativeComplexError(HPn.asinh(HPn.Complex(r1, r2)), MPn.asinh(MPn.mpc(r1, r2)), functionName="Complex asinh")
+		self.checkRelativeComplexError(HPn.acos(HPn.Complex(r1, r2)), MPn.acos(MPn.mpc(r1, r2)), functionName="Complex acos")
+		self.checkRelativeComplexError(HPn.acosh(HPn.Complex(r1, r2)), MPn.acosh(MPn.mpc(r1, r2)), functionName="Complex acosh")
+		self.checkRelativeComplexError(HPn.atan(HPn.Complex(r1, r2)), MPn.atan(MPn.mpc(r1, r2)), functionName="Complex atan")
+		self.checkRelativeComplexError(HPn.atanh(HPn.Complex(r1, r2)), MPn.atanh(MPn.mpc(r1, r2)), functionName="Complex atanh")
 
-		self.checkRelativeComplexError(HPn.exp(MPn.mpc(r1, r2)), MPn.exp(MPn.mpc(r1, r2)), functionName="Complex exp")
-		self.checkRelativeComplexError(HPn.log(MPn.mpc(r1, r2)), MPn.log(MPn.mpc(r1, r2)), functionName="Complex log")
-		self.checkRelativeComplexError(HPn.log10(MPn.mpc(r1, r2)), MPn.log10(MPn.mpc(r1, r2)), functionName="Complex log10")
+		self.checkRelativeComplexError(HPn.exp(HPn.Complex(r1, r2)), MPn.exp(MPn.mpc(r1, r2)), functionName="Complex exp")
+		self.checkRelativeComplexError(HPn.log(HPn.Complex(r1, r2)), MPn.log(MPn.mpc(r1, r2)), functionName="Complex log")
+		self.checkRelativeComplexError(HPn.log10(HPn.Complex(r1, r2)), MPn.log10(MPn.mpc(r1, r2)), functionName="Complex log10")
 		self.checkRelativeComplexError(
-		        HPn.pow(MPn.mpc(r1, r2), MPn.mpc(r1 + r2, r1 - r2)), (MPn.mpc(r1, r2)**MPn.mpc(r1 + r2, r1 - r2)), functionName="Complex pow"
+		        HPn.pow(HPn.Complex(r1, r2), HPn.Complex(r1 + r2, r1 - r2)), (MPn.mpc(r1, r2)**MPn.mpc(r1 + r2, r1 - r2)), functionName="Complex pow"
 		)
-		self.checkRelativeComplexError(HPn.sqrt(MPn.mpc(r1, r2)), MPn.sqrt(MPn.mpc(r1, r2)), functionName="Complex sqrt")
+		self.checkRelativeComplexError(HPn.sqrt(HPn.Complex(r1, r2)), MPn.sqrt(MPn.mpc(r1, r2)), functionName="Complex sqrt")
 
 		# Two argument MathSpecialFunctions
 		if (self.needsMpmathAtN(self.currentN)):  # can test Bessel only if mpmath is available.
@@ -782,15 +784,16 @@ class SimpleTests(unittest.TestCase):
 		#print("zz:",hex(id(zz)))
 		#print("mpmath:",hex(id(mpmath)))
 		a = HPn.Var()
-		a.val = zz
-		if (not self.testRecordingMode):
-			self.assertEqual(MPn.mp.dps, self.digs0 + mth.RealHPConfig.extraStringDigits10)
-		#print("---- a.val=",a.val.__repr__())
-		#print("---- zz   =",zz   .__repr__())
-		#print("---- DPS  =",mpmath.mp.dps)
-		#print("---- abs  =",abs(MPn.mpf(a.val-zz)))
-		#print("---- 10** =",self.tolerance)
-		self.checkRelativeError(a.val, zz)
+		if (type(a.val) != float):
+			a.val = zz
+			if (not self.testRecordingMode):
+				self.assertEqual(MPn.mp.dps, self.digs0 + mth.RealHPConfig.extraStringDigits10)
+			#print("---- a.val=",a.val.__repr__())
+			#print("---- zz   =",zz   .__repr__())
+			#print("---- DPS  =",mpmath.mp.dps)
+			#print("---- abs  =",abs(MPn.mpf(a.val-zz)))
+			#print("---- 10** =",self.tolerance)
+			self.checkRelativeError(a.val, zz)
 		self.assertEqual(HPn.IsInteger, 0)
 		self.assertEqual(HPn.IsSigned, 1)
 		self.assertEqual(HPn.IsComplex, 0)
@@ -869,6 +872,26 @@ class SimpleTests(unittest.TestCase):
 	def testConstantsCppSide(self):
 		mth.testLoopRealHP()
 
+	def testRealConstructors(self):
+		for N in self.testLevelsHP:
+			self.runCheck(N, self.HPtestRealConstructors)
+
+	def HPtestRealConstructors(self, N, HPn, MPn):
+		a = HPn.Var()
+		a.val = 1
+		a.val = 1.
+		if (type(a.val) != float):
+			a.val = "1."
+		a.val = yade.math.Real(1)
+		a.val = yade.math.Real(1.)
+		a.val = yade.math.Real("1.")
+		a.val = MPn.mpf(1)
+		a.val = MPn.mpf(1.)
+		a.val = MPn.mpf("1.")
+		a.val = HPn.Real(1)
+		a.val = HPn.Real(1.)
+		a.val = HPn.Real("1.")
+
 	def testBasicVariable(self):
 		for N in self.testLevelsHP:
 			self.runCheck(N, self.HPtestBasicVariable)
@@ -878,18 +901,84 @@ class SimpleTests(unittest.TestCase):
 		self.checkRelativeError(a.val, -71.23, 0.01)
 		a.val = 10
 		self.checkRelativeError(a.val, 10)
+		a.val = 1
+		self.checkRelativeError(a.val, 1)
+		a.val = 1.5
+		self.checkRelativeError(a.val, 1.5)
+		if (type(a.val) != float):
+			a.val = "1.5"
+			self.checkRelativeError(a.val, 1.5)
+		a.val = HPn.Real("1.5")
+		self.checkRelativeError(a.val, MPn.mpf(1.5))
 		self.checkRelativeComplexError(a.cpl, -71.23 + 33.23j, 0.01)
-		a.cpl = MPn.mpc("1", "-1")
-		self.checkRelativeComplexError(a.cpl, 1 - 1j, 1e-15)
-		self.checkRelativeComplexError(a.cpl, MPn.mpc("1", "-1"))
+		if (type(a.cpl) != complex):
+			a.cpl = MPn.mpc("1", "-1")
+			self.checkRelativeComplexError(a.cpl, 1 - 1j, 1e-15)
+			self.checkRelativeComplexError(a.cpl, MPn.mpc("1", "-1"))
 
-	def thisTestsExceptionReal(self):
+	def thisTestsExceptionReal1(self):
 		a = self.HPnHelper.Var()
 		a.val = "13123-123123*123"
 
-	def thisTestsExceptionComplex(self):
+	def thisTestsExceptionComplex1(self):
 		a = self.HPnHelper.Var()
 		a.cpl = "13123-123123*123-50j"
+
+	def thisTestsExceptionReal2(self):
+		a = self.HPnHelper.Var()
+		a.val = "wrong number"
+
+	def thisTestsExceptionComplex2(self):
+		a = self.HPnHelper.Var()
+		a.cpl = "wrong number"
+
+	def thisTestsExceptionReal3(self):
+		a = self.HPnHelper.Var()
+		a.val = "-1.0 wrong"
+
+	def thisTestsExceptionComplex3(self):
+		a = self.HPnHelper.Var()
+		a.cpl = "-1.0 wrong"
+
+	def thisTestsExceptionReal4(self):
+		a = self.HPnHelper.Var()
+		a.val = "-1wrong"
+
+	def thisTestsExceptionComplex4(self):
+		a = self.HPnHelper.Var()
+		a.cpl = "-1wrong"
+
+	def thisTestsExceptionReal1r(self):
+		a = self.HPnHelper.Var()
+		a.val = self.HPnHelper.Real("13123-123123*123")
+
+	def thisTestsExceptionComplex1c(self):
+		a = self.HPnHelper.Var()
+		a.cpl = self.HPnHelper.Complex("13123-123123*123-50j")
+
+	def thisTestsExceptionReal2r(self):
+		a = self.HPnHelper.Var()
+		a.val = self.HPnHelper.Real("wrong number")
+
+	def thisTestsExceptionComplex2c(self):
+		a = self.HPnHelper.Var()
+		a.cpl = self.HPnHelper.Complex("wrong number")
+
+	def thisTestsExceptionReal3r(self):
+		a = self.HPnHelper.Var()
+		a.val = self.HPnHelper.Real("-1.0 wrong")
+
+	def thisTestsExceptionComplex3c(self):
+		a = self.HPnHelper.Var()
+		a.cpl = self.HPnHelper.Complex("-1.0 wrong")
+
+	def thisTestsExceptionReal4r(self):
+		a = self.HPnHelper.Var()
+		a.val = self.HPnHelper.Real("-1wrong")
+
+	def thisTestsExceptionComplex4c(self):
+		a = self.HPnHelper.Var()
+		a.cpl = self.HPnHelper.Complex("-1wrong")
 
 	def testWrongInput(self):
 		for N in self.testLevelsHP:
@@ -901,8 +990,25 @@ class SimpleTests(unittest.TestCase):
 			return
 		# depending on backed Real use it throws TypeError or RuntimeError
 		self.HPnHelper = HPn
-		self.assertRaises(Exception, self.thisTestsExceptionReal)
-		self.assertRaises(Exception, self.thisTestsExceptionComplex)
+		# TODO: this won't work. In ToFromPythonConverter.hpp the ArbitraryComplex_from_python has to be rewritten like ArbitraryReal_from_python was.
+		#a = self.HPnHelper.Var()
+		#a.cpl = "-1"
+		self.assertRaises(Exception, self.thisTestsExceptionReal1)
+		self.assertRaises(Exception, self.thisTestsExceptionComplex1)
+		self.assertRaises(Exception, self.thisTestsExceptionReal2)
+		self.assertRaises(Exception, self.thisTestsExceptionComplex2)
+		self.assertRaises(Exception, self.thisTestsExceptionReal3)
+		self.assertRaises(Exception, self.thisTestsExceptionComplex3)
+		self.assertRaises(Exception, self.thisTestsExceptionReal4)
+		self.assertRaises(Exception, self.thisTestsExceptionComplex4)
+		self.assertRaises(Exception, self.thisTestsExceptionReal1r)
+		self.assertRaises(Exception, self.thisTestsExceptionComplex1c)
+		self.assertRaises(Exception, self.thisTestsExceptionReal2r)
+		self.assertRaises(Exception, self.thisTestsExceptionComplex2c)
+		self.assertRaises(Exception, self.thisTestsExceptionReal3r)
+		self.assertRaises(Exception, self.thisTestsExceptionComplex3c)
+		self.assertRaises(Exception, self.thisTestsExceptionReal4r)
+		self.assertRaises(Exception, self.thisTestsExceptionComplex4c)
 
 	def testEigenCost(self):
 		for N in self.testLevelsHP:

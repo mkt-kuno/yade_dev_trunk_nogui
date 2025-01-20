@@ -89,7 +89,8 @@ struct custom_OpenMPAccumulator_to_float {
 #if (YADE_REAL_BIT <= 64)
 	static PyObject* convert(const OpenMPAccumulator<Real>& acc) { return boost::python::incref(PyFloat_FromDouble(acc.get())); }
 #else
-	static PyObject* convert(const OpenMPAccumulator<Real>& acc) { return ArbitraryReal_to_python<Real>::convert(acc.get()); }
+	// use RealVisitor here. Don't use slow python mpmath.
+	static PyObject* convert(const OpenMPAccumulator<Real>& acc) { return boost::python::incref(boost::python::object(acc.get()).ptr()); }
 #endif
 };
 struct custom_OpenMPAccumulator_from_float {

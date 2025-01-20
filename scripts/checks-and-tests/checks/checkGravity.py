@@ -37,8 +37,8 @@ tolerance = 1e-10
 print("checkGravity.py : yade precision is ", yade.math.getDigits10(1), " decimal places. Will use error tolerance of: ", tolerance)
 
 print("Note: for high precision calculations use yade.math.toHP1(...) see this:")
-print("g = yade.math.toHP1('-9.81') ## produces: ", (yade.math.toHP1('-9.81')).__repr__())
-print("g = -9.81                    ## produces: ", (-9.81 * yade.math.toHP1('1')).__repr__())
+print("g = Real('-9.81') ## produces: ", (yade.math.Real('-9.81')).__repr__())
+print("g = -9.81         ## produces: ", (-9.81 * yade.math.Real('1')).__repr__())
 print("See https://yade-dem.org/doc/HighPrecisionReal.html#string-conversions for more info.")
 
 

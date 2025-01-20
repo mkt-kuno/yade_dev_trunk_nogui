@@ -106,6 +106,117 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.assertEqual(3 / 2, 3 / MPn.mpc("2"))
 		self.assertEqual(5, abs(MPn.mpc("-3", "-4")))
 
+	def testRealComplex(self):
+		for N in self.testLevelsHP:
+			self.runCheck(N, self.HPtestRealComplex)
+
+	def HPtestRealComplex(self, N, HPn, prefix, MPn):
+		self.assertEqual(2, float(HPn.Real(2)))
+		self.assertEqual(2, float(HPn.Real("2")))
+		self.assertEqual(2**3, HPn.Real("2")**3)
+		self.assertEqual(2 + 4, HPn.Real("2") + 4)
+		self.assertEqual(2 - 4, HPn.Real("2") - 4)
+		self.assertEqual(2 * 4, HPn.Real("2") * 4)
+		self.assertEqual(2 / 4, HPn.Real("2") / 4)
+		self.assertEqual(2 + 4, HPn.Real("2") + 4.)
+		self.assertEqual(2 - 4, HPn.Real("2") - 4.)
+		self.assertEqual(2 * 4, HPn.Real("2") * 4.)
+		self.assertEqual(2 / 4, HPn.Real("2") / 4.)
+		self.assertEqual(2 + 4, HPn.Real("2") + HPn.Real(4.))
+		self.assertEqual(2 - 4, HPn.Real("2") - HPn.Real(4.))
+		self.assertEqual(2 * 4, HPn.Real("2") * HPn.Real(4.))
+		self.assertEqual(2 / 4, HPn.Real("2") / HPn.Real(4.))
+		self.assertEqual(2 + 4, HPn.Real("2") + yade.math.Real(4.))
+		self.assertEqual(2 - 4, HPn.Real("2") - yade.math.Real(4.))
+		self.assertEqual(2 * 4, HPn.Real("2") * yade.math.Real(4.))
+		self.assertEqual(2 / 4, HPn.Real("2") / yade.math.Real(4.))
+		self.assertEqual(3 + 2, 3 + HPn.Real("2"))
+		self.assertEqual(3 - 2, 3 - HPn.Real("2"))
+		self.assertEqual(3 * 2, 3 * HPn.Real("2"))
+		self.assertEqual(3 / 2, 3 / HPn.Real("2"))
+		self.assertEqual(3 + 2, 3. + HPn.Real("2"))
+		self.assertEqual(3 - 2, 3. - HPn.Real("2"))
+		self.assertEqual(3 * 2, 3. * HPn.Real("2"))
+		self.assertEqual(3 / 2, 3. / HPn.Real("2"))
+		self.assertEqual(3 + 2, HPn.Real(3.) + HPn.Real("2"))
+		self.assertEqual(3 - 2, HPn.Real(3.) - HPn.Real("2"))
+		self.assertEqual(3 * 2, HPn.Real(3.) * HPn.Real("2"))
+		self.assertEqual(3 / 2, HPn.Real(3.) / HPn.Real("2"))
+		self.assertEqual(3 + 2, yade.math.Real(3.) + HPn.Real("2"))
+		self.assertEqual(3 - 2, yade.math.Real(3.) - HPn.Real("2"))
+		self.assertEqual(3 * 2, yade.math.Real(3.) * HPn.Real("2"))
+		self.assertEqual(3 / 2, yade.math.Real(3.) / HPn.Real("2"))
+		self.assertEqual(2 - 3, HPn.Real("2") - 3)
+
+		self.assertTrue(HPn.Real(1) < HPn.Real(2))
+		self.assertTrue(HPn.Real(1) < 2)
+		self.assertTrue(HPn.Real(1) < 2.)
+		self.assertTrue(1 < HPn.Real(2))
+		self.assertTrue(1. < HPn.Real(2))
+		self.assertFalse(HPn.Real(1) > HPn.Real(2))
+		self.assertFalse(HPn.Real(1) > 2)
+		self.assertFalse(HPn.Real(1) > 2.)
+		self.assertFalse(1 > HPn.Real(2))
+		self.assertFalse(1. > HPn.Real(2))
+
+		self.assertFalse(HPn.Real(2) < HPn.Real(2))
+		self.assertFalse(HPn.Real(2) < 2)
+		self.assertFalse(HPn.Real(2) < 2.)
+		self.assertFalse(2 < HPn.Real(2))
+		self.assertFalse(2. < HPn.Real(2))
+		self.assertFalse(HPn.Real(2) > HPn.Real(2))
+		self.assertFalse(HPn.Real(2) > 2)
+		self.assertFalse(HPn.Real(2) > 2.)
+		self.assertFalse(2 > HPn.Real(2))
+		self.assertFalse(2. > HPn.Real(2))
+
+		self.assertTrue(HPn.Real(1) <= HPn.Real(2))
+		self.assertTrue(HPn.Real(1) <= 2)
+		self.assertTrue(HPn.Real(1) <= 2.)
+		self.assertTrue(1 <= HPn.Real(2))
+		self.assertTrue(1. <= HPn.Real(2))
+		self.assertFalse(HPn.Real(1) >= HPn.Real(2))
+		self.assertFalse(HPn.Real(1) >= 2)
+		self.assertFalse(HPn.Real(1) >= 2.)
+		self.assertFalse(1 >= HPn.Real(2))
+		self.assertFalse(1. >= HPn.Real(2))
+
+		self.assertTrue(HPn.Real(2) <= HPn.Real(2))
+		self.assertTrue(HPn.Real(2) <= 2)
+		self.assertTrue(HPn.Real(2) <= 2.)
+		self.assertTrue(2 <= HPn.Real(2))
+		self.assertTrue(2. <= HPn.Real(2))
+		self.assertTrue(HPn.Real(2) >= HPn.Real(2))
+		self.assertTrue(HPn.Real(2) >= 2)
+		self.assertTrue(HPn.Real(2) >= 2.)
+		self.assertTrue(2 >= HPn.Real(2))
+		self.assertTrue(2. >= HPn.Real(2))
+
+		self.assertFalse(HPn.Real(1) == HPn.Real(2))
+		self.assertFalse(HPn.Real(1) == 2)
+		self.assertFalse(HPn.Real(1) == 2.)
+		self.assertFalse(1 == HPn.Real(2))
+		self.assertFalse(1. == HPn.Real(2))
+		self.assertTrue(HPn.Real(1) != HPn.Real(2))
+		self.assertTrue(HPn.Real(1) != 2)
+		self.assertTrue(HPn.Real(1) != 2.)
+		self.assertTrue(1 != HPn.Real(2))
+		self.assertTrue(1. != HPn.Real(2))
+
+		self.assertEqual(2, complex(HPn.Complex(2)))
+		self.assertEqual(2 + 5j, complex(HPn.Complex(2 + 5j)))
+		self.assertEqual(2, complex(HPn.Complex("2")))
+		self.assertEqual(2 + 5j, complex(HPn.Complex(2, 5)))
+		self.assertEqual(HPn.Complex(2 + 3), HPn.Complex("2") + HPn.Complex(3))
+		self.assertEqual(HPn.Complex(2 - 3), HPn.Complex("2") - HPn.Complex(3))
+		self.assertEqual(HPn.Complex(2 * 4), HPn.Complex("2") * HPn.Complex(4))
+		self.assertEqual(HPn.Complex(2 / 4), HPn.Complex("2") / HPn.Complex(4))
+		self.assertEqual(HPn.Complex(3 + 2), HPn.Complex(3) + HPn.Complex("2"))
+		self.assertEqual(HPn.Complex(3 - 2), HPn.Complex(3) - HPn.Complex("2"))
+		self.assertEqual(HPn.Complex(3 * 2), HPn.Complex(3) * HPn.Complex("2"))
+		self.assertEqual(HPn.Complex(3 / 2), HPn.Complex(3) / HPn.Complex("2"))
+		self.assertEqual(5, abs(HPn.Complex(-3, -4)))
+
 	def testVector2i(self):
 		for N in self.testLevelsHP:
 			self.runCheck(N, self.HPtestVector2i)
@@ -174,7 +285,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.checkRelativeComplexError(c2c[1], MPn.mpf("12"))
 
 		# the replace mpc →→ MPn.mpc is to make sure that the complex numbers are accessible in this test
-		self.assertEqual(c2c, eval(prefix + c2c.__str__().replace("mpc", "MPn.mpc")))
+		self.assertEqual(c2c, eval(prefix + c2c.__str__().replace("Complex", "HPn.Complex")))
 
 	def testVector3i(self):
 		for N in self.testLevelsHP:
@@ -206,8 +317,8 @@ class ExtendedMinieigenTests(unittest.TestCase):
 			self.runCheck(N, self.HPtestVector3)
 
 	def HPtestVector3(self, N, HPn, prefix, MPn):
-		a3r = HPn.Vector3(2.1, 1.1, 4.3)
-		b3r = HPn.Vector3(3.1, 5.1, 5.2)
+		a3r = HPn.Vector3("2.1", "1.1", "4.3")
+		b3r = HPn.Vector3("3.1", "5.1", "5.2")
 		c3r = a3r + b3r
 		#self.assertEqual(c3r.eigenFlags(),352)
 		#self.assertEqual(c3r.eigenStorageOrder(),0)
@@ -233,27 +344,27 @@ class ExtendedMinieigenTests(unittest.TestCase):
 			self.runCheck(N, self.HPtestVector3c)
 
 	def HPtestVector3c(self, N, HPn, prefix, MPn):
-		a3c = HPn.Vector3c(2.1 + 1j, 1.1 + 2.5j, 4.3 - 1j)
-		b3c = HPn.Vector3c(3.1, 5.1, 5.2)
+		a3c = HPn.Vector3c(2.25 + 1j, 1.25 + 2.5j, 4.25 - 1j)
+		b3c = HPn.Vector3c(3.25, 5.25, 5.25)
 		c3c = a3c + b3c
 		#self.assertEqual(c3c.eigenFlags(),352)
 		#self.assertEqual(c3c.eigenStorageOrder(),0)
 
 		self.assertEqual(MPn.mp.dps, self.digs1)
-		self.checkRelativeComplexError(c3c[0], MPn.mpc("5.2", "1"))
-		self.checkRelativeComplexError(c3c[1], MPn.mpc("6.2", "2.5"))
+		self.checkRelativeComplexError(c3c[0], MPn.mpc("5.5", "1"))
+		self.checkRelativeComplexError(c3c[1], MPn.mpc("6.5", "2.5"))
 		self.checkRelativeComplexError(c3c[2], MPn.mpc("9.5", "-1"))
 
 		c3c *= 3
 
 		self.assertEqual(MPn.mp.dps, self.digs1)
-		self.checkRelativeComplexError(c3c[0], MPn.mpc("15.6", "3"))
-		self.checkRelativeComplexError(c3c[1], MPn.mpc("18.6", "7.5"))
+		self.checkRelativeComplexError(c3c[0], MPn.mpc("16.5", "3"))
+		self.checkRelativeComplexError(c3c[1], MPn.mpc("19.5", "7.5"))
 		self.checkRelativeComplexError(c3c[2], MPn.mpc("28.5", "-3"))
 
-		self.checkRelativeComplexError(c3c[0], eval(prefix + c3c.__str__().replace("mpc", "MPn.mpc"))[0])
-		self.checkRelativeComplexError(c3c[1], eval(prefix + c3c.__str__().replace("mpc", "MPn.mpc"))[1])
-		self.checkRelativeComplexError(c3c[2], eval(prefix + c3c.__str__().replace("mpc", "MPn.mpc"))[2])
+		self.checkRelativeComplexError(c3c[0], eval(prefix + c3c.__str__().replace("Complex", "HPn.Complex"))[0])
+		self.checkRelativeComplexError(c3c[1], eval(prefix + c3c.__str__().replace("Complex", "HPn.Complex"))[1])
+		self.checkRelativeComplexError(c3c[2], eval(prefix + c3c.__str__().replace("Complex", "HPn.Complex"))[2])
 
 	def testVector3na(self):
 		for N in self.testLevelsHP:
@@ -262,23 +373,23 @@ class ExtendedMinieigenTests(unittest.TestCase):
 	def HPtestVector3na(self, N, HPn, prefix, MPn):
 		if ((HPn.vectorize == False) or (not hasattr(HPn, 'Vector3na'))):
 			return
-		a3a = HPn.Vector3na(2.1, 1.1, 4.3)
-		b3a = HPn.Vector3na(3.1, 5.1, 5.2)
+		a3a = HPn.Vector3na(2.25, 1.5, 4.25)
+		b3a = HPn.Vector3na("3.1", "5.1", "5.2")
 		c3a = a3a + b3a
 		#self.assertEqual(c3a.eigenFlags(),352)
 		#self.assertEqual(c3a.eigenStorageOrder(),0)
 
 		self.assertEqual(MPn.mp.dps, self.digs1)
-		self.checkRelativeError(c3a[0], MPn.mpf("5.2"))
-		self.checkRelativeError(c3a[1], MPn.mpf("6.2"))
-		self.checkRelativeError(c3a[2], MPn.mpf("9.5"))
+		self.checkRelativeError(c3a[0], MPn.mpf("5.35"))
+		self.checkRelativeError(c3a[1], MPn.mpf("6.6"))
+		self.checkRelativeError(c3a[2], MPn.mpf("9.45"))
 
 		c3a *= 3
 
 		self.assertEqual(MPn.mp.dps, self.digs1)
-		self.checkRelativeError(c3a[0], MPn.mpf("15.6"))
-		self.checkRelativeError(c3a[1], MPn.mpf("18.6"))
-		self.checkRelativeError(c3a[2], MPn.mpf("28.5"))
+		self.checkRelativeError(c3a[0], MPn.mpf("16.05"))
+		self.checkRelativeError(c3a[1], MPn.mpf("19.8"))
+		self.checkRelativeError(c3a[2], MPn.mpf("28.35"))
 
 		self.checkRelativeError(c3a[0], eval(prefix + c3a.__str__())[0])
 		self.checkRelativeError(c3a[1], eval(prefix + c3a.__str__())[1])
@@ -292,8 +403,8 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		# The Vector4 bug was fixed only recently, don't test if there's nothing to test
 		if (not hasattr(HPn, 'Vector4')):
 			return
-		a4r = HPn.Vector4(2.1, 1.1, 4.3, 5.5)
-		b4r = HPn.Vector4(3.1, 5.1, 5.2, -5.0)
+		a4r = HPn.Vector4("2.1", "1.1", "4.3", "5.5")
+		b4r = HPn.Vector4("3.1", "5.1", "5.2", "-5.0")
 		c4r = a4r + b4r
 		#self.assertEqual(c4r.eigenFlags(),352)
 		#self.assertEqual(c4r.eigenStorageOrder(),0)
@@ -380,7 +491,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 
 		for i in range(3):
 			for j in range(3):
-				self.checkRelativeComplexError(b3m[i][j], eval(prefix + b3m.__str__().replace("mpc", "MPn.mpc"))[i][j])
+				self.checkRelativeComplexError(b3m[i][j], eval(prefix + b3m.__str__().replace("Complex", "HPn.Complex"))[i][j])
 		#print(b3m.__str__())
 
 	def testQuaternion(self):

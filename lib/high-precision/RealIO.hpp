@@ -52,7 +52,11 @@ namespace math {
 			Rr                ret;
 			std::stringstream s { st };
 			s >> ret;
-			return ret;
+			if ((not s.fail()) and (s.eof())) {
+				return ret;
+			} else {
+				throw std::runtime_error("fromStringRealHP: Unable to interpret input string as a floating point value");
+			}
 		} else {
 			return boost::lexical_cast<math::UnderlyingHP<Rr>>(st);
 		}
