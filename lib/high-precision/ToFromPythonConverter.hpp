@@ -16,6 +16,9 @@
 #include <boost/mpl/range_c.hpp>
 #include <functional>
 
+// This is the same macro for looping over RealHP<N> levels like in lib/high-precision/RealHPConfig.hpp, but this one loops over levels exported to python (faster compilation)
+#define YADE_REGISTER_HP_PYTHON_LEVELS(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PARSE_ONE, name, YADE_MINIEIGEN_HP) // it just creates: name(1) name(2) name(3) ....
+
 namespace forCtags {
 struct ToFromPythonConverter {
 }; // for ctags
@@ -24,6 +27,14 @@ struct ToFromPythonConverter {
 /*************************************************************************/
 /*************************       mpmath         **************************/
 /*************************************************************************/
+
+// The note at the end of http://mpmath.org/doc/current/basics.html#temporarily-changing-the-precision
+// indicates that having different mpmath variables with different precision is poorly supported.
+// So python conversions of RealHP<N> for different precisions is questionable.
+// Not a big problem, because N>=2 is supposed to be used only in critical C++ sections where better calculations are necessary.
+// And not much with python, only for debugging when necessary.
+// Also, we now have directly Real and Complex types in YADE, not mpmath.mpf and mpmath.mpc anymore.
+// So the prepareMpmath below is only used by RealVisitor and ComplexVisitor to export to mpmath.
 template <typename Rr> struct prepareMpmath {
 	static inline ::boost::python::object work()
 	{
@@ -38,56 +49,78 @@ template <typename Rr> struct prepareMpmath {
 /*************************        Real          **************************/
 /*************************************************************************/
 
-// The note at the end of http://mpmath.org/doc/current/basics.html#temporarily-changing-the-precision
-// indicates that having different mpmath variables with different precision is poorly supported.
-// So python conversions of RealHP<N> for different precisions is questionable.
-// Not a big problem, because N>=2 is supposed to be used only in critical C++ sections where better calculations are necessary. And not much with python, only for debugging when necessary.
-
-template <typename ArbitraryReal> struct ArbitraryReal_to_python {
-	static PyObject* convert(const ArbitraryReal& val)
-	{
-		::boost::python::object mpmath = prepareMpmath<ArbitraryReal>::work();
-		if (yade::math::isnan(val)) { // mpmath does not tolerate '-nan' values. So any NaN will be a "nan".
-			::boost::python::object result = mpmath.attr("mpf")("nan");
-			return boost::python::incref(result.ptr());
-		} else { // other numbers are normally converted
-			::boost::python::object result = mpmath.attr("mpf")(::yade::math::toStringHP<ArbitraryReal>(val));
-			return boost::python::incref(result.ptr());
-		}
-	}
-};
-
 // https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/faq/how_can_i_automatically_convert_.html
 template <typename ArbitraryReal> struct ArbitraryReal_from_python {
 	ArbitraryReal_from_python() { boost::python::converter::registry::push_back(&convertible, &construct, boost::python::type_id<ArbitraryReal>()); }
 	static void* convertible(PyObject* obj_ptr)
 	{
-		// using long strings or mpmath.mpf(…) object is the only way to get higher precision numbers into C++
-		// The line below quickly accepts whatever python is able to convert into float, fortunately this also works for mpmath.mpf(…)
-		// this can not work with val=0.123123123123123123123333312312333333123123123, the extra digits are cut-off by python before it reaches this function
-		PyFloat_AsDouble(obj_ptr);
-		// This quickly returns when argument wasn't a string.
-		if (PyErr_Occurred() == nullptr) return obj_ptr;
-		PyErr_Clear();
-		// The quick way didn't work. There was an error, so let's clear it. And check if that is a string with a valid number inside.
+		// read from python int
+		if (PyLong_CheckExact(obj_ptr) == 1) { return obj_ptr; }
+		// read from python float
+		if (PyFloat_CheckExact(obj_ptr) == 1) { return obj_ptr; }
+		// read from all other precision RealHP<levelHP> levels.
+		if (PyObject_HasAttrString(obj_ptr, "levelRealHPMethod") == 1) { return obj_ptr; }
+		// read from mpmath.mpf
+		if (PyObject_HasAttrString(obj_ptr, "_mpf_") == 1) { return obj_ptr; }
+		// The quick way didn't work. So check if that is a string with a valid number inside.
 		// This is a little more expensive. But it is used very rarely - only when user writes a python line like val="0.123123123123123123123333312312333333123123123"
-		// otherwise only mpmath.mpf(NUMBER) objects are passed around inside python scripts which does not reach this line.
+		// Otherwise only Real type objects are passed around inside python scripts which does not reach this line.
+		// So this approach is slow, because it's parsing a string (twice: (1) here and (2) in construct), but it's extremely rarely used.
 		std::istringstream ss { ::boost::python::call_method<std::string>(obj_ptr, "__str__") };
 		ArbitraryReal      r;
 		ss >> r;
 		// Must reach end of string .eof(), otherwise it means there were illegal characters
 		return ((not ss.fail()) and (ss.eof())) ? obj_ptr : nullptr;
 	}
-	static void construct(PyObject* obj_ptr, boost::python::converter::rvalue_from_python_stage1_data* data)
+	// NOTE: The ::boost::enable_if_c is here to make sure that ArbitraryReal_from_python::construct DOES NOT EXIST for type 'double'
+	//       and produces compilation error if someone tries to use it. This is because python handles 'double' type natively.
+	static typename ::boost::enable_if_c<not std::is_same<double, ArbitraryReal>::value, void>::type
+	construct(PyObject* obj_ptr, boost::python::converter::rvalue_from_python_stage1_data* data)
 	{
-		prepareMpmath<ArbitraryReal>::work();
-		std::istringstream ss { ::boost::python::call_method<std::string>(obj_ptr, "__str__") };
-
 		void* storage = ((boost::python::converter::rvalue_from_python_storage<ArbitraryReal>*)(data))->storage.bytes;
 		new (storage) ArbitraryReal;
-		ArbitraryReal* val = (ArbitraryReal*)storage;
-		// ensure that "nan" "inf" are read correctly
-		*val              = ::yade::math::fromStringRealHP<ArbitraryReal>(ss.str());
+		ArbitraryReal* val     = (ArbitraryReal*)storage;
+		bool           success = false;
+		// read from python int
+		if (PyLong_CheckExact(obj_ptr) == 1) {
+			*val    = boost::python::extract<long int>(obj_ptr)();
+			success = true;
+		}
+		// read from python float
+		if ((not success) and (PyFloat_CheckExact(obj_ptr) == 1)) {
+			*val    = boost::python::extract<double>(obj_ptr)();
+			success = true;
+		}
+		// RealVisitor : handle all other high-precision types RealHP<levelHP>
+		if ((not success) and (PyObject_HasAttrString(obj_ptr, "levelRealHPMethod") == 1)) {
+			int objLevelHP = ::boost::python::call_method<int>(obj_ptr, "levelRealHPMethod");
+			switch (objLevelHP) {
+#define CASE_LEVEL_HP(levelHP)                                                                                                                                 \
+	case levelHP: {                                                                                                                                        \
+		if (objLevelHP == ::yade::math::levelOfRealHP<ArbitraryReal>) {                                                                                \
+			throw std::runtime_error(__FILE__ " :  ArbitraryReal_from_python::construct objLevelHP == levelOfRealHP<ArbitraryReal> error.");       \
+		} else {                                                                                                                                       \
+			*val = static_cast<ArbitraryReal>(boost::python::extract<::yade::math::RealHP<levelHP>>(obj_ptr)());                                   \
+		}                                                                                                                                              \
+	} break;
+				YADE_REGISTER_HP_PYTHON_LEVELS(CASE_LEVEL_HP)
+#undef CASE_LEVEL_HP
+				default: throw std::runtime_error(__FILE__ " :  ArbitraryReal_from_python::construct switch default case objLevelHP error.");
+			}
+			success = true;
+		}
+		// No need to check this: ↘ because taking from mpmath.mpf is the same as taking from a string.
+		if ((not success) /* or (PyObject_HasAttrString(obj_ptr, "_mpf_") == 1) */) {
+			prepareMpmath<ArbitraryReal>::work();
+			std::istringstream ss { ::boost::python::call_method<std::string>(obj_ptr, "__str__") };
+			*val    = ::yade::math::fromStringRealHP<ArbitraryReal>(ss.str());
+			success = true;
+		}
+		/* Not needed in fact. Last string conversion covered all possible cases.
+		if (not success) {
+			throw std::runtime_error(__FILE__ " :  ArbitraryReal_from_python::construct failed to construct a Real type from given type.");
+		}
+		*/
 		data->convertible = storage;
 	}
 };
@@ -96,19 +129,9 @@ template <typename ArbitraryReal> struct ArbitraryReal_from_python {
 /*************************       Complex        **************************/
 /*************************************************************************/
 
-template <typename ArbitraryComplex> struct ArbitraryComplex_to_python {
-	static PyObject* convert(const ArbitraryComplex& val)
-	{
-		std::stringstream ss_real {};
-		std::stringstream ss_imag {};
-		ss_real << ::yade::math::toStringHP<typename ArbitraryComplex::value_type>(val.real());
-		ss_imag << ::yade::math::toStringHP<typename ArbitraryComplex::value_type>(val.imag());
-		::boost::python::object mpmath = prepareMpmath<typename ArbitraryComplex::value_type>::work();
-		::boost::python::object result = mpmath.attr("mpc")(ss_real.str(), ss_imag.str());
-		return boost::python::incref(result.ptr());
-	}
-};
-
+// TODO: the convertible(…) and construct(…) for Complex type below are in fact extremely slow, because they work on strings.
+//       If we ever need fast high precision Complex numbers in YADE, then these two functions should be rewritten
+//       to work in similar manner as ArbitraryReal_from_python::convertible(…) and construct(…)
 // https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/faq/how_can_i_automatically_convert_.html
 template <typename ArbitraryComplex> struct ArbitraryComplex_from_python {
 	ArbitraryComplex_from_python() { boost::python::converter::registry::push_back(&convertible, &construct, boost::python::type_id<ArbitraryComplex>()); }
@@ -226,7 +249,7 @@ namespace minieigenHP {
 				return numToStringHP(num.real()) + (num.imag() > 0 ? "+" : "") + numToStringHP(num.imag()) + "j";
 			} else {
 				// make sure it is copy-pasteable without loss of precision
-				return "mpc(" + numToStringHP(num.real()) + "," + numToStringHP(num.imag()) + ")";
+				return "Complex(" + numToStringHP(num.real()) + "," + numToStringHP(num.imag()) + ")";
 			}
 		}
 		// only imaginary is non-zero: skip the real part
@@ -234,13 +257,13 @@ namespace minieigenHP {
 			if (isPythonPrecisionEnough) {
 				return numToStringHP(num.imag()) + "j";
 			} else {
-				return "mpc(\"0\"," + numToStringHP(num.imag()) + ")";
+				return "Complex(\"0\"," + numToStringHP(num.imag()) + ")";
 			}
 		}
 		if (isPythonPrecisionEnough) {
 			return numToStringHP(num.real());
 		} else {
-			return "mpc(" + numToStringHP(num.real()) + ",\"0\")";
+			return "Complex(" + numToStringHP(num.real()) + ",\"0\")";
 		}
 	}
 

@@ -335,13 +335,14 @@ class TestMatchMaker(unittest.TestCase):
 			self.assertTrue((atan(O.interactions[id21, id22].phys.tangensOfFrictionAngle) - 0.2) == 0)
 		self.assertTrue((atan(O.interactions[id31, id32].phys.tangensOfFrictionAngle) - 0.3) == 0)
 
-		self.assertTrue(round(O.interactions[id11, id12].phys.cn, 3) - 0.26 == 0)
-		self.assertTrue(round(O.interactions[id21, id22].phys.cn, 3) - 0.182 == 0)
-		self.assertTrue(round(O.interactions[id31, id32].phys.cn, 3) - 0.104 == 0)
+		# Use Real("…") to construct the numbers to ensure we have full precision.
+		self.assertTrue(round(O.interactions[id11, id12].phys.cn, 3) - Real("0.26") == 0)
+		self.assertTrue(round(O.interactions[id21, id22].phys.cn, 3) - Real("0.182") == 0)
+		self.assertTrue(round(O.interactions[id31, id32].phys.cn, 3) - Real("0.104") == 0)
 
-		self.assertTrue(round(O.interactions[id11, id12].phys.cs, 3) - 0.012 == 0)
-		self.assertTrue(round(O.interactions[id21, id22].phys.cs, 3) - 0.007 == 0)
-		self.assertTrue(round(O.interactions[id31, id32].phys.cs, 3) - 0.003 == 0)
+		self.assertTrue(round(O.interactions[id11, id12].phys.cs, 3) - Real("0.012") == 0)
+		self.assertTrue(round(O.interactions[id21, id22].phys.cs, 3) - Real("0.007") == 0)
+		self.assertTrue(round(O.interactions[id31, id32].phys.cs, 3) - Real("0.003") == 0)
 
 
 class TestPyRunner(unittest.TestCase):

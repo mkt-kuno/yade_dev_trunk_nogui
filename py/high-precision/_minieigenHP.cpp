@@ -30,25 +30,34 @@ using namespace ::yade::MathEigenTypes;
 
 CREATE_CPP_LOCAL_LOGGER("_minieigenHP.cpp")
 
+template <int N, bool> struct RegHelper {
+	static void work(const py::scope& /* topScope */) {};
+};
+
+template <int N> struct RegHelper<N, true> {
+	static void work(const py::scope& topScope)
+	{
+		py::scope top(topScope);
+		ArbitraryComplex_from_python<ComplexHP<N>>();
+		ArbitraryReal_from_python<RealHP<N>>();
+	};
+};
+
 template <int N, bool registerConverters> struct RegisterEigenHP {
 	// registerConverters is because C++ ↔ python converers need to be registered. In one of them (parent or child) it has to be skipped to avoid duplicate registrations.
 	// the classes (e.g. HP8.Vector3r ↔ Vector3rHP<8>) have to be exposed always.
 	static void work(const py::scope& topScope, const py::scope& scopeHP)
 	{
 		constexpr bool notDuplicate = not((N == 1) and registerConverters);
-		// https://gitlab.com/cosurgi/minieigen-real specific stuff: START
-		py::scope top(topScope);
-		if (notDuplicate and ::yade::math::RealHPConfig::getDigits10(N) >= 18) {
-			// these are needed only for high precision. The float and double are covered by default converters.
-			ArbitraryComplex_from_python<ComplexHP<N>>();
-			py::to_python_converter<ComplexHP<N>, ArbitraryComplex_to_python<ComplexHP<N>>>();
-
-			ArbitraryReal_from_python<RealHP<N>>();
-			py::to_python_converter<RealHP<N>, ArbitraryReal_to_python<RealHP<N>>>();
-		}
-		// https://gitlab.com/cosurgi/minieigen-real specific stuff: END
-
+		RegHelper<N, (/* notDuplicate and */ (std::numeric_limits<RealHP<N>>::digits10 >= 18))>::work(topScope);
 		py::scope HPn(scopeHP);
+		if (std::numeric_limits<RealHP<N>>::digits10 >= 18) {
+			expose_math_Complex<N>(notDuplicate, topScope);
+			expose_math_Real<N>(notDuplicate, topScope);
+		} else { // Real is python float type
+			py::scope().attr("Real")    = py::import("__main__").attr("__dict__")["__builtins__"].attr("float");
+			py::scope().attr("Complex") = py::import("__main__").attr("__dict__")["__builtins__"].attr("complex");
+		}
 
 		expose_converters<N>(notDuplicate, topScope); // in _ExposeConverters.cpp
 

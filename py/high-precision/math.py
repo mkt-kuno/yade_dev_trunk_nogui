@@ -165,10 +165,15 @@ degrees = degreesHP1
 
 # Create convenience compatibility aliases for all n ∈ getSupportedByMinieigen()
 #    yade.math.Real2 → yade._math.HP2.toHP2
-Real = toHP1
+Real = yade._minieigenHP.Real
+Complex = yade._minieigenHP.Complex
+HP1.Real = yade._minieigenHP.Real
+HP1.Complex = yade._minieigenHP.Complex
 Real1 = toHP1
 # The loop below is the same as the commands above. But for higher n.
 for n in yade._math.RealHPConfig.getSupportedByMinieigen():
 	if (n == 1):
 		continue
 	exec('Real' + str(n) + '=yade._math.HP' + str(n) + '.toHP' + str(n), globals(), globals())
+	exec('HP' + str(n) + '.Real=yade._minieigenHP.HP' + str(n) + '.Real', globals(), globals())
+	exec('HP' + str(n) + '.Complex=yade._minieigenHP.HP' + str(n) + '.Complex', globals(), globals())

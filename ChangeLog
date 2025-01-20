@@ -1,5 +1,62 @@
 ==================================================
 yade-202x.0xa
+Mon, Jan 20 20:05:00 2025 +0100
+
+Bug Fixes
+*********
+
+Code Formatting & Organization
+******************************
+
+Documentation & Comments
+************************
+
+Examples
+********
+
+User Interface (GUI)
+********************
+
+Models & Shapes
+***************
+Alpha shapes
+------------
+
+Clumps
+------
+
+Fluid & thermal & particle saturation
+-------------------------------------
+
+LevelSet & Volume Interacting LevelSet
+--------------------------------------
+
+Polyhedra / Facets
+------------------
+
+PotentialParticles / Blocks
+---------------------------
+
+OpenMPI / OpenMP threads
+************************
+
+Packaging & Build Improvements
+******************************
+
+Small Enhancements
+******************
+
+Testing & Continuous Integration
+********************************
+
+High precision RealHP<N> ComplexHP<N>
+*************************************
+  Write RealVisitor and ComplexVisitor class to completely expose to python
+  Real and Complex types. This significantly speeds up high precision
+  calculations (!1070)
+
+==================================================
+yade-202x.0xa
 Sun, Aug 04 20:05:00 2024 +0100
 
 Bug Fixes

@@ -1,6 +1,6 @@
 /*************************************************************************
 *  2012-2020 Václav Šmilauer                                             *
-*  2020      Janek Kozicki                                               *
+*  2020-2025 Janek Kozicki                                               *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -9,6 +9,24 @@
 #pragma once
 #include "common.hpp"
 // classes dealing with exposing actual types, with many switches inside depending on template arguments
+
+// helper function conv::val for converting strings to int, RealHP or ComplexHP
+namespace conv {
+template <typename Scalar, int Level = -1> inline typename boost::enable_if_c<std::is_same<int, Scalar>::value, int>::type val(const std::string& s)
+{
+	return boost::lexical_cast<int>(s);
+}
+template <typename Rr, int Level = ::yade::math::levelOfRealHP<Rr>>
+inline typename boost::enable_if_c<::yade::math::isRealHP<Rr>, Rr>::type val(const std::string& s)
+{
+	return ::yade::math::fromStringRealHP<Rr>(s);
+}
+template <typename Cc, int Level = ::yade::math::levelOfComplexHP<Cc>>
+inline typename boost::enable_if_c<::yade::math::isComplexHP<Cc>, Cc>::type val(const std::string& s)
+{
+	return ::yade::math::fromStringComplexHP<Cc>(s);
+}
+} // conv
 
 // methods common for vectors and matrices
 template <typename MatrixBaseT> class MatrixBaseVisitor : public py::def_visitor<MatrixBaseVisitor<MatrixBaseT>> {
@@ -241,9 +259,11 @@ private:
 template <typename VectorT> class VectorVisitor : public py::def_visitor<VectorVisitor<VectorT>> {
 	friend class def_visitor_access;
 	typedef typename VectorT::Scalar                                                      Scalar;
+	typedef typename ::yade::math::RealOf<Scalar>                                         RealT;
 	typedef Eigen::Matrix<Scalar, VectorT::RowsAtCompileTime, VectorT::RowsAtCompileTime> CompatMatrixT;
 	typedef Eigen::Matrix<Scalar, 2, 1>                                                   CompatVec2;
 	typedef Eigen::Matrix<Scalar, 3, 1>                                                   CompatVec3;
+	typedef Eigen::Matrix<Scalar, 4, 1>                                                   CompatVec4;
 	typedef Eigen::Matrix<Scalar, 6, 1>                                                   CompatVec6;
 	typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1>                                      CompatVecX;
 	enum { Dim = VectorT::RowsAtCompileTime };
@@ -300,9 +320,15 @@ private:
 	template <typename VectorT2, class PyClass, typename boost::enable_if_c<VectorT2::RowsAtCompileTime == 2, int>::type = 0>
 	static void visit_special_sizes(PyClass& cl)
 	{
-		cl.def(py::init<typename VectorT2::Scalar, typename VectorT2::Scalar>((py::arg("x"), py::arg("y"))))
+		cl.def("__init__", py::make_constructor(&VectorVisitor::fromStrV2, py::default_call_policies(), (py::arg("str1"), py::arg("str2"))))
+		        .def(py::init<typename VectorT2::Scalar, typename VectorT2::Scalar>((py::arg("x"), py::arg("y"))))
 		        .add_static_property("UnitX", &VectorVisitor::Vec2_UnitX)
 		        .add_static_property("UnitY", &VectorVisitor::Vec2_UnitY);
+	}
+	static CompatVec2* fromStrV2(const std::string& s1, const std::string& s2)
+	{
+		CompatVec2* v2(new CompatVec2(conv::val<Scalar>(s1), conv::val<Scalar>(s2)));
+		return v2;
 	}
 	static CompatVec2 Vec2_UnitX() { return CompatVec2::UnitX(); }
 	static CompatVec2 Vec2_UnitY() { return CompatVec2::UnitY(); }
@@ -311,8 +337,10 @@ private:
 	template <typename VectorT2, class PyClass, typename boost::enable_if_c<VectorT2::RowsAtCompileTime == 3, int>::type = 0>
 	static void visit_special_sizes(PyClass& cl)
 	{
-		cl.def(py::init<typename VectorT2::Scalar, typename VectorT2::Scalar, typename VectorT2::Scalar>(
-		               (py::arg("x") = Scalar(0), py::arg("y") = Scalar(0), py::arg("z") = Scalar(0))))
+		cl.def("__init__",
+		       py::make_constructor(&VectorVisitor::fromStrV3, py::default_call_policies(), (py::arg("str1"), py::arg("str2"), py::arg("str3"))))
+		        .def(py::init<typename VectorT2::Scalar, typename VectorT2::Scalar, typename VectorT2::Scalar>(
+		                (py::arg("x") = Scalar(0), py::arg("y") = Scalar(0), py::arg("z") = Scalar(0))))
 		        .def("cross", &VectorVisitor::cross) // cross-product only meaningful for 3-sized vectors
 		        .add_static_property("UnitX", &VectorVisitor::Vec3_UnitX)
 		        .add_static_property("UnitY", &VectorVisitor::Vec3_UnitY)
@@ -324,6 +352,11 @@ private:
 		        .def("zx", &VectorVisitor::Vec3_zx)
 		        .def("yz", &VectorVisitor::Vec3_yz)
 		        .def("zy", &VectorVisitor::Vec3_zy);
+	}
+	static CompatVec3* fromStrV3(const std::string& s1, const std::string& s2, const std::string& s3)
+	{
+		CompatVec3* v3(new CompatVec3(conv::val<Scalar>(s1), conv::val<Scalar>(s2), conv::val<Scalar>(s3)));
+		return v3;
 	}
 	static CompatVec3 cross(const CompatVec3& self, const CompatVec3& other) { return self.cross(other); }
 	static CompatVec3 Vec3_UnitX() { return CompatVec3::UnitX(); }
@@ -341,8 +374,16 @@ private:
 	template <typename VectorT2, class PyClass, typename boost::enable_if_c<VectorT2::RowsAtCompileTime == 4, int>::type = 0>
 	static void visit_special_sizes(PyClass& cl)
 	{
-		cl.def(py::init<typename VectorT2::Scalar, typename VectorT2::Scalar, typename VectorT2::Scalar, typename VectorT2::Scalar>(
-		        (py::arg("v0"), py::arg("v1"), py::arg("v2"), py::arg("v3"))));
+		cl.def("__init__",
+		       py::make_constructor(
+		               &VectorVisitor::fromStrV4, py::default_call_policies(), (py::arg("str1"), py::arg("str2"), py::arg("str3"), py::arg("str4"))))
+		        .def(py::init<typename VectorT2::Scalar, typename VectorT2::Scalar, typename VectorT2::Scalar, typename VectorT2::Scalar>(
+		                (py::arg("v0"), py::arg("v1"), py::arg("v2"), py::arg("v3"))));
+	}
+	static CompatVec4* fromStrV4(const std::string& s1, const std::string& s2, const std::string& s3, const std::string& s4)
+	{
+		CompatVec4* v4(new CompatVec4(conv::val<Scalar>(s1), conv::val<Scalar>(s2), conv::val<Scalar>(s3), conv::val<Scalar>(s4)));
+		return v4;
 	}
 
 	// 6-vector
@@ -591,6 +632,19 @@ private:
 		                py::arg("m22"))))
 		        .def("__init__",
 		             py::make_constructor(
+		                     &MatrixVisitor::Mat3_fromElementStrings,
+		                     py::default_call_policies(),
+		                     (py::arg("m00"),
+		                      py::arg("m01"),
+		                      py::arg("m02"),
+		                      py::arg("m10"),
+		                      py::arg("m11"),
+		                      py::arg("m12"),
+		                      py::arg("m20"),
+		                      py::arg("m21"),
+		                      py::arg("m22"))))
+		        .def("__init__",
+		             py::make_constructor(
 		                     &MatrixVisitor::Mat3_fromRows,
 		                     py::default_call_policies(),
 		                     (py::arg("r0"), py::arg("r1"), py::arg("r2"), py::arg("cols") = false)));
@@ -608,6 +662,22 @@ private:
 	{
 		CompatMat3* m(new CompatMat3);
 		(*m) << m00, m01, m02, m10, m11, m12, m20, m21, m22;
+		return m;
+	}
+	static CompatMat3* Mat3_fromElementStrings(
+	        const std::string& m00,
+	        const std::string& m01,
+	        const std::string& m02,
+	        const std::string& m10,
+	        const std::string& m11,
+	        const std::string& m12,
+	        const std::string& m20,
+	        const std::string& m21,
+	        const std::string& m22)
+	{
+		CompatMat3* m(new CompatMat3);
+		(*m) << conv::val<Scalar>(m00), conv::val<Scalar>(m01), conv::val<Scalar>(m02), conv::val<Scalar>(m10), conv::val<Scalar>(m11),
+		        conv::val<Scalar>(m12), conv::val<Scalar>(m20), conv::val<Scalar>(m21), conv::val<Scalar>(m22);
 		return m;
 	}
 	static CompatMat3* Mat3_fromRows(const CompatVec3& l0, const CompatVec3& l1, const CompatVec3& l2, bool cols = false)
@@ -994,10 +1064,22 @@ class QuaternionVisitor : public py::def_visitor<QuaternionVisitor<QuaternionT>>
 public:
 	template <class PyClass> void visit(PyClass& cl) const
 	{
-		cl.def("__init__", py::make_constructor(&QuaternionVisitor::fromAxisAngle, py::default_call_policies(), (py::arg("axis"), py::arg("angle"))))
+		cl.def("__init__", py::make_constructor(&QuaternionVisitor::fromAxisAngleMpf, py::default_call_policies(), (py::arg("axis"), py::arg("angle"))))
+		        .def("__init__",
+		             py::make_constructor(&QuaternionVisitor::fromAxisAngle, py::default_call_policies(), (py::arg("axis"), py::arg("angle"))))
+		        .def("__init__",
+		             py::make_constructor(&QuaternionVisitor::fromAngleAxisMpf, py::default_call_policies(), (py::arg("angle"), py::arg("axis"))))
 		        .def("__init__",
 		             py::make_constructor(&QuaternionVisitor::fromAngleAxis, py::default_call_policies(), (py::arg("angle"), py::arg("axis"))))
+		        .def("__init__",
+		             py::make_constructor(&QuaternionVisitor::fromTupleStr, py::default_call_policies(), (py::arg("axis"), py::arg("angle"))))
+		        .def("__init__", py::make_constructor(&QuaternionVisitor::fromTuple, py::default_call_policies(), (py::arg("tuple"))))
 		        .def("__init__", py::make_constructor(&QuaternionVisitor::fromTwoVectors, py::default_call_policies(), (py::arg("u"), py::arg("v"))))
+		        .def("__init__",
+		             py::make_constructor(
+		                     &QuaternionVisitor::fromStr,
+		                     py::default_call_policies(),
+		                     (py::arg("str1"), py::arg("str2"), py::arg("str3"), py::arg("str4"))))
 		        .def(py::init<Scalar, Scalar, Scalar, Scalar>(
 		                (py::arg("w"), py::arg("x"), py::arg("y"), py::arg("z")),
 		                "Initialize from coefficients.\n\n.. note:: The order of coefficients is *w*, *x*, *y*, *z*. The [] operator numbers them "
@@ -1037,12 +1119,31 @@ public:
 		        .def("__getitem__", &QuaternionVisitor::__getitem__)
 		        .def("__str__", &QuaternionVisitor::__str__)
 		        .def("__repr__", &QuaternionVisitor::__str__);
+
+		if (std::numeric_limits<Scalar>::digits10 >= 18) {
+			cl.def(py::init<double, double, double, double>(
+			        (py::arg("w"), py::arg("x"), py::arg("y"), py::arg("z")),
+			        "Initialize from coefficients.\n\n.. note:: The order of coefficients is *w*, *x*, *y*, *z*. The [] operator numbers them "
+			        "differently, 0...4 for *x* *y* *z* *w*!"));
+		}
 	}
 
 private:
+	static QuaternionT* fromAxisAngleMpf(const CompatVec3& axis, const py::object& angle) // mpmath support
+	{
+		QuaternionT* ret = new QuaternionT(AngleAxisT(::yade::math::fromStringRealHP<Scalar>(py::extract<std::string>(angle.attr("__str__")())), axis));
+		ret->normalize();
+		return ret;
+	}
 	static QuaternionT* fromAxisAngle(const CompatVec3& axis, const Scalar& angle)
 	{
 		QuaternionT* ret = new QuaternionT(AngleAxisT(angle, axis));
+		ret->normalize();
+		return ret;
+	}
+	static QuaternionT* fromAngleAxisMpf(const py::object& angle, const CompatVec3& axis) // mpmath support
+	{
+		QuaternionT* ret = new QuaternionT(AngleAxisT(::yade::math::fromStringRealHP<Scalar>(py::extract<std::string>(angle.attr("__str__")())), axis));
 		ret->normalize();
 		return ret;
 	}
@@ -1051,6 +1152,35 @@ private:
 		QuaternionT* ret = new QuaternionT(AngleAxisT(angle, axis));
 		ret->normalize();
 		return ret;
+	}
+	static Scalar       S(const py::object& obj) { return ::yade::math::fromStringRealHP<Scalar>(py::extract<std::string>(obj.attr("__str__")())); }
+	static Scalar       S(const std::string& s) { return ::yade::math::fromStringRealHP<Scalar>(s); }
+	static QuaternionT* fromStr(const std::string& s1, const std::string& s2, const std::string& s3, const std::string& s4)
+	{
+		QuaternionT* q(new QuaternionT(S(s1), S(s2), S(s3), S(s4)));
+		return q;
+	}
+	static QuaternionT* fromTupleStr(const py::tuple& axis, const std::string& angle)
+	{
+		return fromAxisAngle(CompatVec3(S(axis[0]), S(axis[1]), S(axis[2])), S(angle));
+	}
+	static QuaternionT* fromTuple(const py::tuple& tuple)
+	{
+		std::string s0 = py::extract<std::string>(tuple[0].attr("__class__").attr("__name__"));
+		std::string s1 = py::extract<std::string>(tuple[1].attr("__class__").attr("__name__"));
+		if (s0 == "Vector3") {
+			if (s1 == "Real") { // Vector3,Real
+				return fromAxisAngle(py::extract<CompatVec3>(tuple[0]), py::extract<Scalar>(tuple[1]));
+			} else { // Vector3,mpmath.mpf
+				return fromAxisAngleMpf(py::extract<CompatVec3>(tuple[0]), tuple[1]);
+			}
+		} else {
+			if (s0 == "Real") { // Real, Vector3
+				return fromAxisAngle(py::extract<CompatVec3>(tuple[1]), py::extract<Scalar>(tuple[0]));
+			} else { // mpmath.mpf, Vector3
+				return fromAxisAngleMpf(py::extract<CompatVec3>(tuple[1]), tuple[0]);
+			}
+		}
 	}
 	static QuaternionT* fromTwoVectors(const CompatVec3& u, const CompatVec3& v)
 	{

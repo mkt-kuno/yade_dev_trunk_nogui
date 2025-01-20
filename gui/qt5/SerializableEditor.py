@@ -203,7 +203,7 @@ class AttrEditor_Mpmath(AttrEditor, QLineEdit):
 
 	def update(self):
 		try:
-			self.trySetter(mpmath.mpf(self.text()))
+			self.trySetter(Real(self.text()))
 		except ValueError:
 			self.refresh()
 
@@ -563,10 +563,10 @@ _fundamentalInitValues = {
 }
 
 if yade.config.highPrecisionMpmath:
-	_fundamentalEditorMap[mpmath.ctx_mp_python.mpf] = AttrEditor_Mpmath
-	_fundamentalInitValues[mpmath.ctx_mp_python.mpf] = (mpmath.mpf(0))
-	_fundamentalEditorMap[mpmath.ctx_mp_python.mpc] = AttrEditor_Complex
-	_fundamentalInitValues[mpmath.ctx_mp_python.mpc] = (mpmath.mpc(0))
+	_fundamentalEditorMap[yade._minieigenHP.Real] = AttrEditor_Mpmath
+	_fundamentalInitValues[yade._minieigenHP.Real] = (Real(0))
+	_fundamentalEditorMap[yade._minieigenHP.Complex] = AttrEditor_Complex
+	_fundamentalInitValues[yade._minieigenHP.Complex] = (Complex(0))
 
 
 class SerQLabel(QLabel):
@@ -673,8 +673,8 @@ class SerializableEditor(QFrame):
 		        'GlExtraDrawer': GlExtraDrawer
 		}
 		if yade.config.highPrecisionMpmath:
-			vecMap['mpf'] = mpmath.ctx_mp_python.mpf
-			vecMap['mpc'] = mpmath.ctx_mp_python.mpc
+			vecMap['Real'] = yade._minieigenHP.Real
+			vecMap['Complex'] = yade._minieigenHP.Complex
 		for T, ret in list(vecMap.items()):
 			if vecTest(T, cxxT):
 				logging.debug("Got type %s from cxx type %s" % (repr(ret), cxxT))

@@ -92,8 +92,9 @@ namespace units { // C++ standard uses int64_t because ↓ it supports ±292.5 y
 #define LOG_TIMED(howOften, MSG)                                                                                                                               \
 	{                                                                                                                                                      \
 		using namespace std::chrono_literals;                                                                                                          \
-		static_assert(units::isSecOrMilliSec<decltype(howOften)>, "LOG_TIMED_* Bad first argument, see testTimedLevels(); in file py/_log.cpp.");      \
-		thread_local static auto t = Timer(true);                                                                                                      \
+		static_assert(                                                                                                                                 \
+		        ::yade::units::isSecOrMilliSec<decltype(howOften)>, "LOG_TIMED_* Bad first argument, see testTimedLevels(); in file py/_log.cpp.");    \
+		thread_local static auto t = ::yade::Timer(true);                                                                                              \
 		if (t.check(howOften)) { MSG }                                                                                                                 \
 	}
 

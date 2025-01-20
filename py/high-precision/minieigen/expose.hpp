@@ -17,3 +17,6 @@ template <int N> void expose_quaternion(bool notDuplicate, const py::scope& topS
 template <int N> void expose_complex1(bool notDuplicate, const py::scope& topScope); // does nothing if _COMPLEX_SUPPORT is not #defined
 template <int N> void expose_complex2(bool notDuplicate, const py::scope& topScope); // does nothing if _COMPLEX_SUPPORT is not #defined
 template <int N> void expose_converters(bool notDuplicate, const py::scope& topScope);
+
+template <int N> void expose_math_Real(bool notDuplicate, const py::scope& topScope);
+template <int N> void expose_math_Complex(bool notDuplicate, const py::scope& topScope);
