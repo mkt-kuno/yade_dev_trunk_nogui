@@ -132,7 +132,7 @@ void CapillarityEngine::triangulateData()
 }
 
 int firstIteration = 1;
-int x              = 0;
+int xShadow        = 0;
 
 template <
         typename IPhysT> // the template parameter should be an IPhys with capillary attributes, see the selection of correct type below, in CapillarityEngine::action()
@@ -349,7 +349,7 @@ void CapillarityEngine::action()
 	} else {
 		if (((totalVolumeConstant || (!totalVolumeConstant && firstIteration == 1)) && totalVolumeofWater != -1)
 		    || (totalVolumeConstant && totalVolumeofWater == -1)) {
-			if (!totalVolumeConstant) x = 1;
+			if (!totalVolumeConstant) xShadow = 1;
 			totalVolumeConstant = 1;
 			Real p0             = capillaryPressure;
 			Real slope;
@@ -378,7 +378,7 @@ void CapillarityEngine::action()
 				V1                = waterVolume();
 				capillaryPressure = p1;
 			}
-			if (x == 1) {
+			if (xShadow == 1) {
 				totalVolumeConstant = 0;
 				firstIteration += 1;
 			}
