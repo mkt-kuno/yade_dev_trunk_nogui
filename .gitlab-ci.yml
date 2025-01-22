@@ -419,6 +419,15 @@ make_minimal:
     - export CHECK_FORMAT="CHECK_FORMAT"
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 
+make_unity:
+  <<: *make_definition
+  <<: *artifacts_definition
+  <<: *skip_WIP
+  before_script:
+    - export EXTRA_CMAKE_ARGS="-DCMAKE_UNITY_BUILD=ON -DCMAKE_UNITY_BUILD_BATCH_SIZE=3000 $EXTRA_CMAKE_ARGS"
+    - echo $EXTRA_CMAKE_ARGS
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
+
 # _opposite means that all non-minimal options (options that do not reduce significantly amount of compiled code) are set to the setting opposite to the default one
 make_opposite:
   <<: *make_definition

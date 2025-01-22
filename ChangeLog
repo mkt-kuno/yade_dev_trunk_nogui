@@ -45,6 +45,7 @@ Packaging & Build Improvements
 
 Small Enhancements
 ******************
+  Add Unity build to the pipeline, to make sure it doesn't break sometime (!1073)
 
 Testing & Continuous Integration
 ********************************

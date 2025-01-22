@@ -228,9 +228,9 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 		if (mat1->seed == -1) dl = l0 * mat1->lambdau;
 		else {
 			// initialize random number generator
-			static boost::minstd_rand randGen(mat1->seed != 0 ? mat1->seed : (int)TimingInfo::getNow(true));
+			static boost::minstd_rand randGenLoc(mat1->seed != 0 ? mat1->seed : (int)TimingInfo::getNow(true));
 			static boost::variate_generator<boost::minstd_rand&, boost::triangle_distribution<Real>> rnd(
-			        randGen, boost::triangle_distribution<Real>(0, 0.5, 1));
+			        randGenLoc, boost::triangle_distribution<Real>(0, 0.5, 1));
 			Real rndu = rnd();
 			TRVAR1(rndu);
 			dl        = l0 * mat1->lambdau * rndu;
@@ -241,9 +241,9 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 		if (mat2->seed == -1) dl = l0 * mat2->lambdau;
 		else {
 			// initialize random number generator
-			static boost::minstd_rand randGen(mat2->seed != 0 ? mat2->seed : (int)TimingInfo::getNow(true));
+			static boost::minstd_rand randGenLoc(mat2->seed != 0 ? mat2->seed : (int)TimingInfo::getNow(true));
 			static boost::variate_generator<boost::minstd_rand&, boost::triangle_distribution<Real>> rnd(
-			        randGen, boost::triangle_distribution<Real>(0, 0.5, 1));
+			        randGenLoc, boost::triangle_distribution<Real>(0, 0.5, 1));
 			Real rndu = rnd();
 			TRVAR1(rndu);
 			dl = l0 * mat2->lambdau * rndu;
