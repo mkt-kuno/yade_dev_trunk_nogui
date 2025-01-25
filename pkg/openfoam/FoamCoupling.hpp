@@ -108,7 +108,7 @@ class FoamCoupling : public GlobalEngine {
 		std::vector<Body::id_t> localIds; // 'local', those Ids in the present subdomain  that are in coupling, used in parallel mode.
 
 		std::string foamSolverName;
-		unsigned numFoamProcs;
+		int numFoamProcs;
 
 		//std::vector<int> intrFluidRanks;
 
