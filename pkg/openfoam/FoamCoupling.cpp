@@ -46,6 +46,7 @@ void FoamCoupling::StartFoamSolver()
 {
 	assert(initDone == false && "Coupling has been initialized!");
 	assert(!foamSolverName.empty() && "OpenFOAM solver has not been set.");
+	if (foamSolverName.empty()) LOG_ERROR("OpenFoam environment not found. Is environment variable WM_PROJECT_DIR defined?")
 	scene = Omega::instance().getScene().get();
 	// local rank and sizes
 	MPI_Comm_rank(selfComm(), &localRank);
