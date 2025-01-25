@@ -682,10 +682,6 @@ void FoamCoupling::checkFoamVersion() {
 				if (!version.empty() && version.front() == 'v') //remove the leading 'v'
 						version.erase(0, 1);
 				foamVersion = std::stoi(version);
-				std::cout<<"OFOAM v"<<foamVersion<<" in path"<< wmProjectDir <<std::endl;
-			} else {
-				// If WM_PROJECT_DIR was not found, print a message indicating this
-				std::cout << "WM_PROJECT_DIR environment variable not found." << std::endl;
 			}
 		}
 
