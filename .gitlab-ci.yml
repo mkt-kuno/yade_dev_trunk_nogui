@@ -4,7 +4,6 @@
 # Five new images:
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_nogui
-# image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_foam
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
@@ -743,6 +742,24 @@ test_SSE:
   needs: ["make_SSE"]
   
 ## 3.1.2 Yade-OFoam sub-section (for clarity) - there is room for template magic in the "script" part
+
+test_24_foam2312:
+  <<: *platforms_definition
+  <<: *gitlab_runner_retry_definition
+  <<: *skip_WIP
+  stage: test
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
+  dependencies:
+    - make_24_04
+  needs: ["make_24_04"]
+  timeout: 25 minutes
+  script:
+    - export PYTHONUNBUFFERED=1
+    - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - pwd
+    - apt-get update && apt-get install -y openfoam2312-default
+    - source /usr/lib/openfoam/openfoam2312/etc/bashrc && scripts/checks-and-tests/testOpenFoam.sh
 
 test_22_foam2312:
   <<: *platforms_definition
