@@ -29,26 +29,26 @@ class Subdomain;
 class Interaction;
 class BodyContainer;
 class FoamCoupling : public GlobalEngine {
-	private:
+private:
 	// some variables for MPI_Send/Recv
-		const int sendTag=500;
-		int rank, commSize; // for serial Yade-OpenFOAM
-		int foamCommSize, worldCommSize; //
-		MPI_Status status;
-		int szdff, localCommSize, localRank, worldRank;
-		const int TAG_GRID_BBOX = 1001;
-		const int TAG_PRT_DATA = 1002;
-		const int TAG_FORCE = 1005;
-		const int TAG_SEARCH_RES = 1004;
-		const int yadeMaster = 0;
-		const int TAG_SZ_BUFF = 1003;
-		const int TAG_FLUID_DT = 1050;
-		const int TAG_YADE_DT = 1060;
-		const int TAG_SHARED_ID = 1080;
-		bool serialYade=false;
-		MPI_Comm FOAMCOMM; // the communicator used to spawn the FOAM processes.
-		MPI_Comm INTRACOMM; // the merged communicator to communicate with the FOAM processes.
-	public:
+	const int  sendTag = 500;
+	int        rank, commSize;              // for serial Yade-OpenFOAM
+	int        foamCommSize, worldCommSize; //
+	MPI_Status status;
+	int        szdff, localCommSize, localRank, worldRank;
+	const int  TAG_GRID_BBOX  = 1001;
+	const int  TAG_PRT_DATA   = 1002;
+	const int  TAG_FORCE      = 1005;
+	const int  TAG_SEARCH_RES = 1004;
+	const int  yadeMaster     = 0;
+	const int  TAG_SZ_BUFF    = 1003;
+	const int  TAG_FLUID_DT   = 1050;
+	const int  TAG_YADE_DT    = 1060;
+	const int  TAG_SHARED_ID  = 1080;
+	bool       serialYade     = false;
+	MPI_Comm   FOAMCOMM;  // the communicator used to spawn the FOAM processes.
+	MPI_Comm   INTRACOMM; // the merged communicator to communicate with the FOAM processes.
+public:
 	// clang-format off
 		// void getRank();
 		void setNumParticles(int);
@@ -168,45 +168,49 @@ class FoamCoupling : public GlobalEngine {
     .add_property("comm",&FoamCoupling::getMyComm,&FoamCoupling::setMyComm,"Communicator to be used for MPI (converts mpi4py comm <-> c++ comm)")
     )
 	// clang-format on
-    DECLARE_LOGGER;
+	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(FoamCoupling);
 /* a class for holding info on the min and max bounds of the fluid mesh. Each fluid proc has a domain minmax and */
-class FluidDomainBbox : public Shape{
-	public:
-		//std::vector<double> minMaxBuff; // a buffer to receive the min max during MPI_Recv.
-		void setMinMax(const std::vector<double>& minmaxbuff){
-			if (minmaxbuff.size() != 6){LOG_ERROR("incorrect minmaxbuff size. FAIL"); return; }
-			minBound[0] = minmaxbuff[0];
-			minBound[1] = minmaxbuff[1];
-			minBound[2] = minmaxbuff[2];
-			maxBound[0] = minmaxbuff[3];
-			maxBound[1] = minmaxbuff[4];
-			maxBound[2] = minmaxbuff[5];
-			minMaxisSet = true;
-
+class FluidDomainBbox : public Shape {
+public:
+	//std::vector<double> minMaxBuff; // a buffer to receive the min max during MPI_Recv.
+	void setMinMax(const std::vector<double>& minmaxbuff)
+	{
+		if (minmaxbuff.size() != 6) {
+			LOG_ERROR("incorrect minmaxbuff size. FAIL");
+			return;
 		}
-		int domainRank; // rank of the fluid domain.
-		virtual ~FluidDomainBbox() {};
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(FluidDomainBbox,Shape,"The bounding box of a fluid grid from one OpenFOAM/YALES2 proc",
-		((bool,minMaxisSet,false,,"flag to check if the min max bounds of this body are set."))
-		((std::vector<Body::id_t>,bIds,std::vector<Body::id_t>(), , "ids of bodies intersecting with this subdomain, "))
-		((Vector3r,minBound,Vector3r(-NaN, -NaN, -NaN),,"min bounds of the fluid grid "))
-		((Vector3r,maxBound,Vector3r(NaN, NaN, NaN),,"max bounds of the fluid grid"))
-		((bool,hasIntersection,false,,"if this Yade subdomain has intersection with this OpenFOAM/YALES2 subdomain"))
-		,
-		createIndex();
-		,
-		);
-		DECLARE_LOGGER;
-		REGISTER_CLASS_INDEX(FluidDomainBbox, Shape);
+		minBound[0] = minmaxbuff[0];
+		minBound[1] = minmaxbuff[1];
+		minBound[2] = minmaxbuff[2];
+		maxBound[0] = minmaxbuff[3];
+		maxBound[1] = minmaxbuff[4];
+		maxBound[2] = minmaxbuff[5];
+		minMaxisSet = true;
+	}
+	int domainRank; // rank of the fluid domain.
+	virtual ~FluidDomainBbox() {};
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(
+	        FluidDomainBbox,
+	        Shape,
+	        "The bounding box of a fluid grid from one OpenFOAM/YALES2 proc",
+	        ((bool, minMaxisSet, false, , "flag to check if the min max bounds of this body are set."))(
+	                (std::vector<Body::id_t>, bIds, std::vector<Body::id_t>(), , "ids of bodies intersecting with this subdomain, "))(
+	                (Vector3r, minBound, Vector3r(-NaN, -NaN, -NaN), , "min bounds of the fluid grid "))(
+	                (Vector3r, maxBound, Vector3r(NaN, NaN, NaN), , "max bounds of the fluid grid"))(
+	                (bool, hasIntersection, false, , "if this Yade subdomain has intersection with this OpenFOAM/YALES2 subdomain")),
+	        createIndex();
+	        , );
+	DECLARE_LOGGER;
+	REGISTER_CLASS_INDEX(FluidDomainBbox, Shape);
 };
 REGISTER_SERIALIZABLE(FluidDomainBbox);
-class Bo1_FluidDomainBbox_Aabb : public BoundFunctor{
-	public:
-		void go(const shared_ptr<Shape>& , shared_ptr<Bound>& , const Se3r& se3, const Body*) override;
+class Bo1_FluidDomainBbox_Aabb : public BoundFunctor {
+public:
+	void go(const shared_ptr<Shape>&, shared_ptr<Bound>&, const Se3r& se3, const Body*) override;
 	FUNCTOR1D(FluidDomainBbox);
-	YADE_CLASS_BASE_DOC(Bo1_FluidDomainBbox_Aabb,BoundFunctor, "creates/updates an :yref:`Aabb` of a :yref:`FluidDomainBbox`.");
+	YADE_CLASS_BASE_DOC(Bo1_FluidDomainBbox_Aabb, BoundFunctor, "creates/updates an :yref:`Aabb` of a :yref:`FluidDomainBbox`.");
 };
 REGISTER_SERIALIZABLE(Bo1_FluidDomainBbox_Aabb);
 } // namespace yade
