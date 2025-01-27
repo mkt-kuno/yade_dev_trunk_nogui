@@ -40,6 +40,15 @@ PotentialParticles / Blocks
 OpenMPI / OpenMP threads
 ************************
 
+OpenFoam coupling
+*****************
+ Drop support for OpenFoam6.org
+ Support ".com" versions from 2006 to 2312
+ Support OpenFoam10.org and OpenFoam11.org
+ All supported versions tested in the pipeline
+ Simpler launch command
+ Some bugfix
+
 Packaging & Build Improvements
 ******************************
 
@@ -9835,6 +9844,9 @@ PotentialParticles / Blocks
 
 OpenMPI / OpenMP threads
 ************************
+
+OpenFoam coupling
+*****************
 
 Packaging & Build Improvements
 ******************************

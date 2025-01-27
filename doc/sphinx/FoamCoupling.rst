@@ -75,6 +75,9 @@ Along with the continuity equation:
 
 Volume averaged coupling (`pimpleFoamYade`)
 --------------------------------------------
+.. warning:: The volume averaged coupling is currently under active development. Users are advised to exercise caution when utilizing this feature, as some functionalities may be incomplete, experimental, or subject to significant changes in future updates.
+
+
 In the volume averaged coupling, the effect of the particle volume fraction is included. The Navier-Stokes equations take the following form:
 
   .. math:: \frac{\partial (\epsilon_{f} \vec{U}_{f}) }{\partial t} + \nabla \cdot ( \epsilon_{f} \vec{U}_{f} \vec{U}_{f}) = -\frac{\nabla p}{\rho} + \epsilon_{f} \nabla \bar{\bar \tau} -K \left(U_{f}-U_{p} \right) + \vec{S}_{u} + \epsilon_{f} \vec{g}

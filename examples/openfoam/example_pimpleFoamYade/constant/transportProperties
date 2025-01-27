@@ -11,11 +11,12 @@ FoamFile
 
 continuousPhaseName fluid;
 
-rho.fluid         1000; 
-partDensity       1000; 
+rho.fluid         1000;
+partDensity       1000;
 
 
 transportModel  Newtonian;
 nu              1e-06;
+nu.fluid         1e-06;
 
 // ************************************************************************* //

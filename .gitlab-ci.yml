@@ -678,23 +678,6 @@ test_suse15:
     - make_suse15
   needs: ["make_suse15"]
 
-test_18_foam:
-  <<: *platforms_definition
-  <<: *gitlab_runner_retry_definition
-  <<: *skip_WIP
-  stage: test
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_foam
-  dependencies:
-    - make_18_04
-  needs: ["make_18_04"]
-  timeout: 25 minutes
-  script:
-    - export PYTHONUNBUFFERED=1
-    - cat /etc/os-release
-    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
-    - pwd
-    - scripts/checks-and-tests/testOpenFoam.sh
-
 test_18_04_nogui:
   <<: *test_definition
   <<: *skip_GUI_TEST
@@ -758,6 +741,152 @@ test_SSE:
   dependencies:
     - make_SSE
   needs: ["make_SSE"]
+  
+## 3.1.2 Yade-OFoam sub-section (for clarity) - there is room for template magic in the "script" part
+
+test_22_foam2312:
+  <<: *platforms_definition
+  <<: *gitlab_runner_retry_definition
+  <<: *skip_WIP
+  stage: test
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam2312
+  dependencies:
+    - make_22_04
+  needs: ["make_22_04"]
+  timeout: 25 minutes
+  script:
+    - export PYTHONUNBUFFERED=1
+    - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - pwd
+    - scripts/checks-and-tests/testOpenFoam.sh
+
+test_22_foam2306:
+  <<: *platforms_definition
+  <<: *gitlab_runner_retry_definition
+  <<: *skip_WIP
+  stage: test
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam2312
+  dependencies:
+    - make_22_04
+  needs: ["make_22_04"]
+  timeout: 25 minutes
+  script:
+    - export PYTHONUNBUFFERED=1
+    - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - pwd
+    - apt-get update && apt-get install -y openfoam2306-default
+    - source /usr/lib/openfoam/openfoam2306/etc/bashrc && scripts/checks-and-tests/testOpenFoam.sh
+
+test_22_foam2212:
+  <<: *platforms_definition
+  <<: *gitlab_runner_retry_definition
+  <<: *skip_WIP
+  stage: test
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam2312
+  dependencies:
+    - make_22_04
+  needs: ["make_22_04"]
+  timeout: 25 minutes
+  script:
+    - export PYTHONUNBUFFERED=1
+    - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - pwd
+    - apt-get update && apt-get install -y openfoam2212-default
+    - ls /usr/lib/openfoam/
+    - set -x
+    - script -q /dev/null source /usr/lib/openfoam/openfoam2212/etc/bashrc
+    - ls /usr/lib/openfoam/
+    - scripts/checks-and-tests/testOpenFoam.sh
+
+test_22_foam2112:
+  <<: *platforms_definition
+  <<: *gitlab_runner_retry_definition
+  <<: *skip_WIP
+  stage: test
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam2312
+  dependencies:
+    - make_22_04
+  needs: ["make_22_04"]
+  timeout: 25 minutes
+  before_script:
+    - export NO_GUI="NO_GUI"
+    - apt-get update && apt-get install -y openfoam2112-default
+  script:
+    - export PYTHONUNBUFFERED=1
+    - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - pwd
+    - source /usr/lib/openfoam/openfoam2112/etc/bashrc && scripts/checks-and-tests/testOpenFoam.sh
+
+test_22_foam2006:
+  <<: *platforms_definition
+  <<: *gitlab_runner_retry_definition
+  <<: *skip_WIP
+  stage: test
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam2312
+  dependencies:
+    - make_22_04
+  needs: ["make_22_04"]
+  timeout: 25 minutes
+  before_script:
+    - export NO_GUI="NO_GUI"
+    - apt-get update && apt-get install -y openfoam2006-default
+  script:
+    - export PYTHONUNBUFFERED=1
+    - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - pwd
+    - source /usr/lib/openfoam/openfoam2006/etc/bashrc && scripts/checks-and-tests/testOpenFoam.sh
+
+test_22_foam11:
+  <<: *platforms_definition
+  <<: *gitlab_runner_retry_definition
+  <<: *skip_WIP
+  stage: test
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam2312
+  dependencies:
+    - make_22_04
+  needs: ["make_22_04"]
+  timeout: 25 minutes
+  before_script:
+    - export NO_GUI="NO_GUI"
+    - sh -c "wget -O - https://dl.openfoam.org/gpg.key > /etc/apt/trusted.gpg.d/openfoam.asc"
+    - add-apt-repository http://dl.openfoam.org/ubuntu
+    - apt-get update && apt-get -y install openfoam11
+  script:
+    - export PYTHONUNBUFFERED=1
+    - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - pwd
+    - source /opt/openfoam11/etc/bashrc && scripts/checks-and-tests/testOpenFoam.sh
+
+test_22_foam10:
+  <<: *platforms_definition
+  <<: *gitlab_runner_retry_definition
+  <<: *skip_WIP
+  stage: test
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04_foam2312
+  dependencies:
+    - make_22_04
+  needs: ["make_22_04"]
+  timeout: 25 minutes
+  before_script:
+    - export NO_GUI="NO_GUI"
+    - sh -c "wget -O - https://dl.openfoam.org/gpg.key > /etc/apt/trusted.gpg.d/openfoam.asc"
+    - add-apt-repository http://dl.openfoam.org/ubuntu
+    - apt-get update && apt-get -y install openfoam10
+  script:
+    - export PYTHONUNBUFFERED=1
+    - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - pwd
+    - source /opt/openfoam10/etc/bashrc && scripts/checks-and-tests/testOpenFoam.sh
+  
+  
+
 
 # 3.2. check stage
 .check_template: &check_definition

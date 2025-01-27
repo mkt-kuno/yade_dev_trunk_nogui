@@ -1,8 +1,9 @@
-# -*- encoding=utf-8 -*-
 import os
+# from yadeimport import *
 from yade import mpy as mp
 
-numThreads = 4
+parallelYade=True #mpirun --allow-run-as-root -n 2 python3 scriptMPI.py , if False  python3 scriptMPI.py
+numProcOF=2
 
 O.periodic = True
 O.cell.setBox(0.1000005, 0.100005, 0.100005)
@@ -50,12 +51,18 @@ O.bodies.append(box(center=yplus, extents=(maxval, minval, maxval), fixed=True))
 
 #zplus = 0.25*(v4+v7+v6+v5)
 #O.bodies.append(box(center=zplus,extents=(maxval, maxval, minval), fixed=True))
-
+# setup the openfoam coupling, more stuff is done in mpy.py
 fluidCoupling = FoamCoupling()
-fluidCoupling.couplingModeParallel = True
-fluidCoupling.isGaussianInterp = True
+fluidCoupling.couplingModeParallel = parallelYade
+fluidCoupling.isGaussianInterp = False
 #use pimpleFoamYade for gaussianInterp (only in serial mode)
 sphereIDs = [b.id for b in O.bodies if type(b.shape) == Sphere]
+
+'''The yade specific (icoFoamYade, pimpleFoamYade) OpenFOAM solver can be found in $FOAM_USER_APPBIN, (
+# full path here, the scond argument, 2 is the number of FoamProcs. '''
+# fluidCoupling.SetOpenFoamSolver(os.environ.get('FOAM_USER_APPBIN')+'/icoFoamYade', 2)
+# it also work without path after sourcing OFoam's bashrc
+fluidCoupling.SetOpenFoamSolver("icoFoamYade", numProcOF)
 
 # Integrator
 # add small damping in case of stability issues.. ~ 0.1 max, also note : If gravity is needed, set it in constant/g dir.
@@ -75,7 +82,7 @@ O.engines = [
         GlobalStiffnessTimeStepper(timestepSafetyCoefficient=0.7, timeStepUpdateInterval=200, parallelMode=True, label="ts"),
         fluidCoupling,  #to be called after timestepper
         NewtonIntegrator(damping=0.0, label='newton', gravity=(0, 0.0, 0)),
-        VTKRecorder(fileName='spheres/3d-vtk-', recorders=['all'], parallelMode=True, iterPeriod=1000)
+        # VTKRecorder(fileName='spheres/3d-vtk-', recorders=['all'], parallelMode=True, iterPeriod=1000)
 ]
 collider.verletDist = 0.00075
 mp.YADE_TIMING = False
@@ -89,7 +96,5 @@ mp.DOMAIN_DECOMPOSITION = True
 mp.mpirun(NSTEPS)
 mp.mprint("RUN FINISH")
 fluidCoupling.killMPI()
+
 exit()
-#mp.MPI.Finalize()
-#mp.mergeScene()
-#if mp.rank == 0: O.save('mergedScene.yade')
