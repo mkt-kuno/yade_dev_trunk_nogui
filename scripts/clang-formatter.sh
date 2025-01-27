@@ -49,7 +49,7 @@ if [ ! -d "${1}" ]; then
 	fi
 else
 	echo "Formatting directory: ${FORMATTER} -i ${1}"
-	find ${1} -iname *.cpp -o -iname *.hpp -o -iname *.ipp -o -iname *.h | xargs ${FORMATTER} -i
+	find "${1}" -type d -name "Solvers" -prune -o \( -iname "*.cpp" -o -iname "*.hpp" -o -iname "*.ipp" -o -iname "*.h" \) -print | xargs ${FORMATTER} -i
 	finish-print-stats
 fi
 
