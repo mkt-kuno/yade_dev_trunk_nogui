@@ -26,6 +26,9 @@ Concrete execution can also be seen in the gitlab pipeline, see the `test-script
 The supported OpenFoam versions include v10 and v11 from the foundation release, and (not limited to) v2006, v2112, v2212, v2306,  v2312 from openfoam.com.
 The list of versions tested in the development branch can be visualized in gitlab pipelines.
 
+An older version of the coupling, which was using OpenFoam6, is archived in branch `FOAM6couplingArchive<https://gitlab.com/yade-dev/trunk/-/tree/FOAM6couplingArchive>`_.
+
+
 Background
 ==========
 
