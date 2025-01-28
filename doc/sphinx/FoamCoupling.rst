@@ -15,8 +15,16 @@ The :yref:`FoamCoupling` engine must be enabled with the ENABLE_MPI flag during 
 Yade sends the particle information (particle position, velocity, etc. ) to all the OpenFOAM processes. Each OpenFOAM process searches the particle in the local mesh,
 if the particle is found, the hydrodynamic drag force and torque are calculated using the fluid velocity at the particle position (two interpolation methods are available) and the particle velocity.
 The hydroynamic force is sent to the Yade process and it is added  to the force container.  The negative of the particle hydrodynamic force (interpolated back to the fluid cell center) is set as source term in the Navier-Stokes equations.
-The `OpenFOAM solver <https://github.com/dpkn31/Yade-OpenFOAM-coupling>`_ must also be installed to facilitate the MPI connection between Yade and OpenFOAM.
 Technical details on the coupling methodology can be found in [Kunhappan2017]_ and [Kunhappan2018]_.
+
+Supported versions and examples
+===============================
+
+A number of example scripts can be found in Yade sources, see `the OpenFoam folder<https://gitlab.com/yade-dev/trunk/-/tree/master/examples/openfoam>`_.
+Concrete execution can also be seen in the gitlab pipeline, see the `test-script<https://gitlab.com/yade-dev/trunk/-/blob/master/scripts/checks-and-tests/testOpenFoam.sh>`_.
+
+The supported OpenFoam versions include v10 and v11 from the foundation release, and (not limited to) v2006, v2112, v2212, v2306,  v2312 from openfoam.com.
+The list of versions tested in the development branch can be visualized in gitlab pipelines.
 
 Background
 ==========
@@ -244,7 +252,7 @@ Execution
 
 The simulation is executed via the following command::
 
-  mpiexec -n 1 python3 scriptYade.py : -n NUMPROCS icoFoamYade -parallel
+  mpirun -n 4 /path/to/yade/install/bin/yade-exec scriptMPI.py
 
 The `video`__ below shows the steps involved in compiling and executing the coupled CFD-DEM simulation
 

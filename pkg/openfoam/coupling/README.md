@@ -7,22 +7,15 @@ An OpenFOAM solver for realizing CFD-DEM simulations with the Open Source Discre
  * Documentation : https://yade-dev.gitlab.io/trunk/FoamCoupling.html
  * Examples : https://gitlab.com/yade-dev/trunk/tree/master/examples/openfoam
 
+## UPDATE (Feb 2025)
+
+After Feb 2025 the git repository of the coupling solver is merged into Yade's repository on gitlab and most information should be searched in Yade's documentation (this README may not be freuently updated).
+Nevertheless the coupled solver is DEM-agnostic, it is compiled independently and it could be used as an interface to other DEM codes.
+
 ## UPDATE (27 Nov 2019) 
 * Full parallel coupling between Yade and OpenFOAM (as Yade is now fully parallel based on MPI) 
 
 ![Alt text](ccpl1.png)
 
-Prerequisites : Latest Yade git version with the FoamCoupling engine (https://gitlab.com/yade-dev/trunk). OpenFOAM-6. 
+Prerequisites : A Yade version with the FoamCoupling engine (https://gitlab.com/yade-dev/trunk). A supported version of OpenFOAM (see https://yade-dev.gitlab.io/trunk/FoamCoupling.html).
 
-## Build
-* Compile the lib FoamYade and solver icoFoamYade : 
-  * ``./Allwmake``
-
-## Running 
-* Copy example to $FOAM_RUN
-* Create a symbolic link
-  * ``ln -s /path/to/your/yade/install/bin/yade-exec libyade.py``
-* Run 
-  * ``cp -r example_icoFoamYade /to/your/run/dir ``
-  * ``mpiexec -n 1 python scriptYade.py : -n 2 icoFoamYade -parallel``
-  
