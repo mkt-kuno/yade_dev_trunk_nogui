@@ -1,6 +1,6 @@
 ==================================================
-yade-202x.0xa
-Sun, Aug 04 20:05:00 2024 +0100
+yade-2025.2.0
+Mon, Feb 10 06:15:00 2025 +0100
 
 Bug Fixes
 *********
@@ -20,7 +20,7 @@ Documentation & Comments
   two additional tutorial examples
   remove some "utils." prefix in tutorial and clarify why
   smallfix in documentation of mpy module
-  
+
 Examples
 ********
 
