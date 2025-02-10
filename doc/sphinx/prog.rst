@@ -161,19 +161,20 @@ How to make a release
 ----------------------
 
 The release process is automated using GitLab CI/CD pipelines. The release process is triggered by creating a new tag in the repository.
-The tag should be named according to the version number, e.g. ``2022.01a``.
+The tag should be named according to the `semver convention <https://semver.org/>`__, (e.g., ``2025.2.0``), whre the first number is the
+year, the second number is the month, and the third number is the patch version.
 The release process will build the software, run tests, and generate the documentation.
 
 
 #.  Create RELEASE file in the root folder with the version number in it.
-#.  Add new changelog entries to Changelog using "git shortlog PREVVERSION..".
+#.  Update Changelog file, put the proper date and version number in the top of the file.
 #.  Create branch using the following command and format:
 
 	.. code-block:: bash
 
-		git checkout -b YYYY.MM
+		git checkout -b YYYY.M.0
 
-#.  Tag release "git tag -as YYYY.MMa -m"YYYY.MMa"
+#.  Tag release "git tag -as YYYY.M.0 -m"YYYY.M.0"
 #.  Return to master branch and remove RELEASE file
 #.  Push master, new branch and tags to gitlab
 #.  Download tar.gz
@@ -186,13 +187,13 @@ RELEASE file should contain the version number in the following format:
 
 .. code-block:: bash
 
-	YYYY.MM
+	YYYY.MM.0
 
-where ``YYYY`` is the year and ``MM`` is the month of the release. For example, the release file for the January 2022 release should contain the following text:
+where ``YYYY`` is the year and ``MM`` is the month of the release. For example, the release file for the February 2025 release should contain the following text:
 
 .. code-block:: bash
 
-	2022.01a
+	2025.2.0
 
 
 
