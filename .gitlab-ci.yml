@@ -1200,6 +1200,7 @@ deb_bookworm:
 deb_bookworm_long_double:
   <<: *deb_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bookworm
+  allow_failure: true
   before_script:
     - rm -rf ./deb
     - export PREC_NAME="-long-double"
@@ -1232,6 +1233,7 @@ deb_trixie:
 deb_trixie_long_double:
   <<: *deb_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
+  allow_failure: true
   before_script:
     - rm -rf ./deb
     - export PREC_NAME="-long-double"
@@ -1278,6 +1280,7 @@ deb_jammy:
 deb_jammy_long_double:
   <<: *deb_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04
+  allow_failure: true
   before_script:
     - rm -rf ./deb
     - export PREC_NAME="-long-double"

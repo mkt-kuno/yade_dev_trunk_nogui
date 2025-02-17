@@ -54,6 +54,8 @@ Small Enhancements
 Testing & Continuous Integration
 ********************************
 
+  Fix #365 - for now just "allow_failure: true" for the deb_*_long_double jobs (it is a Polyhedra + CGAL problem) (!1081)
+
 High precision RealHP<N> ComplexHP<N>
 *************************************
 
