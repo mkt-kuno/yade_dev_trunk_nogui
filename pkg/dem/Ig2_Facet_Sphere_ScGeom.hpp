@@ -48,7 +48,7 @@ when $\vec{H}$ strictly belongs to the Facet surface (different expressions othe
 
 )""",
 		((Real,shrinkFactor,((void)"no shrinking",0),,"The radius of the inscribed circle of the facet is decreased by the value of the sphere's radius multiplied by *shrinkFactor*. From the definition of contact point on the surface made of facets, the given surface is not continuous and becomes in effect surface covered with triangular tiles, with gap between the separate tiles equal to the sphere's radius multiplied by 2×*shrinkFactor*. If zero, no shrinking is done."))
-		((bool,hertzian,false,,"The equivalent radius for the Facet (:yref:`ScGeom.refR1`) is chosen as 1e8 times the Sphere's radius (closer to Hertzian therory, where it is infinite)."))
+		((bool,hertzian,false,,"If True, the equivalent radius for the Facet (:yref:`ScGeom.refR1`) is chosen as 1e8 times the Sphere's radius (closer to Hertzian therory, where it is infinite). Otherwise, it is chosen to be equal to twice the Sphere's radius."))
 	);
 	// clang-format on
 	DECLARE_LOGGER;
@@ -98,9 +98,9 @@ public:
 	   const bool&                    force,
 	   const shared_ptr<Interaction>& c) override;
 	// clang-format off
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Wall_Sphere_ScGeom,IGeomFunctor,"Create/update a :yref:`ScGeom` instance representing intersection of :yref:`Wall` and :yref:`Sphere`. The equivalent radius for the Wall (:yref:`ScGeom.refR1`) is chosen equal to the Sphere's radius.",
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Wall_Sphere_ScGeom,IGeomFunctor,"Create/update a :yref:`ScGeom` instance representing intersection of :yref:`Wall` and :yref:`Sphere`.",
 		((bool,noRatch,true,,"Avoid granular ratcheting"))
-        ((bool,hertzian,false,,"The equivalent radius for the Wall (:yref:`ScGeom.refR1`) is chosen as 1e8 times the Sphere's radius (closer to Hertzian therory, where it is infinite)."))
+        ((bool,hertzian,false,,"If True, the equivalent radius for the Wall (:yref:`ScGeom.refR1`) is chosen as 1e8 times the Sphere's radius (closer to Hertzian therory, where it is infinite). Otherwise, it is chosen to be equal to the Sphere's radius."))
 	);
 	// clang-format on
 	FUNCTOR2D(Wall, Sphere);
