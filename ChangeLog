@@ -4,6 +4,7 @@ Sun, Aug 04 20:05:00 2024 +0100
 
 Bug Fixes
 *********
+  Fix contact force field normalization in TimeAverager (!1084)
 
 Code Formatting & Organization
 ******************************

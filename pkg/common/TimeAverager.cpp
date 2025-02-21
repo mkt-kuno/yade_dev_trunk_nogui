@@ -27,7 +27,9 @@ Vector3r         TimeAverager::getContactForce(Body::id_t id) const { return get
 Vector3r         TimeAverager::getContactTorque(Body::id_t id) const { return getValueFromMap(contactTorque, id); }
 vector<Vector3r> TimeAverager::getContactForceField(Body::id_t id) const
 {
-	if (computeContactForceField) { return getValueFromMap(contactForceField, id); }
+	if (computeContactForceField) {
+		return getValueFromMap(contactForceField, id);
+	}
 	throw std::runtime_error("No value to retrieve for contactForceField since computeContactForceField is false.");
 }
 
@@ -46,7 +48,9 @@ void TimeAverager::initialization()
 		nbContact[id]     = getInstantNbContact(b);
 		contactForce[id]  = getInstantContactForce(b);
 		contactTorque[id] = getInstantContactTorque(b);
-		if (computeContactForceField) { contactForceField[id] = getInstantContactForceField(b); }
+		if (computeContactForceField) {
+			contactForceField[id] = getInstantContactForceField(b);
+		}
 	}
 	tAccu = 0;
 }
@@ -90,7 +94,9 @@ template <typename T> T TimeAverager::updateAverage(const T& averagedVal, const 
 template <typename T> T TimeAverager::getValueFromMap(const boost::unordered_map<Body::id_t, T>& mapObject, Body::id_t id) const
 {
 	auto it = mapObject.find(id);
-	if (it == mapObject.end()) { throw std::runtime_error("Particle ID not found in map"); }
+	if (it == mapObject.end()) {
+		throw std::runtime_error("Particle ID not found in map");
+	}
 	return it->second;
 }
 
@@ -130,20 +136,32 @@ Vector3r TimeAverager::getInstantContactTorque(const shared_ptr<Body>& b) const
 vector<Vector3r> TimeAverager::getInstantContactForceField(const shared_ptr<Body>& b) const
 {
 	vector<Vector3r> instantContactForceField(grid.size(), Vector3r::Zero());
+
 	// Loop on interaction map
 	for (Body::MapId2IntrT::iterator it = b->intrs.begin(), end = b->intrs.end(); it != end; ++it) {
 		// Retrieve Interaction object from the current map pair
 		const shared_ptr<Interaction>& I = (*it).second;
 		if (!I->isReal()) continue;
+
 		// Get  physics and geom object from the interaction
 		NormShearPhys*         phys = YADE_CAST<NormShearPhys*>(I->phys.get());
 		GenericSpheresContact* geom = YADE_CAST<GenericSpheresContact*>(I->geom.get());
-		// Spread the contact force on each point of the grid, according to the distance between the contact point
-		// and the grid point. Use a gaussian kernel to smooth the field.
+
+		// Compute Gaussian kernel weights associated to each grid point, according to the distance between
+		// the contact point and the grid point, and compute the sum of the weights for normalization purpose.
+		vector<Real> weights(grid.size());
+		Real         normalizationFactor = 0.0;
 		for (size_t i = 0; i < grid.size(); i++) {
 			Real distanceToContact = (b->state->pos + grid[i] - geom->contactPoint).norm();
-			Real weight            = exp(-pow(distanceToContact, 2) / (2 * pow(sigma, 2))) / (sqrt(2 * Mathr::PI) * sigma);
-			instantContactForceField[i] += (phys->shearForce + phys->normalForce) * weight;
+			weights[i]             = exp(-pow(distanceToContact, 2) / (2 * pow(sigma, 2)));
+			normalizationFactor += weights[i];
+		}
+
+		// Distribute the contact force on the grid
+		if (normalizationFactor > 0) { // Safety check for the division
+			for (size_t i = 0; i < grid.size(); i++) {
+				instantContactForceField[i] += (phys->shearForce + phys->normalForce) * weights[i] / normalizationFactor;
+			}
 		}
 	}
 	return instantContactForceField;
