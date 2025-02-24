@@ -50,6 +50,8 @@ OpenFoam coupling
 Packaging & Build Improvements
 ******************************
 
+  Relax constraints on Python versions.
+
 Small Enhancements
 ******************
 

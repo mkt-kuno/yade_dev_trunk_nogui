@@ -321,61 +321,50 @@ INCLUDE(FindMissingVersions)
 SET(Boost_NO_BOOST_CMAKE ON)  # solved issues on HPC/Nix, see https://github.com/YosysHQ/nextpnr/issues/322#issuecomment-536177724
 INCLUDE(YadePythonHelpers)
 
-SET(PY3_VERSIONS 3.13 3.12 3.11 3.10 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0) #append newer python versions at the beginning here.
-SET(PY2_VERSIONS 2.7 2.6)
 
 IF (DEFINED PYTHON_EXECUTABLE)
 	SET(USER_DEFINED_PYTHON_EX ${PYTHON_EXECUTABLE})
 ENDIF()
-IF(${PYTHON_VERSION} EQUAL -1)
-	SET(PY_VERSIONS_CHECK "${PY3_VERSIONS};${PY2_VERSIONS}")
-ELSEIF(${PYTHON_VERSION} EQUAL 2)
-	SET(PY_VERSIONS_CHECK "${PY2_VERSIONS}")
-ELSEIF(${PYTHON_VERSION} EQUAL 3)
-	SET(PY_VERSIONS_CHECK "${PY3_VERSIONS}")
+
+
+#Find python
+IF(${PYTHON_VERSION} EQUAL -1) 
+	FIND_PACKAGE(PythonInterp)
 ELSE()
-	SET(PY_VERSIONS_CHECK "${PYTHON_VERSION}")
+	FIND_PACKAGE(PythonInterp ${PYTHON_VERSION})
+ENDIF()
+IF(NOT PythonInterp_FOUND)
+	MESSAGE(FATAL_ERROR "No python version could be found in your system.")
 ENDIF()
 
-MESSAGE("Loop on the following python versions and check available dependencies:${PY_VERSIONS_CHECK}" )
-FOREACH(py_version ${PY_VERSIONS_CHECK})
-	#Set desired python version
-	set(Python_ADDITIONAL_VERSIONS ${py_version})
-	#Find python
-	FIND_PACKAGE(PythonInterp)
-	IF(NOT PythonInterp_FOUND)
-		MESSAGE(FATAL_ERROR "No python version could be found in your system.")
-	ENDIF()
-	IF (DEFINED USER_DEFINED_PYTHON_EX)
-        	MESSAGE("Using user defined PYTHON_EXECUTABLE: ${USER_DEFINED_PYTHON_EX}")
-        	SET(PYTHON_EXECUTABLE ${USER_DEFINED_PYTHON_EX} CACHE FILEPATH "user defined python executable" FORCE)
-	ENDIF()
+IF (DEFINED USER_DEFINED_PYTHON_EX)
+	MESSAGE("Using user defined PYTHON_EXECUTABLE: ${USER_DEFINED_PYTHON_EX}")
+	SET(PYTHON_EXECUTABLE ${USER_DEFINED_PYTHON_EX} CACHE FILEPATH "user defined python executable" FORCE)
+ENDIF()
 
-	#FindPythonInterp will try to fallback in older Python version, we have to check manually if it found the version we wish
-	PYTHON_VERSION_MATCHES(${py_version})
-	IF(NOT ${PYTHON_VERSION_MATCH})
-	    #Reset variables to be able to use finpythoninterp multiple times
-		unset(PYTHON_EXECUTABLE CACHE)
-		unset(PYTHONINTERP_FOUND CACHE)
-		CONTINUE()
+#Check if specified version is found
+IF(${PYTHON_VERSION} EQUAL -1) # If -1, accept any Python version.
+	SET(PYTHON_VERSION_MATCH TRUE)
+ELSE()# else check, the specified version
+	IF(${PYTHON_VERSION_MAJOR} EQUAL ${PYTHON_VERSION})
+		SET(PYTHON_VERSION_MATCH TRUE)
+	ELSE()
+		SET(PYTHON_VERSION_MATCH FALSE)
 	ENDIF()
+ENDIF()
+
+#Check for dependencies.
+IF(${PYTHON_VERSION_MATCH})
 	MESSAGE("Python version ${PYTHON_VERSION_STRING} found, try to import dependencies...")
 	FIND_PYTHON_PACKAGES()
 	IF(ALL_PYTHON_DEPENDENCIES_FOUND)
 		MESSAGE("Found all python dependencies with version ${PYTHON_VERSION_STRING}, will compile yade with that.")
-		BREAK()
 	ELSE()
-	    #Reset variables to be able to use finpythoninterp multiple times
-		unset(PYTHON_EXECUTABLE CACHE)
-		unset(PYTHONINTERP_FOUND CACHE)
+		MESSAGE(FATAL_ERROR "No python version with all dependencies was found.")
 	ENDIF()
-ENDFOREACH()
-
-#After the loop on all python versions, having ALL_PYTHON_DEPENDENCIES_FOUND==FALSE must trigger an error:
-IF(NOT ALL_PYTHON_DEPENDENCIES_FOUND)
-	MESSAGE(FATAL_ERROR "No python version with all dependencies was found.")
+ELSE()
+	MESSAGE(FATAL_ERROR "Python version does not match specified.")
 ENDIF()
-
 #======================================
 #====== *** END PYTHON/BOOST *** ======
 #======================================

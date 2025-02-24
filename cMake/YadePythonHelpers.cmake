@@ -205,22 +205,3 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
 
 ENDFUNCTION(FIND_PYTHON_PACKAGES)
-
-# Did findpythoninterp found the python version we want ? Output in PYTHON_VERSION_MATCH.
-FUNCTION(PYTHON_VERSION_MATCHES version_number)
-	SET(PYTHON_VERSION_MATCH FALSE PARENT_SCOPE)
-	string(REGEX MATCH "([0-9]+)\\.([0-9]+)" _ ${version_number})
-	set(ver_major ${CMAKE_MATCH_1})
-	set(ver_minor ${CMAKE_MATCH_2})
-	MESSAGE("Trying python version: " ${version_number} " parsed as " ${ver_major} " " ${ver_minor})
-
-	IF(NOT (${PYTHON_VERSION_MAJOR} EQUAL ${ver_major}))
-		RETURN()
-	ENDIF()
-
-	IF(NOT(${PYTHON_VERSION_MINOR} EQUAL ${ver_minor}))
-		RETURN()
-	ENDIF()
-	#if we are here we match major and minor
-	SET(PYTHON_VERSION_MATCH TRUE PARENT_SCOPE)
-ENDFUNCTION(PYTHON_VERSION_MATCHES version_number)
