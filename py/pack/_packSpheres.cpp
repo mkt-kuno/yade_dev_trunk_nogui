@@ -63,7 +63,7 @@ try {
 				:param float porosity: initial guess for the iterative generation procedure (if ``num``>1). The algorithm will be retrying until the number of generated spheres is ``num``. The first iteration tries with the provided porosity, but next iterations increase it if necessary (hence an initialy high porosity can speed-up the algorithm). If ``psdSizes`` is not defined, ``rRelFuzz`` ($z$) and ``num`` ($N$) are used so that the porosity given ($\rho$) is approximately achieved at the end of generation, $r_m=\sqrt[3]{\frac{V(1-\rho)}{\frac{4}{3}\pi(1+z^2)N}}$. The default is $\rho$=0.5. The optimal value depends on ``rRelFuzz`` or  ``psdSizes``.
 				:param psdSizes: sieve sizes (particle diameters) when particle size distribution (PSD) is specified.
 				:param psdCumm: cummulative fractions of particle sizes given by ``psdSizes``; must be the same length as *psdSizes* and should be non-decreasing.
-				:param bool distributeMass: if ``True``, given distribution will be used to distribute sphere's mass rather than radius of them.
+				:param bool distributeMass: if ``True``, given distribution reflects mass per radius (the most common), else number of spheres per radius.
 				:param seed: number used to initialize the random number generator.
 				:returns: number of created spheres, which can be lower than ``num`` depending on the method used.
 
