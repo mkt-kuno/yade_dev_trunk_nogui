@@ -16,7 +16,20 @@
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wsuggest-override"
 #include <mpi.h>
+
+// This is the fix for the broken incremental build.
+// See https://gitlab.com/yade-dev/trunk/-/issues/368
+//
+// Without this define the header ../../MPI_api.h is included and it causes
+// the incremental build to fail, thus each time some files will be recompiled
+// though they are not changed.
+//
+// With this define the MPI_api.h is not included and the pycapi.h is used
+// instead. And it resolves the problem.
+//
+#define MPI4PY_LIMITED_API
 #include <mpi4py/mpi4py.h> // for passing MPI_Comm from python to c++
+
 #pragma GCC diagnostic pop
 namespace yade { // Cannot have #include directive inside.
 
