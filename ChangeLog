@@ -5,6 +5,7 @@ Sun, Aug 04 20:05:00 2024 +0100
 Bug Fixes
 *********
   Fix contact force field normalization in TimeAverager (!1084)
+  Fix incremental build issue with MPI header inclusion (!1088)
 
 Code Formatting & Organization
 ******************************
@@ -12,8 +13,9 @@ Code Formatting & Organization
 Documentation & Comments
 ************************
 
-  Update release versioning information.
+  Update release versioning information
   Doc precision about equivalent Facet/Wall ScGeom radius
+  Fix wrong statement in makeCloud doc (!1089)
 
 Examples
 ********
