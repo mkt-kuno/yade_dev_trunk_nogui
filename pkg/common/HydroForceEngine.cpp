@@ -788,23 +788,34 @@ void HydroForceEngine::fluidResolution(Real tfin, Real dt)
 		//////////////////////////////////
 		// Compute the lateral wall friction profile, if activated
 		if (fluidWallFriction == true) {
-			maxiter = 100;  //Maximum number iteration for the resolution
-			eps     = 1e-2; //Tolerance for the equation resolution
-			for (j = 0; j < nCell - 1; j++) {
-				Re    = max(1e-10, fabs(ufn[j + 1]) * channelWidth / viscof);
-				ffold = pow(0.32, -2); //Initial guess of the friction factor
-				delta = 1e10;          //Initialize at a random value greater than eps
-				q     = 0;
-				while ((delta >= eps)
-				       && (q < maxiter)) { //Loop while the required precision is reached or the  maximum iteration number is overpassed
-					q += 1;
-					//Graf and Altinakar 1993 formulation of the friction factor
-					ff    = pow(2. * log(Re * sqrt(ffold)) + 0.32, -2);
-					delta = fabs(ff - ffold) / ffold;
-					ffold = ff;
-				}
-				if (q == maxiter) ff = 0.;
-				wallFriction[j] = fluidFrictionCoef * ff;
+			switch (wallFrictionModel) {
+				case 0: {  //Blasius 1913
+					for (j = 0; j < nCell - 1; j++) {
+						Re = max(1e-10, fabs(ufn[j + 1]) * channelWidth / viscof);
+						wallFriction[j] = fluidFrictionCoef * 0.3164 / pow(Re, 0.25);
+					}
+				}; break;
+				case 1: {  //Graf and Altinakar 1998
+					maxiter = 100;  //Maximum number iteration for the resolution
+					eps     = 1e-2; //Tolerance for the equation resolution
+					for (j = 0; j < nCell - 1; j++) {
+						Re    = max(1e-10, fabs(ufn[j + 1]) * channelWidth / viscof);
+						ffold = pow(0.32, -2); //Initial guess of the friction factor
+						delta = 1e10;          //Initialize at a random value greater than eps
+						q     = 0;
+						while ((delta >= eps)
+							&& (q < maxiter)) { //Loop while the required precision is reached or the  maximum iteration number is overpassed
+							q += 1;
+							//Graf and Altinakar 1993 formulation of the friction factor
+							ff    = pow(2. * log10(Re * sqrt(ffold) / 4) + 0.32, -2);
+							delta = fabs(ff - ffold) / ffold;
+							ffold = ff;
+						}
+						if (q == maxiter) ff = 0.;
+						wallFriction[j] = fluidFrictionCoef * ff;
+					}
+				}; break;
+				default: throw std::runtime_error("HydroForceEngine: wallFrictionModel should take an integer value between 0 and 1.");	
 			}
 		}
 		////////////////////////////////// end wall friction

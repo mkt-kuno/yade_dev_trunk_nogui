@@ -52,6 +52,7 @@ public:
 		((Real,kappa,0.41,,"Fluid resolution: Von Karman constant. Can be tuned to account for the effect of particles on the fluid turbulence, see e.g. [RevilBaudard2015]_"))
 		((int,viscousSubLayer,0,,"Fluid resolution: solve the viscous sublayer close to the bottom boundary if set to 1"))
 		((bool,fluidWallFriction,false,,"Fluid resolution: if set to true, introduce a sink term to account for the fluid friction at the wall, see [Maurin2015]_ for details. Requires to set the width of the channel. It might slow down significantly the calculation."))
+		((int,wallFrictionModel,0,,"Model used to compute the wall friction factor $f$. 0: Blasius (1913) explicit formula $f=0.3164/Re^{1/4}$ (faster), 1: Graf and Altinakar (1998) implicit formula $f=(2\\log_{10}(Re \\sqrt{f_{old}} /4) + 0.32)^{-2}$."))
 		((Real,fluidFrictionCoef,1.,,"Fluid resolution: fitting coefficient for the fluid wall friction"))
 		((Real,channelWidth,1.,,"Fluid resolution: Channel width for the evaluation of the fluid wall friction inside the fluid resolution."))
 		((Real,phiBed,0.08,,"Turbulence modelling parameter. Associated with mixing length modelling ilm = 5."))
