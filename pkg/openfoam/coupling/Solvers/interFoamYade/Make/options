@@ -1,0 +1,44 @@
+sinclude $(GENERAL_RULES)/mplib$(WM_MPLIB)
+sinclude $(RULES)/mplib$(WM_MPLIB)
+EXE_INC = \
+    -I$(FOAM_SOLVERS)/multiphase/VoF \
+    -I$(LIB_SRC)/phaseSystemModels/twoPhaseInter/incompressibleInterPhaseTransportModel/lnInclude \
+    -I$(LIB_SRC)/phaseSystemModels/twoPhaseInter/VoFphaseIncompressibleTurbulenceModels/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+    -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/transportModels/incompressible/lnInclude \
+    -I$(LIB_SRC)/transportModels/interfaceProperties/lnInclude \
+    -I$(LIB_SRC)/transportModels/twoPhaseMixture/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/incompressible/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/phaseIncompressible/lnInclude \
+    -I$(LIB_SRC)/transportModels/immiscibleIncompressibleTwoPhaseMixture/lnInclude \
+    -I../../FoamYade_two_phase/lnInclude    \
+    -I../../FoamYade_two_phase/meshtree       \
+    -I$(LIB_SRC)/Pstream/mpi/lnInclude  \
+    $(PFLAGS) $(PINC) -std=gnu++0x
+    
+
+EXE_LIBS = \
+    -lfiniteVolume \
+    -lfvOptions \
+    -lmeshTools \
+    -lsampling \
+    -ldynamicFvMesh \
+    -lincompressibleTransportModels \
+    -linterfaceProperties \
+    -limmiscibleIncompressibleTwoPhaseMixture \
+    -ltwoPhaseProperties \
+    -lturbulenceModels \
+    -lincompressibleTurbulenceModels \
+    -lwaveModels \
+    -lVoFphaseTurbulentTransportModels \
+    -lincompressibleInterPhaseTransportModels\
+    -L$(FOAM_USER_LIBBIN) \
+    -lMeshTree  \
+    -lYadeFoam_two_phase	\
+    -L$(FOAM_LIBBIN)/$(FOAM_MPI)/lPstream	\
+     $(PLIBS)

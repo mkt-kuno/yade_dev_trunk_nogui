@@ -1,0 +1,20 @@
+#!/bin/sh
+cd "${0%/*}" || exit                                # Run from this directory
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
+#------------------------------------------------------------------------------
+
+
+restore0Dir
+
+touch yade.foam     # paraview reader
+
+runApplication blockMesh
+
+runApplication setFields
+
+runApplication decomposePar
+
+python3 boxWithInterfaceAndParticles_yade_script.py 
+# mpirun --allow-run-as-root -n 2 python3 standingTank_script.py
+
+#------------------------------------------------------------------------------
