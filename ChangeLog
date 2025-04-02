@@ -12,7 +12,7 @@ Code Formatting & Organization
 
 Documentation & Comments
 ************************
-
+  Updating of YADE acknowledgement
   Update release versioning information
   Doc precision about equivalent Facet/Wall ScGeom radius
   Fix wrong statement in makeCloud doc (!1089)
