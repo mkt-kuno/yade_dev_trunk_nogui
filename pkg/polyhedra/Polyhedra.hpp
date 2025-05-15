@@ -177,8 +177,7 @@ public:
 		((int,Wei_m,-1,,"Weibull Formulation, Weibull modulus, m, (if negative - disabled), [Gladky2017]_"))
 		((Real,Wei_S0,-1,,"Weibull Formulation, Sigma0, Pa, (if negative - disabled), [Gladky2017]_"))
 		((Real,Wei_V0,1e-9,,"Weibull Formulation, V0, m^3, representative volume, [Gladky2017]_."))
-		((Real,Wei_P,-1,,"Weibull Formulation, failure  probability, P, [Gladky2017]_."))
-		((Real,young,1e8,,"Young modulus")),
+		((Real,Wei_P,-1,,"Weibull Formulation, failure  probability, P, [Gladky2017]_.")),
 		/*ctor*/ createIndex();
 	);
 	// clang-format on
