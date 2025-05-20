@@ -37,6 +37,7 @@ Fluid & thermal & particle saturation
 
 LevelSet & Volume-interacting LevelSet
 --------------------------------------
+  Getting back to [Duriez2021b] behavior for inertial descriptions: LS volume and inertia computations include again strictly zero distance values (!1101)
 
 Polyhedra / Facets
 ------------------

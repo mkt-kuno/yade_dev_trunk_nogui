@@ -333,8 +333,8 @@ void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, bo
 				if (math::abs(phi) < phiRef)
 					dV = smearedHeaviside(-phi / phiRef)
 					        * Vcell; // we are within the smeared boundary (avoiding smearing if smearCoeff < 0)
-				else if (phi < 0)
-					dV = Vcell; // inside, and away from boundary
+				else if (phi <= 0)
+					dV = Vcell; // inside (more or less far from boundary depending from smearing)
 				else if (phi > 0)
 					dV = 0.; // outside
 				if (dV > 0.) {
@@ -371,7 +371,7 @@ void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, bo
 				if (math::abs(phi) < phiRef)
 					dV = smearedHeaviside(-phi / phiRef)
 					        * Vcell; // we are within the smeared boundary (avoiding smearing if smearCoeff < 0)
-				else if (phi < 0)
+				else if (phi <= 0)
 					dV = Vcell; // inside, and away from boundary
 				else if (phi > 0)
 					dV = 0.; // outside

@@ -15,9 +15,9 @@ if ('LS_DEM' in features):
 		else:
 			return True
 
-	# Starting with particle-scale comparisons
-	###################################################
-	# sphere case:
+	# Particle-scale comparisons for a sphere
+	#########################################
+
 	lsSph = levelSetBody('sphere', radius=1, spacing=0.05, nodesPath=1)
 
 	def distSphereTh(pt, radius=1):
@@ -58,7 +58,10 @@ if ('LS_DEM' in features):
 	if not equalNbr(lsSph.shape.getSurface(), 4 * pi, 0.025):  # tolerance could be 1.1e-3 with 2502 surface nodes
 		raise YadeCheckError("Failed because of incorrect getSurface() for a sphere in LS-DEM")
 
-	# superellipsoid case:
+	# Particle-scale comparisons for a superellipsoid
+	#################################################
+
+	### With respect to exact (volume) result:
 	rx, ry, rz, epsE, epsN = 0.5, 1.2, 1., 0.1, 0.5
 	lsSe = levelSetBody('superellipsoid', extents=(rx, ry, rz), epsilons=(epsE, epsN), spacing=0.05)
 
@@ -81,7 +84,58 @@ if ('LS_DEM' in features):
 	volExp = 2. / 3. * rx * ry**rz * epsE * epsN * beta(epsE / 2, epsE / 2) * beta(epsN, epsN / 2)
 	if not equalNbr(lsSe.shape.volume(), volExp, 0.05):
 		raise YadeCheckError("Failed because of an incorrect superellipsoid volume in LS-DEM:", lsSe.shape.volume(), "vs", volExp, "expected")
-	print('LS-DEM distance, volume and surface descriptions as correct as expected')
+
+	### With respect to previous YADE-obtained results (this is ~ the script of https://gitlab.com/yade-dev/trunk/-/issues/375):
+	rx, ry, rz, epsE, epsN = [0.4, 1., 0.8, 0.4, 1.6]  # Shape E from Duriez2021b = Duriez & Galusinski (2021) Computers & Geosciences 157
+	volTh, inertiaTh = 1.0864026569757073, numpy.array(
+	        [0.318409979166153656, 0.1283513094313180336, 0.2624619724909635354]
+	)  # theoretical volume and inertia (xx,yy,zz) coefficients/eigenvalues as per Barr1995 and reported by Duriez 2021b in Table 2. Mind the typo therein which inverted Ixx and Iyy for that particular shape..
+	#### without smearing, with reference error data from Duriez2021b (Figs. 7 and 15):
+	resVals = [4, 5, 8]  # considered values for grid resolution
+	volRefError = numpy.array([0.97937905, 1.02173535, 1.0014703])  # for grid resolution 4, 5 and 8
+	inertiaRefError = numpy.array(
+	        [
+	                [1.05002943, 0.98222898, 1.00315571]  # for res = 4
+	                ,
+	                [1.02746689, 1.03917029, 1.03074973]  # for res = 5
+	                ,
+	                [1.00153711, 1.0013097, 0.99237233]  # for res = 8
+	        ]
+	)
+	# Preparing the array for presently obtained errors
+	volObtainedError = -numpy.ones(len(resVals))  # 1 item of volume error per grid resolution
+	inertiaObtainedError = -numpy.ones((len(resVals), 3))  # 3 items of inertia errors per grid resolution
+	# the LS description:
+	for idx, res in enumerate(resVals):
+		b = levelSetBody("superellipsoid", extents=(rx, ry, rz), epsilons=(epsE, epsN), spacing=2 * min(rx, ry, rz) / res, nSurfNodes=0, smearCoeff=-1)
+		volLS, inertiaLS = b.shape.volume(), numpy.array(b.shape.inertia())
+		volObtainedError[idx] = volLS / volTh
+		inertiaObtainedError[idx, :] = inertiaLS / inertiaTh
+	# the comparisons, with a higher tolerance for the finer grid to accept numeric variation in a FAST_NATIVE build:
+	if not numpy.all(numpy.isclose(volObtainedError[:2], volRefError[:2], rtol=1.e-5)
+	                ) or not numpy.isclose(volObtainedError[2], volRefError[2], rtol=1.e-3):
+		raise YadeCheckError(
+		        'Problem on LS volume (inertia not yet tested) of Duriez2021b shape E, got following ratios for the different grid resolutions\n',
+		        volObtainedError, 'vs\n', volRefError, 'expected, wo smearing'
+		)
+	if not numpy.all(numpy.isclose(inertiaObtainedError[:2], inertiaRefError[:2], rtol=1.e-5)
+	                ) or not numpy.all(numpy.isclose(inertiaObtainedError[:2], inertiaRefError[:2], rtol=5.e-3)):
+		raise YadeCheckError(
+		        'Problem on LS inertia (volume is OK) of Duriez2021b shape E, got following ratios for the different grid resolutions\n',
+		        inertiaObtainedError, 'vs\n', inertiaRefError, 'expected, wo smearing'
+		)
+	#### with smearing:
+	b = levelSetBody("superellipsoid", extents=(rx, ry, rz), epsilons=(epsE, epsN), spacing=2 * min(rx, ry, rz) / 5, nSurfNodes=0, smearCoeff=1)
+	# reference values from Yade 2025-05-13.git-5018262:
+	volExpected, inertiaExpected = 1.1241686219537839, numpy.array(Vector3(0.3439694527863318974, 0.1415271320033010538, 0.2850711020402842966))
+	# LS values and comparisons:
+	volLS, inertiaLS = b.shape.volume(), numpy.array(b.shape.inertia())
+	if not numpy.isclose(volLS, volExpected):
+		raise YadeCheckError('Problem on LS volume (inertia not yet tested) of Duriez2021b shape E with smearing, got', volLS, 'vs', volExpected)
+	if not numpy.all(numpy.isclose(inertiaLS, inertiaExpected)):
+		raise YadeCheckError('Problem on LS inertia of Duriez2021b shape E with smearing, got', inertiaLS, 'vs', inertiaExpected)
+
+	print('LS-DEM as correct as expected at particle scale')
 
 	# Now looking at the relative movements of 2 spheres and 2 LevelSet-shaped twins
 	################################################################################
