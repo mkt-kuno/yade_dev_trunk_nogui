@@ -64,6 +64,7 @@ Testing & Continuous Integration
 ********************************
 
   Fix #365 - for now just "allow_failure: true" for the deb_*_long_double jobs (it is a Polyhedra + CGAL problem) (!1081)
+  Fix success/failure message for GUI test. (!1104)
 
 High precision RealHP<N> ComplexHP<N>
 *************************************

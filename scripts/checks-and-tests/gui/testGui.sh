@@ -87,11 +87,11 @@ for FileName in ${GUI_TESTS_PATH}/testGui*py; do
 	# If running was a success then a file testGui_${TestFile}_OK_or_Skipped.txt, it is created by scripts/checks-and-tests/gui/helper/testGuiHelper.py, at the end of screenshotEngine function.
 	echo -e "*** Checking if it was a success        ***"
 	if [[ ! -f ${CREATE_NEW_SCREENSHOTS}/testGui_${TestFile}_OK_or_Skipped.txt ]] ; then
-		echo "File ${CREATE_NEW_SCREENSHOTS}/testGui_${TestFile}_OK_or_Skipped.txt is missing, aborting."
+		echo -e "Error: file ${CREATE_NEW_SCREENSHOTS}/testGui_${TestFile}_OK_or_Skipped.txt is missing.\nStatus:\033[91m failure\033[0m"
 		exit 1
 	else
 		ls -la ${CREATE_NEW_SCREENSHOTS}/testGui_${TestFile}_OK_or_Skipped.txt
-		echo -e "*** OK ***"
+		echo -e "*** OK ***\nStatus:\033[92m success\033[0m"
 	fi
 done
 
