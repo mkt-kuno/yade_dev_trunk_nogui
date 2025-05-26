@@ -479,19 +479,21 @@ def levelSetBody(
         distField=[],
         smearCoeff=1.5,
         nSurfNodes=102,
+        surfNodes = [],
         nodesPath=2,
         nodesTol=50,
         orientation=Quaternion(1, 0, 0, 0),
         hasAABE=False,
         axesAABE=Vector3.Zero,
         dynamic=True,
-        material=-1
+        material=-1,
+        starLike = False
 ):
-	"""Creates a :yref:`LevelSet` shaped body through various workflows: one can choose among pre-defined shapes (through *shape* and related attributes), or to mimick a :yref:`Clump` instance (*clump* attribute, for comparison purposes), or directly assign the discrete distance field on some grid (*distField* and *grid* attributes)
+	"""Creates a :yref:`LevelSet` shaped body through various workflows: one can choose to define the discrete distance field from pre-defined shapes (through *shape* and related arguments), or to mimick a :yref:`Clump` instance (*clump* argument, for comparison purposes), or directly assign the discrete distance field on some grid (*distField* and *grid* arguments). Surface nodes can also be either ray traced (see *nSurfNodes*, *nodesPath* and *nodesTol*) or directly assigned (see *surfNodes*)
 
 	:param string shape: use this argument to enjoy predefined shapes among 'sphere', 'box' (for a rectangular parallelepiped), 'disk' (for a 2D analysis in (x,y) plane), or 'superellipsoid'; in conjunction with *extents* or *radius* attributes. Superellipsoid surfaces are defined in local axes (inertial frame) by the following equation: $f(x,y,z) = ( |x/r_x|^{2/\\epsilon_e} + |y/r_y|^{2/\\epsilon_e} )^{\\epsilon_e/\\epsilon_n} + |z/r_z|^{2/\\epsilon_n} = 1$ and their distance field is obtained thanks to a :yref:`Fast Marching Method<FastMarchingMethod>`.
 	:param Vector3 center: (initial) position of that body
-	:param Clump clump: pass here a multi-sphere instance to mimick, if desired
+	:param Clump clump: pass here a multi-sphere (other cases of Clump not supported) instance to mimick, if desired
 	:param Real radius: imposed radius in case *shape* = 'sphere' or 'disk'
 	:param Vector3 extents: half extents along the local axes in case *shape* = 'box' or 'superellipsoid' ($r_x,r_y,r_z$ for the latter)
 	:param Vector2 epsilons: in case *shape* = 'superellipsoid', the ($\\epsilon_e,\\epsilon_n$) exponents
@@ -499,14 +501,16 @@ def levelSetBody(
 	:param list distField: the :yref:`discrete distance field<LevelSet.distField>` on *grid* (if given) as a list (of list of list; use .tolist() if working initially with 3D numpy arrays), where distField[i][j][k] is the distance value at grid.gridPoint(i,j,k)
 	:param RegularGrid grid: the :yref:`grid carrying the distance field<LevelSet.lsGrid>`, when the latter is directly assigned through *distField*
 	:param Real smearCoeff: passed to :yref:`LevelSet.smearCoeff`
-	:param int nSurfNodes: number of boundary nodes, passed to :yref:`LevelSet.nSurfNodes`
-	:param int nodesPath: path for the boundary nodes, passed to :yref:`LevelSet.nodesPath`
-	:param Real nodesTol: tolerance while ray tracing boundary nodes, passed to :yref:`LevelSet.nodesTol`
+	:param int nSurfNodes: number of requested :yref:`surface nodes<LevelSet.surfNodes>` when ray tracing them (number of rays, actually), passed to the corresponding argument of :yref:`LevelSet.rayTraceSurfNodes` together with *nodesPath* and *nodesTol* (exclusive of *surfNodes*)
+	:param int nodesPath: path for ray tracing the :yref:`surface nodes<LevelSet.surfNodes>`, passed to the corresponding argument of :yref:`LevelSet.rayTraceSurfNodes` (has to be used exclusive of *surfNodes*)
+	:param list surfNodes: :yref:`surface nodes<LevelSet.surfNodes>` as a list of Vector3r for a direct assignment of those, instead of ray tracing them while using *nSurfNodes* and *nodesPath* (a non-empty *surfNodes* is actually enough to bypass ray tracing and those other attributes and trigger direct assignment)
+	:param Real nodesTol: tolerance while ray tracing the :yref:`surface nodes<LevelSet.surfNodes>` (and not assigning them with *surfNodes*), passed to to the corresponding argument of :yref:`LevelSet.rayTraceSurfNodes`
 	:param Quaternion orientation: the initial orientation of the body
 	:param bool hasAABE: flag indicating if the axis-aligned bounding ellipsoid (AABE) was set, passed to :yref:`LevelSet.hasAABE`
 	:param Vector3 axesAABE: principal half-axes of the axis aligned bounding ellipsoid (AABE) when *hasAABE*, passed to :yref:`LevelSet.axesAABE`
 	:param bool dynamic: passed to :yref:`Body.dynamic`
 	:param Material material: passed to :yref:`Body.material`
+	:param bool starLike: passed to :yref:`LevelSet.starLike` when the function is also passed *grid* and *distField* (otherwise, :yref:`LevelSet.starLike` is automatically set)
 	:return: a corresponding body instance"""
 	try:
 		ls = LevelSet()  # simpler test than testing 'LS_DEM' in features since features is not readily accessible here
@@ -534,7 +538,7 @@ def levelSetBody(
 			extents = Vector3(extents[0], extents[1], extents[2])
 		b.shape = lsSimpleShape(3, AlignedBox3(-extents, extents), epsilons=epsilons, step=spacing, smearCoeff=smearCoeff)
 	elif len(distField):
-		b.shape = LevelSet(lsGrid=grid, distField=distField, smearCoeff=smearCoeff)  # NB: we could pass twoD = sthg here, function of distField size
+		b.shape = LevelSet(lsGrid=grid, distField=distField, smearCoeff=smearCoeff, starLike = starLike)  # NB: we could pass twoD = sthg here, function of distField size
 	if clump != None:
 		if not isinstance(clump, Clump):
 			raise ValueError("Please give a Clump instance as a clump attribute, instead of ", clump)
@@ -548,9 +552,6 @@ def levelSetBody(
 		]  # list with greatest points for each (Aabb of a) Clump member
 		maxExt = [max([memb[axis] for memb in maxMembers]) for axis in range(3)]  # maximum of the Clump Aabb
 		b.shape = lsSimpleShape(4, AlignedBox3(minExt, maxExt), step=spacing, clump=clump, smearCoeff=smearCoeff)
-	b.shape.nSurfNodes = nSurfNodes  # this was not done in lsSimpleShape()
-	b.shape.nodesPath = nodesPath  # ditto
-	b.shape.nodesTol = nodesTol
 	inertia = b.shape.inertia()  # this line will call LevelSet::init(), if not already done.
 	_commonBodySetup(
 	        b, b.shape.volume(), inertia, material, pos=center, dynamic=dynamic
@@ -562,6 +563,12 @@ def levelSetBody(
 	else:
 		b.aspherical = True
 	b.state.ori = b.state.refOri = orientation
+        # Finally defining the nodes (unless nSurfNodes = 0 and surfNodes remains empty, probably because VLS-DEM with no nodes is used) in the below if block:
+	if len(surfNodes) > 0:
+		b.shape.assignSurfNodes(surfNodes)
+	elif nSurfNodes > 0:
+		b.shape.rayTraceSurfNodes(nSurfNodes, nodesPath, nodesTol)
+        # And the VLS-DEM *AABE properties:
 	b.shape.hasAABE = hasAABE
 	b.shape.axesAABE = axesAABE
 	return b

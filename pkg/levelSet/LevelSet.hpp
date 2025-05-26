@@ -15,17 +15,23 @@ namespace yade {
 class LevelSet : public Shape {
 private:
 	Real     minRad, maxRad; // for sphericity
-	Vector3r center;
-	Real     volume, lengthChar;
-	Vector3r inertia; // the eigenvalues of the inertia matrix: its diagonal expression in localAxes basis (in a Vector3r form here)
-	bool     initDone;
-	bool     initDoneMarchingCubes;
-	int      nVoxInside;
-	void     init();          // compute nVoxInside, center, volume, and inertia and calls initSurfNodes
-	void     initSurfNodes(); // fills surfNodes
-	Real     distanceInterpolation(const Vector3r&, const int&, const int&, const int&) const; // trilinear interpolation of distance in a given cell
-	bool rayTraceInCell(const Vector3r&, const Vector3r&, const Vector3r&, const Vector3i&);   // handles the ray tracing from a given point in a given cell
-	void rayTrace(const Vector3r&); // recursively calls rayTraceInCell, walking accross the whole grid along a ray starting from center
+	Vector3r         center;
+	Real             volume, lengthChar;
+	Vector3r         inertia; // the eigenvalues of the inertia matrix: its diagonal expression in localAxes basis (in a Vector3r form here)
+	bool             initDone;
+	bool             initDoneMarchingCubes;
+	int              nVoxInside;
+	vector<Vector3r> nodesOnRay; // computed in rayTrace
+	void             assignSurfNodes(vector<Vector3r>);
+	void             postProcessNodes(); // applies necessary operations (e.g., computing sphericity) after surfNodes is filled
+	void             init();             // compute nVoxInside, center, volume, and inertia
+	void             rayTraceSurfNodes(const int&, const int&, const Real&);               // fills surfNodes by ray tracing
+	Real distanceInterpolation(const Vector3r&, const int&, const int&, const int&) const; // trilinear interpolation of distance in a given cell
+	bool rayTraceInCell(
+	        const Vector3r&, const Vector3r&, const Vector3r&, const Vector3i&, const Real&); // handles the ray tracing from a given point in a given cell
+	vector<Vector3r> rayTrace(
+	        const Vector3r&,
+	        const Real&); // recursively calls rayTraceInCell, walking accross the whole grid along a ray starting from center and returning nodesOnRay
 	Real smearedHeaviside(Real) const;
 	struct mcData { // Structure for holding marching cubes triangulation of level set particle
 		vector<Vector3r> triangles;
@@ -49,14 +55,12 @@ public:
   YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(LevelSet,Shape,"A level set description of particle shape based on a :yref:`discrete distance field<LevelSet.distField>` and :yref:`surface nodes<LevelSet.surfNodes>` [Duriez2021a]_ [Duriez2021b]_. See :ysrc:`examples/levelSet` for example scripts.",
 		((vector< vector< vector<Real> > >,distField,,Attr::readonly,"The signed (< 0 when inside) distance-to-surface function as a discrete scalar field on :yref:`lsGrid<LevelSet.lsGrid>`, with `distField[i][j][k]` corresponding to `lsGrid.gridPoint(i,j,k)`. From Python, slice this multi-dimensional list with care: while `distField[i][:][:]` corresponds to values on a x-cst plane, `distField[:][:][k]` is not at z-constant (use `[[distField[i][j][k] for j in ..] for i in ..]` instead)"))
 		((vector<Vector3r>,corners,,Attr::readonly,"The 8 corners of an axis-aligned bounding box, in local axes. It is computed once for all by :yref:`Bo1_LevelSet_Aabb` and used by the same Functor to get :yref:`Body.bound`."))
-		((vector<Vector3r>,surfNodes,,Attr::readonly,"Surface discretization nodes (the list of) used for exact contact treatment in :yref:`Ig2_LevelSet_LevelSet_ScGeom`, previously coined boundNodes in [Duriez2021b]_. Expressed in local frame. Getting them back after a save/load cycle requires to launch one iteration or to first ask for shape.center.")) // NB: just nodes as a name would "conflict" with many PFacet variables
-		((int,nSurfNodes,102,,"The number of boundary nodes in :yref:`surfNodes<LevelSet.surfNodes>`, previously coined nNodes in [Duriez2021b]_. Usually set through utils `levelSetBody()` function (has to be set at instantiation in all cases). Please use a perfect square + 2 if not :yref:`twoD<LevelSet.twoD>` and if :yref:`nodesPath<LevelSet.nodesPath>` = 1."))
-		((int,nodesPath,2,,"Defines how the space of spherical coordinates $(\\theta \\in [0;\\pi] ,\\varphi\\in [0;2 \\pi])$ is discretized when ray tracing the boundary nodes: 1 gives a rectangular partition of that space, plus two nodes at $\\theta = 0 [\\pi]$; 2 locates the nodes along a spiral path [Duriez2021a]_")) // Elias'polyhedralBall code; and Rakhmanov1994
-		((Real,nodesTol,50,,"Tolerance coefficient for accepting (if $|\\phi| / L <$ nodesTol $\\times$ numeric precision with $\\phi$ the return value of :yref:`distance<LevelSet.distance>` and $L$ a body-characteristic length taken as $\\sqrt[3]{V}$ with $V$ the :yref:`volume<LevelSet.volume>`, or $\\sqrt{V/g}$ with $g$ the grid :yref:`spacing<RegularGrid.spacing>` if :yref:`twoD<LevelSet.twoD>`) boundary nodes proposed by the ray tracing algorithm.")) // phi will be a varphi, because of a let\phi\varphi in doc/sphinx/conf.py ?
+		((vector<Vector3r>,surfNodes,,Attr::readonly,"Surface discretization in terms of (a list of) nodes, for the master-slave refined contact treatment in :yref:`Ig2_LevelSet_LevelSet_ScGeom`, previously coined boundNodes in [Duriez2021b]_. Expressed in local frame.")) // NB: just nodes as a name would "conflict" with many PFacet variables
 		((Real,sphericity,-1,Attr::readonly,"Shape sphericity computed from boundary nodes and assuming both largest inscribed sphere and smallest circumscribed sphere have the origin (of local axes) as center."))
+		((bool,starLike,false,Attr::readonly,"Indicates whether :yref:`surface nodes<LevelSet.surfNodes>` are ray-traced considering that a ray can intersect the surface no more than once."))
 		((shared_ptr<RegularGrid>,lsGrid,new RegularGrid,Attr::readonly,"The :yref:`regular grid<RegularGrid>` carrying :yref:`distField<LevelSet.distField>`, in local axes."))
-		((bool,twoD,false,Attr::readonly,"True for z-invariant shapes. Serves to restrict the definition of :yref:`surfNodes<LevelSet.surfNodes>` in the (x,y) plane."))
-		((Real,smearCoeff,1.5,,"Rules the smearing coefficient $\\varepsilon > 0$ of the Heaviside step function for a smooth integration of the particle's volume close to its surface (the higher $\\varepsilon$ the smoother, i.e. the more diffuse the surface in terms of volume integration). Given in reciprocal multiples of $R_{cell}$ the half diagonal of the cells of the :yref:`lsGrid<LevelSet.lsGrid>`: $\\varepsilon = R_{cell}\\times 1/$ *smearCoeff* (smearing is deactivated if negative)."))
+		((bool,twoD,false,Attr::readonly,"True for z-invariant shapes. Serves to restrict the ray tracing of :yref:`surfNodes<LevelSet.surfNodes>` in the (x,y) plane."))
+		((Real,smearCoeff,1.5,,"Rules the smearing coefficient $\\varepsilon > 0$ of the Heaviside step function for a smooth integration of the particle's volume close to its surface (the higher $\\varepsilon$ the smoother, i.e. the more diffuse the surface in terms of volume integration). Given in reciprocal multiples of $R_{cell} = \\sqrt{3}/2 g_{grid}$ the half diagonal of the cells of the :yref:`lsGrid<LevelSet.lsGrid>` with $g_{grid}$ the :yref:`cell length<RegularGrid.spacing>`: $\\varepsilon = R_{cell}\\times 1/$ *smearCoeff* (smearing is deactivated if negative)."))
 		((bool,hasAABE,false,,"Flag to indicate whether an axis-aligned bounding ellipsoid (AABE) has been provided by the user. If true, you must specify :yref:`axisAABE<LevelSet.axisAABE>`. Only works for VLS-DEM."))
 		((Vector3r,axesAABE,Vector3r::Zero(),,"The half lengths of the principal axes of the axis-aligned bounding ellipsoid (AABE) of the level-set shape. Format (rx,ry,rz). Only works for VLS-DEM."))
 
@@ -72,14 +76,21 @@ public:
 		center = Vector3r(std::numeric_limits<Real>::infinity(),std::numeric_limits<Real>::infinity(),std::numeric_limits<Real>::infinity());
 		createIndex(); // necessary for such a Shape-derived class, see https://yade-dem.org/doc/prog.html#indexing-dispatch-types
  		,
+		.def("assignSurfNodes",&LevelSet::assignSurfNodes,(boost::python::arg("nodes")),"Assigns given *nodes* (as a list of Vector3r points conforming local frame) to :yref:`surfNodes<LevelSet.surfNodes>`, erasing pre-existing ones if any.")
 		.def("volume",&LevelSet::getVolume,"The volume defined by the negative domain of the :yref:`level set function<LevelSet.distField>`, in a voxellised fashion. A voxel is said to be inside according to the level set value at its minimum grid point and depending upon possible smearing considerations as per :yref:`smearCoeff<LevelSet.smearCoeff>`.")
 		.def("center",&LevelSet::getCenter,"The center of mass of the :yref:`volume<LevelSet.volume>` (considering obviously an uniform density for this volume), in local axes (for verification purposes, by comparison with the origin).")
 		.def("inertia",&LevelSet::getInertia,"The diagonal coefficients (i.e., eigenvalues, in a consistent workflow) of the geometric inertia matrix (the one considering the infinitesimal volume as the integrand, instead of infinitesimal mass) of the particle :yref:`volume<LevelSet.volume>`, as a (xx,yy,zz) Vector3r.")
 // 		.def("nodesInCell",&LevelSet::getNodesInCellCube,(boost::python::args("i", "j", "k")),"Which boundary nodes belong to a given grid cube (given by its i,j,k indices)")
-		.def("distance",&LevelSet::distance,(boost::python::arg("pt"),boost::python::arg("unbound")=false),"Distance to surface at pt, with pt being expressed in the local frame. Has an 'unbound' flag signaling whether to allow the computation of distance values outside of the :yref:`grid<LevelSet.lsGrid>` extents.")
-		.def("normal",&LevelSet::normal,(boost::python::arg("pt"),boost::python::arg("unbound")=false),"Normal vector to the surface at some pt. Local frame applies to both output normal and input pt.  Has an 'unbound' flag signaling whether to allow the computation of the normal outside of the :yref:`grid<LevelSet.lsGrid>` extents.")
-		.def("rayTrace",&LevelSet::rayTrace,(boost::python::arg("ray")),"Performs one ray tracing, possibly modifying :yref:`surfNodes<LevelSet.surfNodes>`. Provided for debugging purposes")
-		.def("getSurface",&LevelSet::getSurface,"Returns particle surface as computed from numeric integration over the :yref:`surface nodes<LevelSet.surfNodes>`. Requires :yref:`nodesPath<LevelSet.nodesPath>` = 1.")
+		.def("distance",&LevelSet::distance,(boost::python::arg("pt"),boost::python::arg("unbound")=false),"Distance to surface at pt, with pt being expressed in the local frame. The 'unbound' flag (if True) allows the computation of distance values outside of the :yref:`grid<LevelSet.lsGrid>` extents, which otherwise returns NaN together with an error.")
+		.def("normal",&LevelSet::normal,(boost::python::arg("pt"),boost::python::arg("unbound")=false),"Unit normal vector to the surface, at some pt. Local frame applies to both output normal and input pt. Has an 'unbound' flag signaling whether to allow (if True) the computation of the normal outside of the :yref:`grid<LevelSet.lsGrid>` extents.")
+		.def("rayTrace",&LevelSet::rayTrace,(boost::python::arg("ray"),boost::python::arg("nodesTol")=50),"Performs one ray tracing along *ray* (to be given in cartesian coordinates, see spher2cart() if a conversion is useful from spherical ones; norm should not matter) and returns the obtained surface points (without modifying :yref:`surfNodes<LevelSet.surfNodes>`). Argument *nodesTol* has the same meaning as in :yref:`rayTraceSurfNodes<LevelSet.rayTraceSurfNodes>`, see therein. Provided for debugging or shape analysis purposes.")
+		.def("rayTraceSurfNodes",&LevelSet::rayTraceSurfNodes, (boost::python::arg("nSurfNodes")=102, boost::python::arg("nodesPath")=2, boost::python::arg("nodesTol") = 50),R"""(Defines all surface nodes (i.e., :yref:`surfNodes<LevelSet.surfNodes>`) by ray tracing, erasing pre-existing ones if any, according to given arguments
+
+		:param int nSurfNodes: how many rays are to be launched. Please use a perfect square + 2 if not :yref:`twoD<LevelSet.twoD>` and if *nodesPath* = 1. Previously coined nNodes in [Duriez2021b]_
+		:param int nodesPath: defines how the space of spherical coordinates $(\theta \in [0;\pi] ,\varphi\in [0;2 \pi])$ is discretized when ray tracing the boundary nodes: 1 gives a rectangular partition of that space, plus two nodes at $\theta = 0 [\pi]$; 2 locates the nodes along a spiral path [Duriez2021a]_
+		:param real nodesTol: tolerance coefficient for accepting (if $|\phi| / L <$ nodesTol $\times$ numeric precision with $\phi$ the return value of :yref:`distance<LevelSet.distance>` and $L$ a body-characteristic length taken as $\sqrt[3]{V}$ with $V$ the :yref:`volume<LevelSet.volume>`, or $\sqrt{V/g_{grid}}$ with $g_{grid}$ the grid :yref:`spacing<RegularGrid.spacing>` if :yref:`twoD<LevelSet.twoD>`) surface nodes proposed by the ray tracing algorithm
+		)""")
+		.def("getSurface",&LevelSet::getSurface,"Returns particle surface as computed from numeric integration over the :yref:`surface nodes<LevelSet.surfNodes>`. It is required those have been ray traced with nodesPath = 1. The return value is just approximate outside of spherical shapes.")
 		.def("computeMarchingCubes",&LevelSet::computeMarchingCubes,"Compute or recompute the triangulation of the particle surface after using the Marching Cubes algorithm on :yref:`distField<LevelSet.distField>`.")
 		.def("marchingCubesVertices",&LevelSet::getMarchingCubeTriangles,"Returns the vertices for a surface triangulation obtained after executing the Marching Cubes algorithm on :yref:`distField<LevelSet.distField>`.")
 		.def("marchingCubesNormals",&LevelSet::getMarchingCubeNormals,"Returns the normals for a surface triangulation obtained after executing the Marching Cubes algorithm on :yref:`distField<LevelSet.distField>`.")

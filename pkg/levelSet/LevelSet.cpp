@@ -17,6 +17,22 @@ namespace yade {
 YADE_PLUGIN((LevelSet));
 CREATE_LOGGER(LevelSet);
 
+void LevelSet::assignSurfNodes(vector<Vector3r> givenNodes)
+{
+	surfNodes.clear();
+	surfNodes.resize(givenNodes.size());
+	minRad = std::numeric_limits<Real>::infinity();
+	maxRad = 0;
+	Real normNode(-1);
+	for (unsigned int idx = 0; idx < givenNodes.size(); idx++) {
+		surfNodes[idx] = givenNodes[idx];
+		normNode       = surfNodes[idx].norm();
+		if (normNode < minRad) minRad = normNode;
+		if (normNode > maxRad) maxRad = normNode;
+	}
+	postProcessNodes();
+}
+
 Vector3r LevelSet::getCenter()
 {
 	if (!initDone) init();
@@ -33,13 +49,17 @@ Real LevelSet::smearedHeaviside(Real x) const
 	return 0.5 * (1.0 + x + sin(Mathr::PI * x) / Mathr::PI);
 }
 
-void LevelSet::rayTrace(const Vector3r& ray)
+std::vector<Vector3r> LevelSet::rayTrace(const Vector3r& ray, const Real& nodesTol)
 {
 	// we launch a ray from shape's center (= 0), and go through all grid cells until the end of the grid, looking for ray-surface intersection
-	Vector3i indices(lsGrid->closestCorner(Vector3r::Zero())), // which grid cell do we start from ?
-	        move;                                              // to control the move from one cell to another
-	Vector3r pointP(Vector3r::Zero()),
-	        point0; // pointP will always be the point where the ray starts from, while point0 is the lowest corner of the current grid cell
+	// we return all found intersection points through a C++ class member nodesOnRay (maybe weird but making the method a void-return would prevent direct Python usage)
+	nodesOnRay = std::vector<Vector3r>(); // will be the returned quantity, reset to empty vector for each ray, before being recursively populated below
+	Vector3r pointP(
+	        Vector3r::
+	                Zero()), // pointP is always the point where the ray starts from, initialized to 0 instead of center for a better precision of the approach (this may lead to brutal segfaults for non-0-centered shapes)
+	        point0;          // while point0 is the lowest corner of the current grid cell
+	Vector3i indices(lsGrid->closestCorner(pointP)), // which grid cell do we start from ?
+	        move;                                    // to control the move from one cell to another
 	std::array<Real, 3>
 	        kVal; // points of the ray are of the form pointP + k * ray (k>= 0). Then, this kVal will include the 3 smallest k-values that make the ray exit of the cell, considering in an independent manner the three axis. E.G. for a ray = (1,0,0) starting from point0, kVal = (spacing, infinity, infinity)
 	bool    diffSign // true if and only if at least one gp has a different sign than the others, ie iff at least one gp has a diff sign than the 1st one
@@ -55,7 +75,8 @@ void LevelSet::rayTrace(const Vector3r& ray)
 	while (true) {
 		LOG_DEBUG(
 		        "\nConsidering cell " << indices[0] << " " << indices[1] << " " << indices[2] << " "
-		                              << " while grid itself has " << lsGrid->nGP[0] << " " << lsGrid->nGP[1] << " " << lsGrid->nGP[2] << "gridpoints");
+		                              << " while grid itself has " << lsGrid->nGP[0] << " " << lsGrid->nGP[1] << " " << lsGrid->nGP[2]
+		                              << " gridpoints");
 		point0   = lsGrid->gridPoint(indices[0], indices[1], indices[2]);
 		diffSign = false;
 		for (unsigned int gp = 0; gp < 8; gp++) { // passing through 8 cell gridpoints to check whether they all have the same distance sign
@@ -75,7 +96,7 @@ void LevelSet::rayTrace(const Vector3r& ray)
 			}
 		}
 		if (diffSign) { // zero distance surface can be detected as in the cell only with at least one change in sign between the gridpoints
-			touchedInCell = rayTraceInCell(ray, pointP, point0, indices);
+			touchedInCell = rayTraceInCell(ray, pointP, point0, indices, nodesTol);
 			LOG_INFO(
 			        "Considering cell " << indices[0] << " " << indices[1] << " " << indices[2]
 			                            << " which should include the surface. rayTraceInCell actually returned " << touchedInCell);
@@ -89,7 +110,9 @@ void LevelSet::rayTrace(const Vector3r& ray)
 			LOG_INFO("Ray reached grid boundary because indices = " << indices << ", ray tracing for that one is over");
 			break; // this should make sense as soon as center is not already in this boundary layer (which should not happen)
 		}
-		// we will now move to the next cell:
+		// we would also stop walking along ray in case we found a (first and only) node for a starLike case:
+		if (touched && starLike) break;
+		// otherwise, we will now move to the next cell:
 		// first, computing the path lengths (along ray) to exit our current cell, testing all three directions, and filling above-mentioned kVal
 		for (int axis = 0; axis < 3; axis++) {
 			if (ray[axis] > 0) kVal[axis] = (point0[axis] + lsGrid->spacing - pointP[axis]) / ray[axis]; // a positive value
@@ -122,13 +145,14 @@ void LevelSet::rayTrace(const Vector3r& ray)
 			break;
 		}
 	}
+	return nodesOnRay;
 }
 
-bool LevelSet::rayTraceInCell(const Vector3r& ray, const Vector3r& pointP, const Vector3r& point0, const Vector3i& indices)
+bool LevelSet::rayTraceInCell(const Vector3r& ray, const Vector3r& pointP, const Vector3r& point0, const Vector3i& indices, const Real& nodesTol)
 {
 	// Given the level set surface described by a trilinear distance function and an oriented ray starting from pointP in some cell,
 	// where the cell is (redundantly, but this is to avoid computing things already computed in rayNode) defined by point0 (lowest corner) and its indices
-	// it searches for the surface points intersected by the ray in that cell (=  surfNodes), and returns true if it found one
+	// it searches for the surface points intersected by the ray in that cell, and returns true if it found one, after populating surfNodes
 	int indX(indices[0]), indY(indices[1]), indZ(indices[2]);
 	LOG_DEBUG("Ray tracing from pointP = " << pointP << " in cell " << indX << " " << indY << " " << indZ);
 	Real     normNode(-1);
@@ -182,37 +206,34 @@ bool LevelSet::rayTraceInCell(const Vector3r& ray, const Vector3r& pointP, const
 	        "N-R root = " << root << " , leading to a dimensionless distance (through the ray cubic polynom) = "
 	                      << coeffs[0] + coeffs[1] * root + coeffs[2] * root * root + coeffs[3] * root * root * root
 	                      << " , using digits = " << std::numeric_limits<Real>::digits);
-	Vector3i indicesPt; // in which cell do we find trialNode (see below) ? (quite useless since Feb 2021 actually, except for log messages)
 	if (root >= 0) trialNode = pointP + spac * root * ray;
 	else if (
 	        math::abs(root) <= Mathr::
 	                EPSILON) // tiny negative numbers count as well. See e.g. 'superellipsoid',extents=(0.07,0.09,0.14),epsilons=(1.1,0.2),spacing= 0.01 for the -z ray
 		trialNode = pointP;
-	else // truly negative roots do not count
-		return false;
-	// trialNode is not garanteed until now to be in the considered (indices) cell, to which the cubic polynom should restrict. In order to check for consistency, we no longer compare indices with indicesPt (that would be a discontinuous test too painful to make work with numeric precision), and just look at the distance value (which is continuous at the boundary of two cells)
+	else                  // truly negative roots do not count
+		return false; // we have no node from this ray
+	// trialNode is not garanteed until now to be in the considered (indices) cell, to which the cubic polynom should restrict. In order to check for consistency, we no longer check the cell indices though (that would be a discontinuous test too painful to make work with numeric precision), and just look at the distance value (which is continuous at the boundary of two cells)
 	if (!Shop::isInBB(trialNode, lsGrid->min, lsGrid->max())) return false; // still starting to check whether trialNodes fits into lsGrid
-	indicesPt = lsGrid->closestCorner(trialNode);
+	Vector3i indicesPt(lsGrid->closestCorner(trialNode)); // in which cell do we find trialNode (see below) ? (quite useless since Feb 2021 actually, except for log messages)
 	LOG_INFO("We have a possible intersection point (" << trialNode << "): it would be in cell " << indicesPt << " whereas we considered cell " << indX
 	                                                   << " " << indY << " " << indZ << endl;);
 	LOG_INFO(
 	        "Dimensionless distance, wrt to grid spacing, is here (from distance function) = " << distance(trialNode)
 	                / spac << " ; while nodesTol*epsilon = " << nodesTol * Mathr::EPSILON);
-	if (surfNodes.size() > 0)
+	if (nodesOnRay.size() > 0) // wondering about a possible duplicate with previous node (along the same ray), in preparation of the actual check below
 		LOG_INFO(
-		        "And previous node is " << surfNodes.back() << " whose comparison with gives (relative difference through norms)"
-		                                << (trialNode - surfNodes.back()).norm() / (surfNodes.back()).norm());
+		        "And previous node is " << surfNodes.back() << " (which should be along same ray and equal to " << nodesOnRay.back()
+		                                << ") whose comparison with gives (relative difference through norms)"
+		                                << (trialNode - surfNodes.back()).norm() / trialNode.norm());
 	if ((math::abs(distance(trialNode)) / lengthChar < nodesTol * Mathr::EPSILON)
 	    // looks like we found a node. Root finding algorithm normally had a Mathr::EPSILON precision wrt to spac but distance() computation is not the same, hence a different precision. Which is finally estimated here from lengthChar (which matters more than spac)
-	    && (surfNodes.size() == 0 || ((trialNode - surfNodes.back()).norm() / lengthChar > nodesTol * Mathr::EPSILON)
+	    && (nodesOnRay.size() == 0 || ((trialNode - nodesOnRay.back()).norm() / trialNode.norm() > nodesTol * Mathr::EPSILON)
 	        // but we still do not want a duplicate of last node, that would come from an adjacent cell, with phi=0 on the cell surface(s)
 	        // NB: the 2 above tests are somewhat contradictory in terms of nodesTol (whose value should not be neither too small (phi = 0 could not be checked and more duplicate) nor too big (phi = 0 could be false positive and false positive in duplicate test). What about a 1e-7 hardcoded ?..
-	        // NB2: maybe we do not need lChar.. (and just divide with trialNode.norm())
 	        )) {
-		LOG_INFO(
-		        "ONE NODE FOUND ! (" << trialNode << "): it would be in cell " << indicesPt << " whereas we considered cell " << indX << " " << indY
-		                             << " " << indZ);
-		surfNodes.push_back(trialNode); // we insert it in shape.surfNodes
+		LOG_INFO("ONE NODE FOUND ! (" << trialNode << ")");
+		nodesOnRay.push_back(trialNode); // we insert it in nodesOnRay
 		touched  = true;
 		normNode = trialNode.norm();
 		if (normNode < minRad) minRad = normNode;
@@ -229,7 +250,7 @@ Vector3r LevelSet::normal(const Vector3r& pt, const bool& unbound) const
 	int      xInd(indices[0]), yInd(indices[1]), zInd(indices[2]);
 
 	if (xInd < 0 || yInd < 0 || zInd < 0) { // operators precedence OK in || vs <
-		LOG_ERROR("Can not compute the normal, returning a NaN vector.");
+		LOG_ERROR("Can not compute the normal because of given negative grid indices, returning a NaN vector.");
 		return Vector3r(NaN, NaN, NaN);
 	}
 	// Some declarations:
@@ -250,41 +271,47 @@ Vector3r LevelSet::normal(const Vector3r& pt, const bool& unbound) const
 			}
 		}
 	}
-	return Vector3r(nx, ny, nz).normalized(); // Do we really need the normalized() ?.. normally, no
+	return Vector3r(nx, ny, nz).normalized(); // .normalized() useful since the FMM-output discrete phi field only approximates Eikonal equation
 }
 
-void LevelSet::initSurfNodes()
+void LevelSet::rayTraceSurfNodes(const int& nSurfNodes, const int& nodesPath, const Real& nodesTol)
 {
+	surfNodes.clear();
 	// Obtaining the boundary nodes through "ray tracing", starting from the center
 	if (nSurfNodes <= 2 && nodesPath == 1 && !twoD)
 		LOG_ERROR("You asked for a level set shape with no more than two boundary nodes, for contact detection purposes. This is too few and will lead "
 		          "to square roots of negative numbers, then unexpected events.");
-	int  nAngle(int(sqrt(nSurfNodes - 2)));    // useful only if(!twoD && case 1), but let s declare and assign it once for all
-	Real phiMult(Mathr::PI * (3. - sqrt(5.))); // useful only if(!twoD && case 2), ditto
-	for (int node = 0; node < nSurfNodes; node++) {
+	int              nAngle(int(sqrt(nSurfNodes - 2)));    // useful only if(!twoD && case 1), but let s declare and assign it once for all
+	Real             phiMult(Mathr::PI * (3. - sqrt(5.))); // useful only if(!twoD && case 2), ditto
+	vector<Vector3r> tracedNodes;                          // quite redundant with class member nodesOnRay, let it be
+	for (int rayIdx = 0; rayIdx < nSurfNodes; rayIdx++) {
 		if (twoD) // 2D analysis in (x,y) plane
-			rayTrace(Vector3r(cos(float(node) / nSurfNodes * 2 * Mathr::PI), sin(float(node) / nSurfNodes * 2 * Mathr::PI), 0));
-		else {
+		{
+			tracedNodes = rayTrace(
+			        Vector3r(cos(float(rayIdx) / nSurfNodes * 2 * Mathr::PI), sin(float(rayIdx) / nSurfNodes * 2 * Mathr::PI), 0), nodesTol);
+			surfNodes.insert(surfNodes.end(), tracedNodes.begin(), tracedNodes.end());
+		} else {
 			Real theta(0), phi(0);
 			switch (nodesPath) {
 				case 1: // rectangular partition method
-					if (node < 2) {
-						theta = (node == 0 ? 0 : Mathr::PI);
+					if (rayIdx < 2) {
+						theta = (rayIdx == 0 ? 0 : Mathr::PI);
 						phi   = 0; // exact value does not really matter..
 					} else {
-						if ((node - 2) / nAngle >= nAngle) // possible when nSurfNodes != k^2 + 2...
+						if ((rayIdx - 2) / nAngle >= nAngle) // possible when nSurfNodes != k^2 + 2...
 							LOG_ERROR(
 							        "Problems may come soon, please define nSurfNodes as a squared integer + 2 if not twoD. "
 							        "Otherwise you will get phi = "
-							        << (node - 2) / nAngle * 2 * Mathr::PI / nAngle);
-						theta = ((node - 2) % nAngle + 1) * Mathr::PI / (nAngle + 1.); // won't include 0 neither pi, handled previously
-						phi   = (node - 2) / nAngle * 2. * Mathr::PI
+							        << (rayIdx - 2) / nAngle * 2 * Mathr::PI / nAngle);
+						theta = ((rayIdx - 2) % nAngle + 1) * Mathr::PI
+						        / (nAngle + 1.); // won't include 0 neither pi, handled previously
+						phi = (rayIdx - 2) / nAngle * 2. * Mathr::PI
 						        / nAngle; // from 0 included to 2 pi excluded. The integer division as first term is intended and prevents merging the 2 nAngle denominators. Also note the left-to-right associativity of * and / which make things work as expected
 					}
 					break;
-				case 2: // spiral points: Elias' code in the spirit of Rakhmanov1994
-					theta = acos(-1. + (2. * node + 1.) / nSurfNodes);
-					phi   = node * phiMult;
+				case 2: // spiral points: Elias' polyhedralBall code in the spirit of Rakhmanov1994
+					theta = acos(-1. + (2. * rayIdx + 1.) / nSurfNodes);
+					phi   = rayIdx * phiMult;
 					break;
 				default:
 					LOG_ERROR(
@@ -292,15 +319,22 @@ void LevelSet::initSurfNodes()
 					        << nodesPath << " which is not implemented. Supported choices are 1 and 2.")
 			}
 			LOG_DEBUG(
-			        "\nnode = " << node << " ; theta = " << theta << " and phi = " << phi << " ; launching ray " << Vector3r(1, theta, phi)
-			                    << endl);
-			rayTrace(ShopLS::spher2cart(Vector3r(1, theta, phi)));
+			        "\nrayIdx (i.e., node for convex) = " << rayIdx << " ; theta = " << theta << " and phi = " << phi << " ; launching ray "
+			                                              << Vector3r(1, theta, phi) << endl);
+			tracedNodes = rayTrace(ShopLS::spher2cart(Vector3r(1, theta, phi)), nodesTol);
+			surfNodes.insert(surfNodes.end(), tracedNodes.begin(), tracedNodes.end());
 		}
 	}
-	if (int(surfNodes.size()) != nSurfNodes)
+	if (int(surfNodes.size()) != nSurfNodes) {
+		string string1(""), string2("");
+		if (starLike) string1 = ", for this starLike shape: this should really not happen";
+		else
+			string2 = " and/or multiple nodes on a same ray (which could be physical)";
 		LOG_WARN(
-		        "Ray tracing gave " << surfNodes.size() << " boundary nodes instead of " << nSurfNodes
-		                            << " asked for: should not happen at least with convex bodies. You may want to adapt nodesTol.");
+		        "Ray tracing gave " << surfNodes.size() << " boundary nodes instead of " << nSurfNodes << " required" << string1
+		                            << ". You may want to check for unsuccessful rays (and nodesTol)" << string2 << ".");
+	}
+	postProcessNodes();
 }
 
 void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, boundary nodes, ...) once distField exists
@@ -403,12 +437,12 @@ void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, bo
 	lengthChar = twoD
 	        ? sqrt(volume / lsGrid->spacing)
 	        : cbrt(volume); // measuring lengthChar here (even if surfNodes already exist and won't be recomputed below) to allow a user to satisfactory call for a rayTrace even after a O.save / O.load
-	if (!surfNodes
-	             .size()) { // 0 boundary nodes as of now. Condition could be false after save/load, where we do not need to duplicate the nodes. Other choice to avoid this test would be to save everything else that's computed by init(), eg center, ..
-		initSurfNodes();
-		sphericity = maxRad / minRad;
-	} // note that sphericity is always saved (but maxRad, minRad are not and are meaningfull only after initSurfNodes())
-	initDone = true;
+	initDone   = true;
+}
+
+void LevelSet::postProcessNodes()
+{
+	sphericity = maxRad / minRad;
 }
 
 Real LevelSet::distance(const Vector3r& pt, const bool& unbound) const
@@ -492,9 +526,9 @@ Vector3r LevelSet::getInertia()
 Real LevelSet::getSurface() const
 {
 	Real nbrAngles(sqrt(surfNodes.size() - 2));
-	if (nodesPath != 1 or nbrAngles != int(nbrAngles)) {
+	if (nbrAngles != int(nbrAngles)) {
 		LOG_ERROR(
-		        "Impossible to compute surface with nodesPath = " << nodesPath << " (1 expected) and " << surfNodes.size()
+			  "Impossible to compute surface with " << surfNodes.size()
 		                                                          << " surface nodes (squared integer + 2 expected). Returning -1");
 		return -1.;
 	}
