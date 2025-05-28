@@ -337,7 +337,7 @@ void LevelSet::rayTraceSurfNodes(const int& nSurfNodes, const int& nodesPath, co
 	postProcessNodes();
 }
 
-void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, boundary nodes, ...) once distField exists
+void LevelSet::init() // computes stuff (center, volume, inertia, boundary nodes, ...) once distField exists
 {
 	if (initDone) LOG_WARN("How comes we run a second time init ?")
 	if (!distField.size()) LOG_ERROR("You are interested into center/volume before that distField has been defined");
@@ -359,10 +359,10 @@ void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, bo
 	volume     = 0.0;      // Initializing volume to zero
 	Real     phi, dV(-1.); // Distance value and considered particle volume for the current cell (the latter can be less than Vcell due to smearing)
 	Vector3r gp;
-	// Particle volume is now computed below based upon the voxellised description using "inside" voxels, where a voxel is said to be inside according to its minimum gridpoint only (boundary effects seem to be unavoidable)
-	for (int xIndex = 0; xIndex < nGPx - 1; xIndex++) { // necessarily stopping before the very last gridpoint
-		for (int yIndex = 0; yIndex < nGPy - 1; yIndex++) {
-			for (int zIndex = 0; zIndex < nGPz - 1; zIndex++) {
+	// Particle volume is now computed below from a voxellised description which is built upon the sign of distField values
+	for (int xIndex = 0; xIndex < nGPx ; xIndex++) {
+		for (int yIndex = 0; yIndex < nGPy ; yIndex++) {
+			for (int zIndex = 0; zIndex < nGPz ; zIndex++) {
 				phi = distField[xIndex][yIndex][zIndex];
 				if (math::abs(phi) < phiRef)
 					dV = smearedHeaviside(-phi / phiRef)
@@ -375,9 +375,9 @@ void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, bo
 					nVoxInside++;
 					volume += dV;
 					gp = lsGrid->gridPoint(xIndex, yIndex, zIndex);
-					xMean += (gp[0] + spac / 2.) * dV;
-					yMean += (gp[1] + spac / 2.) * dV;
-					zMean += (gp[2] + spac / 2.) * dV;
+					xMean += gp[0] * dV;
+					yMean += gp[1] * dV;
+					zMean += gp[2] * dV;
 				}
 			}
 		}
@@ -390,17 +390,16 @@ void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, bo
 	yMean /= volume;
 	zMean /= volume;
 	center = Vector3r(xMean, yMean, zMean);
-	if (center.norm()
-	    > pow(3., 0.5) * spac) // possible offsets almost reach one voxel edge in 1D (e.g. an external but tangent voxel is considered to be inside)
+	if (center.norm() > pow(3., 0.5) * spac) // checking the possible offset wrt a grid spacing-dependent characteristic length
 		LOG_ERROR(
 		        "Incorrect LevelSet description: shape center is equal to " << center << " in local axes, instead of 0 (modulo a " << spac
 		                                                                    << " grid spacing).");
 	// Computing inertia in a 2nd loop, now that we first computed center above (in an unavoidable 1st loop):
 	Real Ixx(0), Ixy(0), Ixz(0), Iyy(0), Iyz(0), Izz(0);
 	Real xV, yV, zV;
-	for (int xIndex = 0; xIndex < nGPx - 1; xIndex++) { // we will stop before the last grid points to avoid counting twice the last (or first) voxels
-		for (int yIndex = 0; yIndex < nGPy - 1; yIndex++) {
-			for (int zIndex = 0; zIndex < nGPz - 1; zIndex++) {
+	for (int xIndex = 0; xIndex < nGPx; xIndex++) {
+		for (int yIndex = 0; yIndex < nGPy; yIndex++) {
+			for (int zIndex = 0; zIndex < nGPz; zIndex++) {
 				phi = distField[xIndex][yIndex][zIndex];
 				if (math::abs(phi) < phiRef)
 					dV = smearedHeaviside(-phi / phiRef)
@@ -411,9 +410,9 @@ void LevelSet::init() // computes stuff (nVoxInside, center, volume, inertia, bo
 					dV = 0.; // outside
 				if (dV > 0.) {
 					gp = lsGrid->gridPoint(xIndex, yIndex, zIndex);
-					xV = gp[0] + spac / 2.; // again, we choose taking the middle of this inside voxel, instead of the gridpoint
-					yV = gp[1] + spac / 2.;
-					zV = gp[2] + spac / 2.;
+					xV = gp[0];
+					yV = gp[1];
+					zV = gp[2];
 					Ixx += (pow(yV - yMean, 2) + pow(zV - zMean, 2)) * dV;
 					Iyy += (pow(xV - xMean, 2) + pow(zV - zMean, 2)) * dV;
 					Izz += (pow(xV - xMean, 2) + pow(yV - yMean, 2)) * dV;

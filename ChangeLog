@@ -37,9 +37,9 @@ Fluid & thermal & particle saturation
 
 LevelSet & Volume-interacting LevelSet
 --------------------------------------
-  Getting back to [Duriez2021b] behavior for inertial descriptions: LS volume and inertia computations include again strictly zero distance values (!1101)
-
   Making it possible to directly assign the surface nodes to a LevelSet (shape or body) (!1095)
+  Getting back to [Duriez2021b] behavior for inertial descriptions: LS volume and inertia computations include again strictly zero distance values (!1101)
+  Modifying the voxellized interpretation of LevelSet.distField hence LevelSet.center (!1103)
 
 Polyhedra / Facets
 ------------------
