@@ -16,6 +16,8 @@ Using and Programming
   
   FEMxDEM.rst
   
+  BayesianCalibration.rst
+
   prog.rst
   
   gitrepo.rst

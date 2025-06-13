@@ -69,6 +69,8 @@ Theoretical background and extensions
 
   potentialparticles.rst
 
+  BayesianCalibration.rst
+
 ######################################
 Performance enhancements
 ######################################

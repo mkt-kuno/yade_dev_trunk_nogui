@@ -17,9 +17,12 @@ Documentation & Comments
   Update release versioning information
   Doc precision about equivalent Facet/Wall ScGeom radius
   Fix wrong statement in makeCloud doc (!1089)
+  Add docu on automated calibration using iterative Bayesian filtering, including excercises to experiment with the external software GrainLearning (!1098)
 
 Examples
 ********
+
+   Two examples of Bayesian calibration: one for particle-particle collision and one for triaxial compression (!1098)
 
 User Interface (GUI)
 ********************
