@@ -53,6 +53,7 @@ OpenMPI / OpenMP threads
 
 OpenFoam coupling
 *****************
+  Add interFoam-YADE coupling (!1096)
 
 Packaging & Build Improvements
 ******************************
