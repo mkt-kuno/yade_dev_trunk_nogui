@@ -7,13 +7,7 @@ The first section gives the reference that we kindly ask you to use for citing Y
 With the increasing rate of publications using Yade it became difficult to list them all, therefore coverage of recent years is only partial.
 You can help us: if you publish or you know publications related to Yade do not hesitate to add it to this list. If you don't have direct access to the source code, please send the reference (as a bibtex item) to `Yade developpers <yade-dev@lists.launchpad.net>`_. If a pdf PDF is freely available, add url for direct fulltext downlad. Yade's web server will gladly host such PDF if legally permitted.
 
-.. note:: This file is generated from :ysrc:`doc/yade-articles.bib`, :ysrc:`doc/yade-conferences.bib`, :ysrc:`doc/yade-theses.bib`, :ysrc:`doc/yade-tech-archive.bib`, and :ysrc:`doc/citing_yade.bib`.
-
-Citing Yade
------------
-Corresponding bibtex entries `here <https://gitlab.com/yade-dev/trunk/blob/master/doc/citing_yade.bib>`_. See also `"Acknowledging Yade" <citing.html>`_.
-
-@bib2rst.bib2rst('../citing_yade.bib')@
+.. note:: This file is generated from :ysrc:`doc/yade-articles.bib`, :ysrc:`doc/yade-conferences.bib`, :ysrc:`doc/yade-theses.bib`, and :ysrc:`doc/yade-tech-archive.bib`.
 
 Journal articles
 ----------------

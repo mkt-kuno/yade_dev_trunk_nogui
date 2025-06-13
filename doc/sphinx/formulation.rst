@@ -247,6 +247,7 @@ Constants
 Let us consider two spheres with *initial* centers $\bar{\vec{C}_1}$, $\bar{\vec{C}}_2$ and radii $r_1$, $r_2$ that enter into contact. The order of spheres within the contact is arbitrary and has no influence on the behavior. Then we define lengths
 
 .. math::
+	:label: eq-separation-dist
 	:nowrap:
 
 	\begin{align*}
@@ -401,6 +402,8 @@ Summary force $\vec{F}=\vec{F}_N+\vec{F}_T$ is then applied to both particles --
 		\vec{F}_1&+=\vec{F} & \vec{F}_2&+=-\vec{F} \\
 		\vec{T}_1&+=d_1(-\vec{n})\times \vec{F} & \vec{T}_2&+=d_2 \vec{n} \times \vec{F}.
 	\end{align*}
+
+Here, $d_1$ and $d_2$ are given by :eq:`eq-separation-dist`. Forces and torques must be applied to the same (contact) point for both particles. Otherwise, an artificial torque will appear and break conservation of angular momentum.
 
 .. _sect-motion-integration:
 

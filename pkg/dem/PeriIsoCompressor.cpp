@@ -149,7 +149,7 @@ void PeriTriaxController::strainStressStiffUpdate()
 	                          << stressTensor(2, 0) << " " << stressTensor(2, 1) << " " << stressTensor(2, 2) << endl
 	                          << "unbalanced = " << Shop::unbalancedForce(/*useMaxForce=*/false, scene));
 
-	if (n > 0) stiff = (1. / n) * sumStiff;
+	if (n > 0) stiff = (1. / n) * sumStiff; // Not dynCell
 	else
 		stiff = Vector3r::Zero();
 }

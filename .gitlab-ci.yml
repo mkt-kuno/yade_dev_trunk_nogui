@@ -872,7 +872,7 @@ test_22_foam10:
   dependencies:
     - make_22_04
   needs: ["make_22_04"]
-  timeout: 25 minutes
+  timeout: 4 hours
   before_script:
     - export NO_GUI="NO_GUI"
     - sh -c "wget -O - https://dl.openfoam.org/gpg.key > /etc/apt/trusted.gpg.d/openfoam.asc"

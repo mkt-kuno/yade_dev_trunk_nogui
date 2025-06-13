@@ -749,7 +749,8 @@ try {
 	py::def("fabricTensor",
 	        Shop__fabricTensor,
 	        (py::args("cutoff") = 0.0, py::args("splitTensor") = false, py::args("thresholdForce") = NaN, py::args("extrema") = py::list()),
-	        "Computes the fabric tensor $F_{ij}=\\frac{1}{n_c}\\sum_c n_i n_j$ [Satake1982]_, for all interactions $c$.\n\n:param Real cutoff: intended to "
+	        "Computes the fabric tensor $F_{ij}=\\frac{1}{n_c}\\sum_c n_i n_j$ [Satake1982]_ over all interactions $c$ with $n_c$ the total number of "
+	        "interactions and $n_i$ and $n_j$ the $i$ and $j$ components of the contact normal, respectively.\n\n:param Real cutoff: intended to "
 	        "disregard boundary effects: to define in [0;1] to focus on the interactions located in the centered inner (1-cutoff)^3*$V$ part of the "
 	        "spherical packing $V$.\n\n:param bool splitTensor: split the fabric tensor into two parts related to the strong (greatest compressive normal "
 	        "forces) and weak contact forces respectively.\n\n:param Real thresholdForce: if the fabric tensor is split into two parts, a threshold value "
@@ -938,8 +939,10 @@ try {
 	        (py::args("volume") = 0, py::args("symmetry") = true),
 	        "Compute overall stress of periodic cell using the same equation as function getStress. In addition, the tangent operator is calculated using "
 	        "the equation published in [Kruyt and Rothenburg1998]_:\n\n.. math:: S_{ijkl}=\\frac{1}{V}\\sum_{c}(k_n n_i l_j n_k l_l + k_t t_i l_j t_k "
-	        "l_l)\n\n:param float volume: same as in function getStress\n:param bool symmetry: make the tensors symmetric.\n\n:return: macroscopic stress "
-	        "tensor and tangent operator as py::tuple");
+	        "l_l)\n\n Although the above formula gives the elements of the fourth-order stiffness tensor, this tangent operator will be returned in Voigt "
+	        "notation, giving a 6 by 6 tensor, where elements of $S_{ijkl}$ mapping to the same Voigt element will be averaged.\n\n:param float volume:"
+	        " same as in function getStress\n:param bool symmetry: make the tensors symmetric.\n\n:return: macroscopic stress tensor and tangent operator"
+	        " as py::tuple");
 	py::def("setBodyPosition",
 	        setBodyPosition,
 	        (py::args("id"), py::args("pos"), py::args("axis") = "xyz"),
