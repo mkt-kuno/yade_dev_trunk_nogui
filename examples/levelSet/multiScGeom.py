@@ -1,6 +1,6 @@
 # Illustration of MultiScGeom and related classes for non-convex LevelSet shapes
 # The script simulates a rounded tetrahedron bouncing along z-axis on a Wall-shaped floor
-# By jerome.duriez@inrae.fr and sacha.duverger@inrae.fr
+# By jerome.duriez@inrae.fr and sacha.duverger@inrae.fr
 
 from yade import plot
 
