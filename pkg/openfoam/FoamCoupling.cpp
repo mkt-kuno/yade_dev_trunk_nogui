@@ -29,9 +29,7 @@ YADE_PLUGIN((Bo1_FluidDomainBbox_Aabb));
 void Bo1_FluidDomainBbox_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r&, const Body*)
 {
 	FluidDomainBbox* domain = static_cast<FluidDomainBbox*>(cm.get());
-	if (!bv) {
-		bv = shared_ptr<Bound>(new Aabb);
-	}
+	if (!bv) { bv = shared_ptr<Bound>(new Aabb); }
 	Aabb* aabb = static_cast<Aabb*>(bv.get());
 	aabb->min  = scene->isPeriodic ? scene->cell->wrapPt(domain->minBound) : domain->minBound;
 	aabb->max  = scene->isPeriodic ? scene->cell->wrapPt(domain->maxBound) : domain->maxBound;
@@ -230,9 +228,7 @@ void FoamCoupling::buildSharedIdsMap()
 			if (otherBody->getIsFluidDomainBbox()) {
 				const shared_ptr<FluidDomainBbox>& flbox = YADE_PTR_CAST<FluidDomainBbox>(otherBody->shape);
 				flbox->bIds.push_back(bodyId);
-				if (!flbox->hasIntersection) {
-					flbox->hasIntersection = true;
-				}
+				if (!flbox->hasIntersection) { flbox->hasIntersection = true; }
 				int indx = (flbox->bIds.size()) - 1;
 				testMap.insert(std::make_pair(
 				        otherId,
@@ -249,9 +245,7 @@ void FoamCoupling::buildSharedIdsMap()
 		const shared_ptr<Body>& flb = (*scene->bodies)[fluidId];
 		if (flb) {
 			const shared_ptr<FluidDomainBbox>& flBox = YADE_PTR_CAST<FluidDomainBbox>(flb->shape);
-			if (flBox->bIds.size() > 0) {
-				inCommunicationProc.push_back(std::make_pair(flBox->domainRank, flBox->bIds.size()));
-			}
+			if (flBox->bIds.size() > 0) { inCommunicationProc.push_back(std::make_pair(flBox->domainRank, flBox->bIds.size())); }
 		}
 	}
 }
@@ -265,9 +259,7 @@ int FoamCoupling::ifSharedIdMap(const Body::id_t& testId)
 		return testId == elem.first;
 	});
 
-	if (it != sharedIdsMapIndx.end()) {
-		res = it - sharedIdsMapIndx.begin();
-	}
+	if (it != sharedIdsMapIndx.end()) { res = it - sharedIdsMapIndx.begin(); }
 	return res;
 }
 
@@ -288,9 +280,7 @@ void FoamCoupling::buildLocalIds()
 			}
 			for (const auto& testId : bodyList) {
 				std::vector<Body::id_t>::iterator iter = std::find(subD->ids.begin(), subD->ids.end(), testId); // can subD have ids sorted?
-				if (iter != subD->ids.end()) {
-					localIds.push_back(*iter);
-				}
+				if (iter != subD->ids.end()) { localIds.push_back(*iter); }
 			}
 		} else {
 			return;
@@ -594,9 +584,7 @@ void FoamCoupling::getParticleForce()
 void FoamCoupling::resetFluidDomains()
 {
 	// clear the vector ids held fluidDomainBbox->bIds
-	if (localRank == yadeMaster and not serialYade) {
-		return;
-	}
+	if (localRank == yadeMaster and not serialYade) { return; }
 	for (unsigned f = 0; f != fluidDomains.size(); ++f) {
 		const shared_ptr<Body>& fdomain = (*scene->bodies)[fluidDomains[f]];
 		if (fdomain) {
@@ -612,9 +600,7 @@ void FoamCoupling::resetFluidDomains()
 void FoamCoupling::setHydroForce()
 {
 	// add the force
-	if (localRank == yadeMaster and not serialYade) {
-		return;
-	}
+	if (localRank == yadeMaster and not serialYade) { return; }
 	for (const auto& rf : hForce) {
 		int                                indx     = abs(rf.first - localCommSize);
 		const std::vector<double>&         forceVec = rf.second;
@@ -682,9 +668,7 @@ void FoamCoupling::runCoupling()
 
 void FoamCoupling::action()
 {
-	if (!initDone) {
-		StartFoamSolver();
-	}
+	if (!initDone) { StartFoamSolver(); }
 	if (exchangeData()) {
 		resetFluidDomains();
 		runCoupling();

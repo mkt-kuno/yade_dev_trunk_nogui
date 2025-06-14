@@ -12,8 +12,8 @@
 #include <preprocessing/dem/Shop.hpp>
 
 namespace yade {
-YADE_PLUGIN((
-        Ig2_Sphere_LevelSet_ScGeom)(Ig2_Box_LevelSet_ScGeom)(Ig2_Wall_LevelSet_ScGeom)(Ig2_Wall_LevelSet_MultiScGeom)(Ig2_LevelSet_LevelSet_ScGeom)(Ig2_LevelSet_LevelSet_MultiScGeom));
+YADE_PLUGIN((Ig2_Sphere_LevelSet_ScGeom)(Ig2_Box_LevelSet_ScGeom)(Ig2_Wall_LevelSet_ScGeom)(Ig2_Wall_LevelSet_MultiScGeom)(Ig2_LevelSet_LevelSet_ScGeom)(
+        Ig2_LevelSet_LevelSet_MultiScGeom));
 CREATE_LOGGER(Ig2_Sphere_LevelSet_ScGeom);
 CREATE_LOGGER(Ig2_Box_LevelSet_ScGeom);
 CREATE_LOGGER(Ig2_LevelSet_LevelSet_ScGeom);
@@ -70,8 +70,8 @@ bool Ig2_Sphere_LevelSet_ScGeom::go(
 	geomPtr->doIg2Work(
 	        contactPoint,
 	        maxOverlap, // Doesn't work for maxOverlap > R, like how pretty much any contact law doesn't.
-	        rad, // Inconsequential value since the contact point to centre distance is used for the torque anyway.
-	        rad, // Inconsequential value since the contact point to centre distance is used for the torque anyway.
+	        rad,        // Inconsequential value since the contact point to centre distance is used for the torque anyway.
+	        rad,        // Inconsequential value since the contact point to centre distance is used for the torque anyway.
 	        state1,
 	        state2,
 	        scene,

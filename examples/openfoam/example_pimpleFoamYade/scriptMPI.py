@@ -2,8 +2,8 @@ import os
 # from yadeimport import *
 from yade import mpy as mp
 
-parallelYade=True #mpirun --allow-run-as-root -n 2 python3 scriptMPI.py , if False  python3 scriptMPI.py
-numProcOF=2
+parallelYade = True  #mpirun --allow-run-as-root -n 2 python3 scriptMPI.py , if False  python3 scriptMPI.py
+numProcOF = 2
 
 O.periodic = True
 O.cell.setBox(1.005, 1.005, 1.005)
@@ -62,8 +62,6 @@ sphereIDs = [b.id for b in O.bodies if type(b.shape) == Sphere]
 
 # Integrator
 # add small damping in case of stability issues.. ~ 0.1 max, also note : If gravity is needed, set it in constant/g dir.
-
-
 '''The yade specific (icoFoamYade, pimpleFoamYade) OpenFOAM solver can be found in $FOAM_USER_APPBIN, (
 # full path here, the scond argument, 2 is the number of FoamProcs. '''
 # fluidCoupling.SetOpenFoamSolver(os.environ.get('FOAM_USER_APPBIN')+'/icoFoamYade', 2)

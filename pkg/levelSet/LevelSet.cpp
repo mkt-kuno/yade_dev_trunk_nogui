@@ -215,7 +215,8 @@ bool LevelSet::rayTraceInCell(const Vector3r& ray, const Vector3r& pointP, const
 		return false; // we have no node from this ray
 	// trialNode is not garanteed until now to be in the considered (indices) cell, to which the cubic polynom should restrict. In order to check for consistency, we no longer check the cell indices though (that would be a discontinuous test too painful to make work with numeric precision), and just look at the distance value (which is continuous at the boundary of two cells)
 	if (!Shop::isInBB(trialNode, lsGrid->min, lsGrid->max())) return false; // still starting to check whether trialNodes fits into lsGrid
-	Vector3i indicesPt(lsGrid->closestCorner(trialNode)); // in which cell do we find trialNode (see below) ? (quite useless since Feb 2021 actually, except for log messages)
+	Vector3i indicesPt(lsGrid->closestCorner(
+	        trialNode)); // in which cell do we find trialNode (see below) ? (quite useless since Feb 2021 actually, except for log messages)
 	LOG_INFO("We have a possible intersection point (" << trialNode << "): it would be in cell " << indicesPt << " whereas we considered cell " << indX
 	                                                   << " " << indY << " " << indZ << endl;);
 	LOG_INFO(
@@ -360,9 +361,9 @@ void LevelSet::init() // computes stuff (center, volume, inertia, boundary nodes
 	Real     phi, dV(-1.); // Distance value and considered particle volume for the current cell (the latter can be less than Vcell due to smearing)
 	Vector3r gp;
 	// Particle volume is now computed below from a voxellised description which is built upon the sign of distField values
-	for (int xIndex = 0; xIndex < nGPx ; xIndex++) {
-		for (int yIndex = 0; yIndex < nGPy ; yIndex++) {
-			for (int zIndex = 0; zIndex < nGPz ; zIndex++) {
+	for (int xIndex = 0; xIndex < nGPx; xIndex++) {
+		for (int yIndex = 0; yIndex < nGPy; yIndex++) {
+			for (int zIndex = 0; zIndex < nGPz; zIndex++) {
 				phi = distField[xIndex][yIndex][zIndex];
 				if (math::abs(phi) < phiRef)
 					dV = smearedHeaviside(-phi / phiRef)
@@ -439,10 +440,7 @@ void LevelSet::init() // computes stuff (center, volume, inertia, boundary nodes
 	initDone   = true;
 }
 
-void LevelSet::postProcessNodes()
-{
-	sphericity = maxRad / minRad;
-}
+void LevelSet::postProcessNodes() { sphericity = maxRad / minRad; }
 
 Real LevelSet::distance(const Vector3r& pt, const bool& unbound) const
 {
@@ -526,9 +524,7 @@ Real LevelSet::getSurface() const
 {
 	Real nbrAngles(sqrt(surfNodes.size() - 2));
 	if (nbrAngles != int(nbrAngles)) {
-		LOG_ERROR(
-			  "Impossible to compute surface with " << surfNodes.size()
-		                                                          << " surface nodes (squared integer + 2 expected). Returning -1");
+		LOG_ERROR("Impossible to compute surface with " << surfNodes.size() << " surface nodes (squared integer + 2 expected). Returning -1");
 		return -1.;
 	}
 	Real dtheta(Mathr::PI / (nbrAngles + 1)), dphi(2 * Mathr::PI / nbrAngles);

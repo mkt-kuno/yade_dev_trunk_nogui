@@ -479,7 +479,7 @@ def levelSetBody(
         distField=[],
         smearCoeff=1.5,
         nSurfNodes=102,
-        surfNodes = [],
+        surfNodes=[],
         nodesPath=2,
         nodesTol=50,
         orientation=Quaternion(1, 0, 0, 0),
@@ -487,7 +487,7 @@ def levelSetBody(
         axesAABE=Vector3.Zero,
         dynamic=True,
         material=-1,
-        starLike = False
+        starLike=False
 ):
 	"""Creates a :yref:`LevelSet` shaped body through various workflows: one can choose to define the discrete distance field from pre-defined shapes (through *shape* and related arguments), or to mimick a :yref:`Clump` instance (*clump* argument, for comparison purposes), or directly assign the discrete distance field on some grid (*distField* and *grid* arguments). Surface nodes can also be either ray traced (see *nSurfNodes*, *nodesPath* and *nodesTol*) or directly assigned (see *surfNodes*)
 
@@ -538,7 +538,9 @@ def levelSetBody(
 			extents = Vector3(extents[0], extents[1], extents[2])
 		b.shape = lsSimpleShape(3, AlignedBox3(-extents, extents), epsilons=epsilons, step=spacing, smearCoeff=smearCoeff)
 	elif len(distField):
-		b.shape = LevelSet(lsGrid=grid, distField=distField, smearCoeff=smearCoeff, starLike = starLike)  # NB: we could pass twoD = sthg here, function of distField size
+		b.shape = LevelSet(
+		        lsGrid=grid, distField=distField, smearCoeff=smearCoeff, starLike=starLike
+		)  # NB: we could pass twoD = sthg here, function of distField size
 	if clump != None:
 		if not isinstance(clump, Clump):
 			raise ValueError("Please give a Clump instance as a clump attribute, instead of ", clump)
@@ -563,12 +565,12 @@ def levelSetBody(
 	else:
 		b.aspherical = True
 	b.state.ori = b.state.refOri = orientation
-        # Finally defining the nodes (unless nSurfNodes = 0 and surfNodes remains empty, probably because VLS-DEM with no nodes is used) in the below if block:
+	# Finally defining the nodes (unless nSurfNodes = 0 and surfNodes remains empty, probably because VLS-DEM with no nodes is used) in the below if block:
 	if len(surfNodes) > 0:
 		b.shape.assignSurfNodes(surfNodes)
 	elif nSurfNodes > 0:
 		b.shape.rayTraceSurfNodes(nSurfNodes, nodesPath, nodesTol)
-        # And the VLS-DEM *AABE properties:
+# And the VLS-DEM *AABE properties:
 	b.shape.hasAABE = hasAABE
 	b.shape.axesAABE = axesAABE
 	return b

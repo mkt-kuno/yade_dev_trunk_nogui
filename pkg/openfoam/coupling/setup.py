@@ -13,25 +13,23 @@ import argparse
 
 
 def getVersionNumber(foamVersionString):
-    if foamVersionString[0] == 'v':
-        return int(foamVersionString.replace('v',''))
-    else:
-        return int(foamVersionString)
+	if foamVersionString[0] == 'v':
+		return int(foamVersionString.replace('v', ''))
+	else:
+		return int(foamVersionString)
+
 
 currentFoamVersion = ""
 rootDir = os.getcwd()
 print("Preparing Yade-OpenFOAM compilation")
-supportedFoamVersions = ['v2312','v2306',
-                         'v2212', 'v2206',
-                         'v2112', 'v2106',
-                         'v2012', 'v2006',
-                         'v1912', 'v1906',
-                         '6', '10', '11'] #11 is not supported yet, maybe 2212 is also supported?
+supportedFoamVersions = [
+        'v2312', 'v2306', 'v2212', 'v2206', 'v2112', 'v2106', 'v2012', 'v2006', 'v1912', 'v1906', '6', '10', '11'
+]  #11 is not supported yet, maybe 2212 is also supported?
 
 try:
-    currentFoamVersion = os.environ['WM_PROJECT_VERSION']
+	currentFoamVersion = os.environ['WM_PROJECT_VERSION']
 except:
-    print("Could not detect OpenFOAM version, have you sourced bashrc from $FOAM_SRC/etc/bashrc ?")
+	print("Could not detect OpenFOAM version, have you sourced bashrc from $FOAM_SRC/etc/bashrc ?")
 
 versionNumber = getVersionNumber(currentFoamVersion)
 
@@ -44,10 +42,13 @@ isFoundationVersion = False if currentFoamVersion[0] == 'v' else True
 isVersion2312 = True if currentFoamVersion == 'v2312' else False
 
 if not currentFoamVersion in supportedFoamVersions:
-    print("Error : The OpenFOAM version", currentFoamVersion, " is not supported, but we will try compiling as if it was v2312 (or 6 if a foundation version is found)")
-    isVersion2312 =  not isFoundationVersion  # pretend we use 2012, in some cases it will work
-else: print("OpenFoam coupling will be compiled for OpenFOAM version", currentFoamVersion)
-
+	print(
+	        "Error : The OpenFOAM version", currentFoamVersion,
+	        " is not supported, but we will try compiling as if it was v2312 (or 6 if a foundation version is found)"
+	)
+	isVersion2312 = not isFoundationVersion  # pretend we use 2012, in some cases it will work
+else:
+	print("OpenFoam coupling will be compiled for OpenFOAM version", currentFoamVersion)
 
 # compile sources ..
 os.chdir(rootDir)
@@ -70,7 +71,6 @@ os.chdir(rootDir + '/FoamYade')
 os.system('wclean')
 os.system('wmake')
 
-
 # # Solvers...
 print("Compiling icoFoamYade solver")
 os.system('wclean')
@@ -78,24 +78,23 @@ os.chdir(rootDir + '/Solvers/icoFoamYade')
 os.system('wclean')
 os.system('wmake')
 
-
 if versionNumber >= 2012:
-    print("Compiling pimpleFoamYade solver")
-    os.chdir(rootDir + '/Solvers/pimpleFoamYadev2312')
-    os.system('wclean')
-    os.system('wmake')
+	print("Compiling pimpleFoamYade solver")
+	os.chdir(rootDir + '/Solvers/pimpleFoamYadev2312')
+	os.system('wclean')
+	os.system('wmake')
 elif versionNumber == 10:
-    print("Compiling pimpleFoamYade OF10 solver")
-    os.chdir(rootDir + '/Solvers/pimpleFoamYade_OF10')
-    os.system('wclean')
-    os.system('wmake')
+	print("Compiling pimpleFoamYade OF10 solver")
+	os.chdir(rootDir + '/Solvers/pimpleFoamYade_OF10')
+	os.system('wclean')
+	os.system('wmake')
 elif versionNumber == 11:
-    print("Compiling pimpleFoamYade OF11 solver")
-    os.chdir(rootDir + '/Solvers/pimpleFoamYade_OF11')
-    os.system('wclean')
-    os.system('wmake')
-else :
-    print("Compiling pimpleFoamYade solver")
-    os.chdir(rootDir + '/Solvers/pimpleFoamYade')
-    os.system('wclean')
-    os.system('wmake')
+	print("Compiling pimpleFoamYade OF11 solver")
+	os.chdir(rootDir + '/Solvers/pimpleFoamYade_OF11')
+	os.system('wclean')
+	os.system('wmake')
+else:
+	print("Compiling pimpleFoamYade solver")
+	os.chdir(rootDir + '/Solvers/pimpleFoamYade')
+	os.system('wclean')
+	os.system('wmake')

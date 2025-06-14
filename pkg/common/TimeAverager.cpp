@@ -27,9 +27,7 @@ Vector3r         TimeAverager::getContactForce(Body::id_t id) const { return get
 Vector3r         TimeAverager::getContactTorque(Body::id_t id) const { return getValueFromMap(contactTorque, id); }
 vector<Vector3r> TimeAverager::getContactForceField(Body::id_t id) const
 {
-	if (computeContactForceField) {
-		return getValueFromMap(contactForceField, id);
-	}
+	if (computeContactForceField) { return getValueFromMap(contactForceField, id); }
 	throw std::runtime_error("No value to retrieve for contactForceField since computeContactForceField is false.");
 }
 
@@ -48,9 +46,7 @@ void TimeAverager::initialization()
 		nbContact[id]     = getInstantNbContact(b);
 		contactForce[id]  = getInstantContactForce(b);
 		contactTorque[id] = getInstantContactTorque(b);
-		if (computeContactForceField) {
-			contactForceField[id] = getInstantContactForceField(b);
-		}
+		if (computeContactForceField) { contactForceField[id] = getInstantContactForceField(b); }
 	}
 	tAccu = 0;
 }
@@ -94,9 +90,7 @@ template <typename T> T TimeAverager::updateAverage(const T& averagedVal, const 
 template <typename T> T TimeAverager::getValueFromMap(const boost::unordered_map<Body::id_t, T>& mapObject, Body::id_t id) const
 {
 	auto it = mapObject.find(id);
-	if (it == mapObject.end()) {
-		throw std::runtime_error("Particle ID not found in map");
-	}
+	if (it == mapObject.end()) { throw std::runtime_error("Particle ID not found in map"); }
 	return it->second;
 }
 

@@ -122,8 +122,9 @@ void Cell::fillGlShearTrsfMatrix(double m[16])
 
 Vector3r Cell::bodyFluctuationVelPy(const shared_ptr<Body>& b)
 {
-	if (b) return bodyFluctuationVel(b->state->pos,b->state->vel,prevVelGrad);
-	else return Vector3r::Zero();
+	if (b) return bodyFluctuationVel(b->state->pos, b->state->vel, prevVelGrad);
+	else
+		return Vector3r::Zero();
 }
 
 } // namespace yade

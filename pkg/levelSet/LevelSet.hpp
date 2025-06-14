@@ -14,7 +14,7 @@ namespace yade {
 
 class LevelSet : public Shape {
 private:
-	Real     minRad, maxRad; // for sphericity
+	Real             minRad, maxRad; // for sphericity
 	Vector3r         center;
 	Real             volume, lengthChar;
 	Vector3r         inertia; // the eigenvalues of the inertia matrix: its diagonal expression in localAxes basis (in a Vector3r form here)

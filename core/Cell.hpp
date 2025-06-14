@@ -17,7 +17,7 @@ The transformation is split between "normal" part and "rotation/shear" part for 
 #include <lib/serialization/Serializable.hpp>
 
 namespace yade { // Cannot have #include directive inside.
-	
+
 class Body;
 
 
