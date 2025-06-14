@@ -180,7 +180,7 @@ By making use of importance sampling, the posterior distribution
 --- this is known as `Bayesian updating <https://statswithr.github.io/book/the-basics-of-bayesian-statistics.html#bayes-updating>`_.
 Figure below illustrates the evolution of a posterior distribution over time.
 
-.. figure:: ./fig/linear_posterior_a.png
+.. figure:: ./fig/linear-posterior-a.png
   :width: 500
   :alt: Posterior distribution at various time steps
 
@@ -202,7 +202,7 @@ can be computed as
 
 The figure below gives an example of the ensemble prediction in darkred, the top three fits in blue, orange, and green, and the observation data in black.
 
-.. figure:: ./fig/linear_obs_and_sim.png
+.. figure:: ./fig/linear-obs-and-sim.png
   :width: 500
   :alt: simulation versus observation data
 
@@ -452,13 +452,13 @@ Setting the verbose flag to true will give all the detailed statistics, includin
     calibration.plot_uq_in_time(verbose=True)
 
 
-.. figure:: ./fig/linear_scatterplot.png
+.. figure:: ./fig/linear-scatterplot.png
   :width: 500
   :alt: Posterior distribution of the model parameters at various iterations.
 
   Posterior distribution of the model parameters at various iterations.
 
-.. figure:: ./fig/linear_obs_and_sim.png
+.. figure:: ./fig/linear-obs-and-sim.png
   :width: 500
   :alt: Comparison between the reference and top three most probable simulation results.
 
