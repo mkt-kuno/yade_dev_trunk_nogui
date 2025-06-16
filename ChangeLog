@@ -45,6 +45,7 @@ LevelSet & Volume-interacting LevelSet
   Getting back to [Duriez2021b] behavior for inertial descriptions: LS volume and inertia computations include again strictly zero distance values (!1101)
   Modifying the voxellized interpretation of LevelSet.distField hence LevelSet.center (!1103)
   Updates of examples/levelSet with in particular new .py functions that should come handy for defining LevelSet bodies from .stl data (!1105)
+  Faster FastMarchingMethod thanks to a heap sort procedure (!1106)
 
 Polyhedra / Facets
 ------------------
@@ -73,6 +74,7 @@ Testing & Continuous Integration
 
   Fix #365 - for now just "allow_failure: true" for the deb_*_long_double jobs (it is a Polyhedra + CGAL problem) (!1081)
   Fix success/failure message for GUI test. (!1104)
+  New possibility to focus tests execution onto a list of check scripts (!1106)
 
 High precision RealHP<N> ComplexHP<N>
 *************************************
