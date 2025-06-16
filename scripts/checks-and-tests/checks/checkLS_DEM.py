@@ -68,7 +68,7 @@ if ('LS_DEM' in features):
 	# see A.H. Barr, in Graphics Gems III, D. Kirk (1995) for the following expressions of a superellipsoid volume. With log therein = natural logarithm
 	def funG(x):  # see also http://people.math.sfu.ca/~cbm/aands/abramowitz_and_stegun.pdf p. 75
 		if x <= 0:
-			raise YadeCheckError("Failed because Gamma function does not apply to", x, "< 0")
+			raise YadeCheckError("Gamma function does not apply to", x, "< 0")
 		gam0, gam1, gam2, gam3 = 1. / 12, 1. / 30, 53. / 210, 195. / 371
 		gam4, gam5 = 22999. / 22737, 29944523. / 19733142
 		gam6 = 109535241009. / 48264275462
@@ -173,18 +173,17 @@ if ('LS_DEM' in features):
 	O.run(100, True)
 
 	if not O.interactions[2, 3]:
-		raise YadeCheckError("Failed, we do not have LS interaction after first stage of relative normal displacement")
+		raise YadeCheckError("No LS interaction after first stage of relative normal displacement")
 	lsCont = O.interactions[2, 3]
 	sphCont = O.interactions[0, 1]
 
 	if not equalNbr(lsCont.geom.penetrationDepth, sphCont.geom.penetrationDepth, 1.e-12):  # 2.2e-13 is a feasible goal on that ideal case
 		raise YadeCheckError(
-		        "Failed, normal overlap is too wrong in LS-DEM after first stage:", lsCont.geom.penetrationDepth, "vs", sphCont.geom.penetrationDepth,
-		        "in DEM"
+			"Normal overlap is too wrong in LS-DEM after first stage:", lsCont.geom.penetrationDepth, "vs", sphCont.geom.penetrationDepth, "in DEM"
 		)
 
 	if not equalVectors(lsCont.geom.normal, sphCont.geom.normal):
-		raise YadeCheckError("Failed, the two normals are too different after first stage:", sphCont.geom.normal, "vs", lsCont.geom.normal)
+		raise YadeCheckError("Normal vector excessive mismatch after first stage:", sphCont.geom.normal, "vs", lsCont.geom.normal)
 	movSph.state.vel = movLS.state.vel = Vector3.Zero
 
 	#2. Circular relative displacement (~ pure shear)
@@ -200,36 +199,37 @@ if ('LS_DEM' in features):
 		sphShearDisp += sphCont.geom.shearInc
 
 	if not equalNbr(
-	        lsCont.geom.penetrationDepth, sphCont.geom.penetrationDepth, 0.03
+		lsCont.geom.penetrationDepth, sphCont.geom.penetrationDepth, 0.03
 	):  # 0.0284 error is expected here, would be eg 0.007 with 6402 nodes and grid precision 80
 		raise YadeCheckError(
-		        "Failed, normal overlaps are too different after 2nd stage:", lsCont.geom.penetrationDepth, "vs", sphCont.geom.penetrationDepth
+			"Normal overlaps are too different after 2nd stage:", lsCont.geom.penetrationDepth, "vs", sphCont.geom.penetrationDepth
 		)
 	if not equalVectors(lsShearDisp, sphShearDisp):
-		raise YadeCheckError("Failed, the two shear displacements are too different after second stage:", sphShearDisp, "vs", lsShearDisp)
+		raise YadeCheckError("Excessive error on shear displacement after second stage:", sphShearDisp, "vs", lsShearDisp)
 	if not equalVectors(
-	        lsCont.geom.normal, sphCont.geom.normal, 0.03
+		lsCont.geom.normal, sphCont.geom.normal, 0.03
 	):  # allowing here 3 % of error. 6402 nodes and grid precision 80 would allow to go under 2 %
-		raise YadeCheckError("Failed, the two normals are too different after second stage:", sphCont.geom.normal, "vs", lsCont.geom.normal)
-	print('LS-DEM contact description as correct as expected')
+		raise YadeCheckError("Excessive normal vector mismatch after second stage:", sphCont.geom.normal, "vs", lsCont.geom.normal)
+	print('LS-DEM ScGeom contact description as correct as expected')
 
-	# Consideration of Fast Marching Method to finish
-	#################################################
+	# Fast Marching Method applied to the distance to the unit sphere
+	#################################################################
 	grid = RegularGrid(-1.1, 1.1, 23)  # a cubic grid from -1.1 to 1.1 with 23 gp ie a 0.1 step
-	fmm = FastMarchingMethod(
-	        phiIni=distIniSE(radii=[1, 1, 1], epsilons=[1, 1], grid=grid), grid=grid
-	)  # checking fast marching method when applied to the distance to the unit sphere
-	phiField = fmm.phi()
-	error = 0
-	for i in range(23):
-		for j in range(23):
-			for k in range(23):
-				phi_ijk = phiField[i][j][k]
-				error += abs(grid.gridPoint(i, j, k).norm() - 1 - phi_ijk)
-	error /= grid.nGP.prod()  # average (and dimensionless with respect to unit radius)
 	errorExpected = 0.009393853398395624  # e.g. on Ubuntu 20.04.3 and jduriez axp17* while would be 0.009419100794945902 on Debian Bullseye, see https://gitlab.com/yade-dev/trunk/-/jobs/1832563583
-	if not equalNbr(error, errorExpected, 5.e-3):
-		raise YadeCheckError("Failed, Fast Marching Method gives an error of", error, "vs", errorExpected, "expected")
+	for heapChoice in [True, False]:
+		fmm = FastMarchingMethod(heapSort = heapChoice,
+						   phiIni=distIniSE(radii=[1, 1, 1], epsilons=[1, 1], grid=grid), grid=grid
+							   )
+		phiField = fmm.phi()
+		error = 0
+		for i in range(23):
+			for j in range(23):
+				for k in range(23):
+					phi_ijk = phiField[i][j][k]
+					error += abs(grid.gridPoint(i, j, k).norm() - 1 - phi_ijk)
+		error /= grid.nGP.prod()  # average (and dimensionless with respect to unit radius)
+		if not equalNbr(error, errorExpected, 5.e-3):
+			raise YadeCheckError("Fast Marching Method with heapSort =", heapChoice, "gives an error of", error, "vs", errorExpected, "expected")
 	print('Fast Marching Method as correct as expected')
 else:
 	print("Skip checkLSdem, LS-DEM feature not available")

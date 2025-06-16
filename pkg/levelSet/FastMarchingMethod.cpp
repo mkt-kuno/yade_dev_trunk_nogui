@@ -83,7 +83,7 @@ void FastMarchingMethod::printNeighbValues(int i, int j, int k) const
 
 void FastMarchingMethod::trializeFromKnown(int xInd, int yInd, int zInd, bool exterior)
 {
-	// we mark the 6 neighbors of xInd yInd zInd as trial, when appropriate
+	// we mark the 6 (or less, in edge cases) neighbors of just-confirmed (xInd,yInd,zInd) gp as trial
 	int nGPx(grid->nGP[0]), nGPy(grid->nGP[1]), nGPz(grid->nGP[2]);
 	if (xInd > 0)                                     // looking at the x- neighbor, if possible
 		trialize(xInd - 1, yInd, zInd, exterior); // test whether that gp actually needs to be trialized will be performed therein
@@ -100,15 +100,21 @@ void FastMarchingMethod::trialize(int xInd, int yInd, int zInd, bool exterior)
 	if ((gpStates[xInd][yInd][zInd] != knownState)                                                         // do not touch known points !
 	    && ((exterior && phiField[xInd][yInd][zInd] > 0) || (!exterior && phiField[xInd][yInd][zInd] < 0)) // let s stick on the given side
 	) {
-		if (gpStates[xInd][yInd][zInd] != trialState) {
-			gpStates[xInd][yInd][zInd] = trialState;
-			trials.push_back(Vector3i(xInd, yInd, zInd));
-		}
-		updateFastMarchingMethod(
+		updatePhi(
 		        xInd,
 		        yInd,
 		        zInd,
-		        exterior); // maybe that guy already had a finite phi value. But there has been recent changes in the neighbourhood in terms of known gp, and we thus recompute phi.
+		        exterior); // maybe that guy already had a finite phi value (was already in trials). But there has been recent changes in the neighbourhood in terms of known gp, and we thus recompute phi.
+		if (gpStates[xInd][yInd][zInd] != trialState) { // putting the gp in trials after its distance has been computed (more logical this way)
+			gpStates[xInd][yInd][zInd] = trialState;
+			trials.push_back(Vector3i(xInd, yInd, zInd));
+			if(heapSort)
+				std::push_heap(trials.begin(),trials.end(),furthestAway(*this)); // will keep a heap structure for trials where *trials.begin() = trials.front() is the closest to the surface since furthestAway(a,b) is False iff a is the closest
+		}
+		// in case it was already in trial state, maybe the above updatePhi has changed its value and deteriorated the heap nature of trials. Calling e.g.
+		// std::make_heap(trials.begin(),trials.end(),furthestAway(*this));
+		// in a else here would make time costs totally explode though, cancelling by far the whole point of heap-sorting (482 s vs 1 s wo the line, vs 131 s before heap-sorting; for ~ 88^3 gp)
+		// manual checks with the parent in the heap (at index k/2 where k is the index of current gp) could still be attempted though
 	}
 }
 
@@ -200,15 +206,16 @@ Real FastMarchingMethod::eikDiscr(Real spac, Real m0, Real m1, Real m2) const
 	return 3 * spac * spac - (pow(m0 - m1, 2) + pow(m0 - m2, 2) + pow(m1 - m2, 2));
 }
 
-void FastMarchingMethod::updateFastMarchingMethod(int i, int j, int k, bool exterior)
+void FastMarchingMethod::updatePhi(int i, int j, int k, bool exterior)
 {
+	// compute a phi-value at i,j,k from surrounding known values
 	const auto   sdgs = surroundings(i, j, k, exterior);
 	vector<Real> knownPhi(sdgs.first);
 	Real         deltaPr(sdgs.second), spac(grid->spacing);
 	if (speed != 1) spac *= ShopLS::grad_fioRose(grid->gridPoint(i, j, k)).norm();
 	int nKnown(knownPhi.size());
 	switch (nKnown) {
-		case 0: LOG_ERROR("Gridpoint " << i << " " << j << " " << k << " goes through updateFastMarchingMethod wo any known gp"); break;
+		case 0: LOG_ERROR("Gridpoint " << i << " " << j << " " << k << " goes through updatePhi wo any known gp"); break;
 		case 1: // 1D propagation along some axis, from phi=knownPhi[0]
 			LOG_INFO("1D propagation at " << i << " " << j << " " << k);
 			phiField[i][j][k] = exterior ? knownPhi[0] + spac : knownPhi[0] - spac;
@@ -244,10 +251,10 @@ void FastMarchingMethod::updateFastMarchingMethod(int i, int j, int k, bool exte
 					        : *std::max_element(
 					                possiblePhi.begin(),
 					                possiblePhi.end()); // something simpler and faster than going through min_element ?
-				} else {                                    // no positive discriminant, downgrading even further to 1D propagation
+				} else { // no positive discriminant (and a empty possiblePhi) downgrading even further to 1D propagation
 					LOG_INFO("1D propagation downgraded twice from 3D at " << i << " " << j << " " << k);
-					phiField[i][j][k] = exterior ? *std::min_element(possiblePhi.begin(), possiblePhi.end()) + spac
-					                             : *std::max_element(possiblePhi.begin(), possiblePhi.end()) - spac;
+					phiField[i][j][k] = exterior ? math::min({m0, m1, m2}) + spac
+					                             : math::max({m0, m1, m2}) - spac;
 				}
 			}
 		} break;
@@ -271,7 +278,7 @@ Real FastMarchingMethod::phiFromEik(Real m0, Real m1, Real m2, Real disc, bool e
 
 vector<vector<vector<Real>>> FastMarchingMethod::phi()
 {
-	// computes and returns phiField.  To check what happens for repeated executions..
+	// computes and returns phiField. It remains to be checked what happens for repeated executions..
 	iniStates(); // gpStates has now a correct format and is full of farState
 	if (phiIni.size() == 0) LOG_FATAL("Empty (none given ?) phiIni in FastMarchingMethod");
 	phiField = phiIni;
@@ -295,55 +302,53 @@ vector<vector<vector<Real>>> FastMarchingMethod::phi()
 	return phiField;
 }
 
-//bool FastMarchingMethod::compFnOut(vector<vector<vector<Real>>>& FastMarchingMethod::phiField,Vector3i gp1,Vector3i gp2){
-//	// shall return true when gp1 is closest to the front, for the purpose of std::sort the narrowband
-//	Real phi1( FastMarchingMethod::phiField[gp1[0]][gp1[1]][gp1[2]]) , phi2( FastMarchingMethod::phiField[gp2[0]][gp2[1]][gp2[2]]);
-//	bool ret( true/*exterior*/ ? phi1 < phi2 : phi1 > phi2 );
-//	return ret;
-//}
-//
-//bool FastMarchingMethod::compFnIn(vector<vector<vector<Real>>>& FastMarchingMethod::phiField,Vector3i gp1,Vector3i gp2){
-//	return not compFnOut(FastMarchingMethod::phiField,gp1,gp2);
-//}
-
-
 void FastMarchingMethod::loopTrials(bool exterior)
 {
-	Vector3i trialGP // some gp in trials that will often change in the while loop below
-	        ,
-	        closest // the gp in trials that has just been detected as the closest one (below)
-	        ;
-	vector<Vector3i>::iterator closestIt; // iterator to gp in trials that will often change below
+	// Some variables that will often change below:
+	Vector3i closest; // the gp in trials that is the closest-to-surface one (as detected below)
+	Real closestPhi; // its distance value
+	Vector3i trialGP; // a random gp in trials (if !heapSort)
+	vector<Vector3i>::iterator closestIt; // tentative iterator to the closest-to-surface gp in trials
+	
+	if(heapSort)
+		std::make_heap(trials.begin(), trials.end(), furthestAway(*this));
 	while (trials.size() != 0) {
+		// taking out of trials the closest-to-surface gridpoint, one at a time
 		LOG_DEBUG(
 		        "A new iteration on the " << (exterior ? "exterior" : "interior") << ", knownTmp currently has " << knownTmp.size()
 		                                  << " elements, and we have " << trials.size() << " trial points");
-		// finding the closest value among trials, starting to look at the 1st one:
-		closestIt = trials.begin();
-		Real closestPhi(phiField[trials[0][0]][trials[0][1]][trials[0][2]]) // initialize possible minimum at the 1st gridpoint in trials
-		        ,
-		        currPhiValue(closestPhi) // value of each current gridpoint
-		        ;
-		for (vector<Vector3i>::iterator trialIt = trials.begin()++; trialIt != trials.end(); trialIt++) { // starting from begin()++ is intended
-			trialGP      = *trialIt;
-			currPhiValue = phiField[trialGP[0]][trialGP[1]][trialGP[2]];
-			if ((exterior && currPhiValue == std::numeric_limits<Real>::infinity())
-			    || (!exterior && currPhiValue == -std::numeric_limits<Real>::infinity())) {
-				LOG_ERROR("Skipping GP " << trialGP << " in the loop because it still carries an +/- infinite value");
-				continue;
-			}
-			if ((exterior && currPhiValue < closestPhi)
-			    || (!exterior && currPhiValue > closestPhi)) { // use a unique math::abs test ? What about short-circuit effects though ?
-				closestIt  = trialIt;
-				closestPhi = currPhiValue;
-			}
-		} // minimum now found
-		closest = *closestIt;
+
+		if(heapSort) {
+			closest = trials.front(); // by heap property
+			std::pop_heap(trials.begin(),trials.end(),furthestAway(*this));
+			trials.pop_back(); // would fit into confirm, but it would require passing the iterator to that function
+			closestPhi = phiField[closest[0]][closest[1]][closest[2]];
+		}
+		else { // brute-force (and much slower) minimum search of the closest value/gp
+			//  starting to look at the 1st one as a random possible initialization for that minimu:
+			closestIt = trials.begin();
+			closestPhi = phiField[trials[0][0]][trials[0][1]][trials[0][2]];
+		    Real currPhiValue(closestPhi); // value at phi for any gp, that will often change below
+			for (vector<Vector3i>::iterator trialIt = trials.begin()++; trialIt != trials.end(); trialIt++) { // starting from begin()++ is intended
+				trialGP      = *trialIt;
+				currPhiValue = phiField[trialGP[0]][trialGP[1]][trialGP[2]];
+				if ((exterior && currPhiValue == std::numeric_limits<Real>::infinity())
+			    	|| (!exterior && currPhiValue == -std::numeric_limits<Real>::infinity())) {
+					LOG_ERROR("Skipping GP " << trialGP << " in the loop because it still carries an +/- infinite value");
+					continue;
+				}
+				if ((exterior && currPhiValue < closestPhi)
+			    	|| (!exterior && currPhiValue > closestPhi)) { // use a unique math::abs test ? What about short-circuit effects though ?
+					closestIt  = trialIt;
+					closestPhi = currPhiValue;
+				}
+			} // minimum now found
+			closest = *closestIt;
+			// removing it from trials, following https://stackoverflow.com/a/4442529/9864634 and a swap/pop_back workflow was verified to be as fast (or slightly faster) than a erase-remove idiom (which is intended to avoid relocation of elements in trials if invoking erase() not at its end)
+			std::swap(*closestIt, trials.back()); // NB: std::swap(closest,trials.back()); is different and worse..
+			trials.pop_back(); // would fit into confirm, but it would require passing the iterator to that function
+		}
 		// LOG_DEBUG("About to confirm "<<closest)
-		// removing it from trials, following https://stackoverflow.com/a/4442529/9864634.
-		std::swap(*closestIt, trials.back());
-		trials.pop_back(); // would fit into confirm, but it would require passing the iterator to that function
-		// NB: above swap pop_back was verified to be as fast (or slightly faster) than a erase-remove idiom (which is intended to avoid relocation of elements in trials if invoking erase() not at its end)
 		confirm(closest[0], closest[1], closest[2], closestPhi, exterior); // this will propagate the information
 		LOG_DEBUG("In that iteration, " << closest << " with phi = " << closestPhi << " was found to be the closest to the interface\n\n");
 	}
