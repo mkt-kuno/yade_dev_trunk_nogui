@@ -31,8 +31,8 @@ slowScripts = ['checkClumpHopper.py', 'checkMPISilo.py', 'colliderTorture.py', '
 
 # checkSpawn.py fails always for now, needs investigations
 skipScripts = ['checkList.py']
-# use this if you want to test only one script, it takes precedence over skipScripts.
-onlyOneScript = []
+# use this if you want to test given scripts (as a list), it takes precedence over skipScripts.
+onlyScripts = []
 
 mpiScripts = ['checkMPI.py', 'checkMPISilo.py', 'checkMPI4PYcomm.py', 'checkMPYcomm.py']
 # singleCore = singleCore + mpiScripts # ignore hybrid MPIxOMP
@@ -59,8 +59,8 @@ def multiCore():  # multi core --check is running.
 
 # function returns [ True / False , "reason for making decision to skip the script" ]
 def mustCheck(sc):
-	if (len(onlyOneScript) == 1):
-		return [sc in onlyOneScript, "not in onlyOneScript"]
+	if (len(onlyScripts) >= 1):
+		return [sc in onlyScripts, "not in onlyScripts"]
 	if ((not opts.checkall) and (sc in slowScripts)):
 		return [False, "in slowScripts"]
 	if (multiCore()):
