@@ -130,7 +130,7 @@ public:
 		strain = Vector3r::Zero();
    		first = true;
 		stiffness.resize(6);
-		previousTranslation.assign(Vector3r::Zero());
+		previousTranslation.fill(Vector3r::Zero());
 		for (int i=0; i<6; ++i){normal[i]=stress[i]=force[i]=Vector3r::Zero();stiffness[i]=0;}
 		normal[wall_bottom].y()=1;
 		normal[wall_top].y()=-1;

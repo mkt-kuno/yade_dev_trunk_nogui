@@ -96,7 +96,11 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		//copy positions in a buffer for faster and/or parallel access
 		virtual void setPositionsBuffer(bool current);
 		virtual void addAlphaToPositionsBuffer(bool current);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
 		virtual void trickPermeability(Solver* /*flow*/) {};
+#pragma GCC diagnostic pop
 
 	public :
 		int retriangulationLastIter;

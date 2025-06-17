@@ -7,6 +7,7 @@ Bug Fixes
   Fix contact force field normalization in TimeAverager (!1084)
   Fix incremental build issue with MPI header inclusion (!1088)
   Removing redundant declaration of young parameter in PolyhedraMat (!1099).
+  Fix Archlinux compilation (!1109)
 
 Code Formatting & Organization
 ******************************

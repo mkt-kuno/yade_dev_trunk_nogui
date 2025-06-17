@@ -46,6 +46,8 @@ def acceptOMPIVersion():  # filter out specific distros for MPI checks
 		return False
 	if yade.libVersions.getAllVersionsCpp()['mpi'][1] == 'ompi:4.1.5':
 		return False  # Open MPI 4.1.5 has a bug https://gitlab.com/yade-dev/trunk/-/issues/309  https://github.com/open-mpi/ompi/issues/11749
+	if yade.libVersions.getAllVersionsCpp()['mpi'][1] == 'ompi:5.0.8':
+		return False  # Open MPI 5.0.8 does not work on Archlinux probably https://github.com/open-mpi/ompi/issues/11749 https://gitlab.com/yade-dev/trunk/-/issues/309
 	return True
 
 
