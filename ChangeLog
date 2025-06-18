@@ -68,6 +68,7 @@ Packaging & Build Improvements
 Small Enhancements
 ******************
   Add ability to choose the fluid wall friction model in HydroForceEngine (!1085)
+  float128 is also not available on riscv64 (!1110)
 
 Testing & Continuous Integration
 ********************************
