@@ -639,17 +639,9 @@ namespace CGT {
 		for (int bound = 0; bound < 6; bound++) {
 			int& id = *boundsIds[bound];
 			if (id < 0) continue;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpragmas"
-#pragma GCC diagnostic ignored "-Wunused-result"
-			T[currentTes].vertexHandles[id];
-#pragma GCC diagnostic pop
 			VectorCell tmpCells;
-			tmpCells.resize(10000); // limiting if we have >10000 fictitious cells?
-			VCellIterator cells_it  = tmpCells.begin();
-			VCellIterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id], cells_it); //
-			for (VCellIterator it = tmpCells.begin(); it != cells_end; it++) {
-				CellHandle& cell = *it;
+			Tri.incident_cells(T[currentTes].vertexHandles[id], std::back_inserter(tmpCells));
+			for (auto& cell : tmpCells) {
 				(cell->info().fictious()) += 1;
 				cell->info().isFictious = true;
 			}
