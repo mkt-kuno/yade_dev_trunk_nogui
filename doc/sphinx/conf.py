@@ -702,7 +702,7 @@ html_theme = 'default'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {'stickysidebar': 'true', 'collapsiblesidebar': 'true', 'rightsidebar': 'false'}
+html_theme_options = {'stickysidebar': 'true', 'collapsiblesidebar': 'true', 'rightsidebar': 'false', "navigation_depth": 1}
 
 if (yade.libVersions.getVersion('sphinx') >= (1, 7, 0)):
 	# 1.7 version set an inconvenient upper-limit to page width, unset it

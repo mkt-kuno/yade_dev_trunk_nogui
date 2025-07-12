@@ -23,6 +23,7 @@ Documentation & Comments
   Fixing formatting issuse and add clarifications (!1102)
   Fix OpenFOAM doc hyperlinks (!1111)
   Precising the definition of State.ori (!1112)
+  Fix sphinx issue with plot module
 
 Examples
 ********

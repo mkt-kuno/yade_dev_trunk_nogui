@@ -42,7 +42,7 @@ import yade.runtime
 if not yade.runtime.hasDisplay:
 	matplotlib.use('Agg')
 
-from yade.minieigenHP import *
+import yade.minieigenHP as ME
 
 #matplotlib.use('TkAgg')
 #matplotlib.use('GTKAgg')
@@ -87,16 +87,16 @@ scatterMarkerKw = dict(marker=[(0., 0.), (-30., 10.), (-25, 0), (-30., -10.)])
 
 componentSeparator = '_'
 componentSuffixes = {
-        Vector2: {
+        ME.Vector2: {
                 0: 'x',
                 1: 'y'
         },
-        Vector3: {
+        ME.Vector3: {
                 0: 'x',
                 1: 'y',
                 2: 'z'
         },
-        Matrix3: {
+        ME.Matrix3: {
                 (0, 0): 'xx',
                 (1, 1): 'yy',
                 (2, 2): 'zz',
@@ -124,9 +124,6 @@ def resetData():
 	"Reset all plot data; keep plots and labels intact."
 	global data
 	data = {}
-
-
-from yade.wrapper import *
 
 
 def splitData():
@@ -173,6 +170,8 @@ def addAutoData():
 	A simple simulation with plot can be written in the following way; note how the energy plot is specified.
 
 	>>> from yade import plot, utils
+	>>> from yade.minieigenHP import *  # not needed in actual yade session, but needed for doctests
+	>>> from yade.wrapper import * # not needed in actual yade session, but needed for doctests
 	>>> plot.plots={'i=O.iter':(O.energy,None,'total energy=O.energy.total()')}
 	>>> # we create a simple simulation with one ball falling down
 	>>> plot.resetData()
@@ -254,6 +253,7 @@ def addData(*d_in, **kw):
 	This way, equal length of all data is assured so that they can be plotted one against any other.
 
 	>>> from yade import plot
+	>>> from yade.minieigenHP import *  # not needed in actual yade session, but needed for doctests
 	>>> from pprint import pprint
 	>>> plot.resetData()
 	>>> plot.addData(a=1)
