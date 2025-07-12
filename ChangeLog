@@ -22,6 +22,7 @@ Documentation & Comments
   Add docu on automated calibration using iterative Bayesian filtering, including excercises to experiment with the external software GrainLearning (!1098)
   Fixing formatting issuse and add clarifications (!1102)
   Fix OpenFOAM doc hyperlinks (!1111)
+  Precising the definition of State.ori (!1112)
 
 Examples
 ********

@@ -52,7 +52,7 @@ public:
 
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(State,Serializable,"State of a body (spatial configuration, internal variables).",
-		((Se3r,se3,Se3r(Vector3r::Zero(),Quaternionr::Identity()),,"Position and orientation as one object."))
+		((Se3r,se3,Se3r(Vector3r::Zero(),Quaternionr::Identity()),,"Position and :yref:`orientation<State.ori>` as one object."))
 		((Vector3r,vel,Vector3r::Zero(),,"Current linear velocity."))
 		((Real,mass,0,,"Mass of this body"))
 		((Vector3r,angVel,Vector3r::Zero(),,"Current angular velocity"))
@@ -85,7 +85,7 @@ public:
 		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set,"Degress of freedom where linear/angular velocity will be always constant (equal to zero, or to an user-defined value), regardless of applied force/torque. String that may contain 'xyzXYZ' (translations and rotations).")
 		// references must be set using wrapper funcs
 		.add_property("pos",&State::pos_get,&State::pos_set,"Current position.")
-		.add_property("ori",&State::ori_get,&State::ori_set,"Current orientation.")
+		.add_property("ori",&State::ori_get,&State::ori_set,"Current orientation as the quaternion-form of the rotation that maps the model, i.e. global, coordinate system into an inertial, i.e. local, basis for the body.")
 		.def("displ",&State::displ,"Displacement from :yref:`reference position<State.refPos>` (:yref:`pos<State.pos>` - :yref:`refPos<State.refPos>`)")
 		.def("rot",&State::rot,"Rotation from :yref:`reference orientation<State.refOri>` (as rotation vector)")
 	);
