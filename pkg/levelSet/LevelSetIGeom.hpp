@@ -28,5 +28,19 @@ public:
 };
 REGISTER_SERIALIZABLE(MultiScGeom);
 
+class LSnodeGeom : public ScGeom {
+public:
+	// clang-format off
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(LSnodeGeom,ScGeom,"Extends :yref:`ScGeom` for faster :yref:`LevelSet`-based simulations of convex bodies while storing previous closest node in :yref:`surfNodeIdx<LSnodeGeom.surfNodeIdx>`, for an optimal contact detection.",
+	((int,surfNodeIdx,-1,Attr::readonly,"Index (within :yref:`surfNodes<LevelSet.surfNodes>` of id2 if Volume(id1) > Volume(id2); else id1) of the surface node that shows the smallest interparticle distance (overlap or not). A negative value that would be encountered during an actual simulation would mean an inconsistency in implementation."))
+	((int,usedWorkflow,-1,Attr::readonly,"Tells for debugging purpose whether this interaction has just (in last Ig2 call) been handled by looping over full nodes because geom was just created (0) or because surfNodeIdx was directly detected as negative (1); or by looping just the neighbor subset (2, desired case), which could itself deteriorate into an additional full loop (3)."))
+	,
+	createIndex(); // same remark as MultiScGeom
+	);
+	// clang-format on
+	REGISTER_CLASS_INDEX(LSnodeGeom, ScGeom); // see createIndex() remark
+};
+REGISTER_SERIALIZABLE(LSnodeGeom);
+
 } // namespace yade
 #endif // YADE_LS_DEM

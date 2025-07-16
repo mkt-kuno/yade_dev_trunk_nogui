@@ -38,6 +38,9 @@ public:
 			((shared_ptr<LawDispatcher>,lawDispatcher,new LawDispatcher,Attr::readonly,":yref:`LawDispatcher` object used for dispatch."))
 			((vector<shared_ptr<IntrCallback> >,callbacks,,,":yref:`Callbacks<IntrCallback>` which will be called for every :yref:`Interaction`, if activated."))
 			((bool, loopOnSortedInteractions, false,,"If true, the main interaction loop will occur on a sorted list of interactions. This is SLOW but useful to workaround floating point force addition non reproducibility when debugging parallel implementations of yade."))
+#ifdef YADE_LS_DEM
+			((bool, warnRoleIg2, true,,"Whether warnings are output (if true) in case the :yref:`IGeomFunctor` would directly request for interaction removal (by returning false in its ::go function) on existing interactions. It is advised to use false only in the specific case of using :yref:`Ig2_LevelSet_LevelSet_LSnodeGeom`, and true otherwise."))
+#endif
 			,
 			/*ctor*/ alreadyWarnedNoCollider=false;
 				#ifdef YADE_OPENMP

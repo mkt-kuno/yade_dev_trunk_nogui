@@ -7,7 +7,7 @@
 #include <pkg/levelSet/LevelSetIGeom.hpp>
 
 namespace yade {
-YADE_PLUGIN((MultiScGeom));
+YADE_PLUGIN((MultiScGeom)(LSnodeGeom));
 
 bool MultiScGeom::hasNode(int nodeIdx) { return (iteratorToNode(nodeIdx) != nodesIds.end()); }
 

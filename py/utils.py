@@ -482,12 +482,13 @@ def levelSetBody(
         surfNodes=[],
         nodesPath=2,
         nodesTol=50,
+        n_neighborsNodes = -1,
         orientation=Quaternion(1, 0, 0, 0),
         hasAABE=False,
         axesAABE=Vector3.Zero,
         dynamic=True,
         material=-1,
-        starLike=False
+        starLike = False
 ):
 	"""Creates a :yref:`LevelSet` shaped body through various workflows: one can choose to define the discrete distance field from pre-defined shapes (through *shape* and related arguments), or to mimick a :yref:`Clump` instance (*clump* argument, for comparison purposes), or directly assign the discrete distance field on some grid (*distField* and *grid* arguments). Surface nodes can also be either ray traced (see *nSurfNodes*, *nodesPath* and *nodesTol*) or directly assigned (see *surfNodes*)
 
@@ -505,6 +506,7 @@ def levelSetBody(
 	:param int nodesPath: path for ray tracing the :yref:`surface nodes<LevelSet.surfNodes>`, passed to the corresponding argument of :yref:`LevelSet.rayTraceSurfNodes` (has to be used exclusive of *surfNodes*)
 	:param list surfNodes: :yref:`surface nodes<LevelSet.surfNodes>` as a list of Vector3r for a direct assignment of those, instead of ray tracing them while using *nSurfNodes* and *nodesPath* (a non-empty *surfNodes* is actually enough to bypass ray tracing and those other attributes and trigger direct assignment)
 	:param Real nodesTol: tolerance while ray tracing the :yref:`surface nodes<LevelSet.surfNodes>` (and not assigning them with *surfNodes*), passed to to the corresponding argument of :yref:`LevelSet.rayTraceSurfNodes`
+	:param int n_neighborsNodes: passed to :yref:`LevelSet.n_neighborsNodes` for an optimized contact search in :yref:`Ig2_LevelSet_LevelSet_LSnodeGeom`
 	:param Quaternion orientation: the initial orientation of the body
 	:param bool hasAABE: flag indicating if the axis-aligned bounding ellipsoid (AABE) was set, passed to :yref:`LevelSet.hasAABE`
 	:param Vector3 axesAABE: principal half-axes of the axis aligned bounding ellipsoid (AABE) when *hasAABE*, passed to :yref:`LevelSet.axesAABE`
@@ -565,6 +567,7 @@ def levelSetBody(
 	else:
 		b.aspherical = True
 	b.state.ori = b.state.refOri = orientation
+	b.shape.n_neighborsNodes = n_neighborsNodes # pass it before assigning / ray tracing surface nodes !
 	# Finally defining the nodes (unless nSurfNodes = 0 and surfNodes remains empty, probably because VLS-DEM with no nodes is used) in the below if block:
 	if len(surfNodes) > 0:
 		b.shape.assignSurfNodes(surfNodes)

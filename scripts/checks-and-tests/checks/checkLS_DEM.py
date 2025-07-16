@@ -18,7 +18,7 @@ if ('LS_DEM' in features):
 	# Particle-scale comparisons for a sphere
 	#########################################
 
-	lsSph = levelSetBody('sphere', radius=1, spacing=0.05, nodesPath=1)
+	lsSph = levelSetBody('sphere', radius=1, spacing=0.05, nodesPath=1, smearCoeff = 1)
 
 	def distSphereTh(pt, radius=1):
 		return Vector3(pt).norm() - radius
@@ -55,8 +55,9 @@ if ('LS_DEM' in features):
 	lNorm = [nod.norm() for nod in lsSph.shape.surfNodes]
 	if not equalNbr(max(lNorm), 1, 1.e-3) or not equalNbr(min(lNorm), 1, 1.e-3):
 		raise YadeCheckError("Failed because of incorrect boundary nodes on a sphere in LS-DEM")
-	if not equalNbr(lsSph.shape.getSurface(), 4 * pi, 0.025):  # tolerance could be 1.1e-3 with 2502 surface nodes
-		raise YadeCheckError("Failed because of incorrect getSurface() for a sphere in LS-DEM")
+	surf, surfTh = lsSph.shape.getSurface(), 4 * pi
+	if not equalNbr(surf, surfTh, 1.2e-3):
+		raise YadeCheckError("Incorrect getSurface() for a sphere in LS-DEM: got ",surf,"vs", surfTh)
 
 	# Particle-scale comparisons for a superellipsoid
 	#################################################
@@ -212,6 +213,100 @@ if ('LS_DEM' in features):
 		raise YadeCheckError("Excessive normal vector mismatch after second stage:", sphCont.geom.normal, "vs", lsCont.geom.normal)
 	print('LS-DEM ScGeom contact description as correct as expected')
 
+	# A similar test about 2 LevelSet-spheres in relative movement, in a LSnodeGeom fashion and wo the truth twins
+	##############################################################################################################
+
+	# (jduriez note: this is zi2ter)
+
+	O.reset()
+	O.bodies.append(levelSetBody('sphere', centrSmall, rad, spacing=2 * rad / prec, nSurfNodes=nSurfNodes, nodesPath=2, n_neighborsNodes = 6, dynamic=False))
+	O.bodies.append(levelSetBody('sphere', centrBig, rRatio * rad, spacing=2 * rRatio * rad / prec, nSurfNodes=nSurfNodes, n_neighborsNodes = 6, nodesPath=2, dynamic=False))
+	movLS = O.bodies[1]
+
+	O.engines = [
+		ForceResetter(),
+		InsertionSortCollider([Bo1_LevelSet_Aabb()],verletDist = 0),
+		InteractionLoop(
+			[Ig2_LevelSet_LevelSet_LSnodeGeom(label = 'ig2')],
+			[Ip2_FrictMat_FrictMat_FrictPhys(kn=MatchMaker(algo='val', val=1.e7), ks=MatchMaker(algo='val', val=1.e7))],
+			[Law2_ScGeom_FrictPhys_CundallStrack(sphericalBodies=False)]
+		),
+		NewtonIntegrator()
+	]
+	O.dt = 5.e-4
+
+	# 1. Normal relative displacement
+	movLS.state.vel = (0, 0, -1.)
+	O.run(100, True)
+
+	if not O.interactions[0, 1]:
+		raise YadeCheckError("No LS(nodeGeom) interaction after first stage of relative normal displacement")
+	lsCont = O.interactions[0, 1]
+	unRef, nodeIdxRef = 0.04855479185286475, nSurfNodes - 1 # NB: we changed path since the previous part of the test so expected values have changed as well
+
+	nMismatchExpected = 0.05587214056599649;
+	nMismatch = ig2.normalMismatch(lsCont)
+	if not equalNbr(nMismatch,nMismatchExpected):
+		raise YadeCheckError("ig2.normalMismatch gives", nMismatch, "vs", nMismatchExpected, "expected")
+
+	if not equalNbr(lsCont.geom.penetrationDepth, unRef, 1.e-12):
+		raise YadeCheckError(
+			"Normal overlap with LSnodeGeom after first stage is:", lsCont.geom.penetrationDepth, "vs", unRef,"expected"
+		)
+	if not (lsCont.geom.surfNodeIdx == nodeIdxRef):
+		raise YadeCheckError("Contacting node after first stage was detected as",lsCont.geom.surfNodeIdx,"vs",nodeIdxRef,"expected (about the pole)")
+
+	#2. Circular relative displacement (~ pure shear)
+	arc = rad * (1 + rRatio)
+	dAlpha = 1.2 * pi / 4.
+	nIt = 1500
+	normV = arc * dAlpha / (nIt * O.dt)
+	lsShearDisp = sphShearDisp = Vector3.Zero
+	for i in range(nIt):
+		movLS.state.vel = normV * Vector3(cos(dAlpha / nIt * i), 0, -sin(dAlpha / nIt * i))
+		O.step()
+		lsShearDisp += lsCont.geom.shearInc
+	shearDispRef, nodeIdxRef = Vector3(2.251877401227810882,-8.274556988554289828e-05,-1.172519769676061863), 1974
+	if not equalVectors(lsShearDisp, shearDispRef):
+		raise YadeCheckError("Obtained shear displacement with LSnodeGeom is:", lsShearDisp, "vs", shearDispRef)
+	if not lsCont.geom.surfNodeIdx == nodeIdxRef:
+		raise YadeCheckError("Contacting node after second stage is",lsCont.geom.surfNodeIdx,"vs",nodeIdxRef,"expected")
+
+	print('LS-DEM LSnodeGeom contact description as correct as expected')
+
+	# Wall - LevelSet test
+	######################
+
+	# jduriez note: this is lsc2
+	O.reset()
+	O.bodies.append( wall(0,2) )
+	O.bodies.append( levelSetBody( 'superellipsoid', (0,0,1.9), extents = (2,1,1), epsilons=(1,1),spacing = 1./10, nSurfNodes = 3602, nodesPath = 1, orientation = Quaternion((0,1,0),pi/2.),dynamic = False) )
+	O.engines = [ForceResetter()
+		     ,InsertionSortCollider([Bo1_LevelSet_Aabb(),Bo1_Wall_Aabb()],verletDist = 0) # no need to wait for IScollider to decide himself to use 0. Note that I can not use anything else for now: the bounds have to match the grids, and those do not extend much more than the bodies...
+		     ,InteractionLoop(
+			     [Ig2_Wall_LevelSet_ScGeom()],
+			     [Ip2_FrictMat_FrictMat_FrictPhys()],
+			     [Law2_ScGeom_FrictPhys_CundallStrack(label='csLaw2')]
+		     )
+		     ]
+	O.dt = 4.e-5
+	O.step()
+	if not O.interactions.has(0,1,True):
+		raise YadeCheckError('Expected Wall-LevelSet interaction not found')
+	else:
+		c_geom = O.interactions[0,1].geom # just geom is already a module name
+		if not equalNbr(c_geom.penetrationDepth,0.1,0.051):
+			raise YadeCheckError('Overlap not correctly measured here: got',c_geom.penetrationDepth,'vs 0.1 expected with a 5.1% tolerance')
+		O.bodies[1].state.pos = Vector3(0,0,0.5) # not recommended elsewhere
+		O.step()
+		if not equalNbr(c_geom.penetrationDepth,1.5,0.0041):
+			raise YadeCheckError('Overlap not correctly measured there: got',c_geom.penetrationDepth,'vs 1.5 expected with a 0.41% tolerance')
+		O.bodies[1].state.pos = Vector3(1,-3,-1.9)
+		O.step()
+		if not equalNbr(c_geom.penetrationDepth,0.1,0.052):
+			raise YadeCheckError('Overlap not correctly measured there: got',c_geom.penetrationDepth,'vs 0.1 expected with a 5.2% tolerance')
+	print('Ig2_Wall_LevelSet_ScGeom as correct as expected')
+
 	# Fast Marching Method applied to the distance to the unit sphere
 	#################################################################
 	grid = RegularGrid(-1.1, 1.1, 23)  # a cubic grid from -1.1 to 1.1 with 23 gp ie a 0.1 step
@@ -231,5 +326,17 @@ if ('LS_DEM' in features):
 		if not equalNbr(error, errorExpected, 5.e-3):
 			raise YadeCheckError("Fast Marching Method with heapSort =", heapChoice, "gives an error of", error, "vs", errorExpected, "expected")
 	print('Fast Marching Method as correct as expected')
+
+	# Checking LS-twins of (multi-sphere) clumps
+	############################################
+
+	O.reset()
+	O.bodies.appendClumped([sphere((0,0,0),1)] + [sphere((2,0,-4+k*2),1) for k in range(5)])
+	O.bodies.append(levelSetBody(clump = O.bodies[6].shape,spacing = 0.1,nSurfNodes = 0))
+	vLSclump = O.bodies[7].shape.volume()
+	vclump = 6*4./3*pi # = the one of the Clump body, indeed
+	if not equalNbr(vLSclump,vclump,5.e-4):
+		raise YadeCheckError("LStwin of a 6 unit-spheres clump has a volume of", vLSclump, "vs", vclump, "expected")
+	print('LStwin of clumps as correct as expected')
 else:
 	print("Skip checkLSdem, LS-DEM feature not available")

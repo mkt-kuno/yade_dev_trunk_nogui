@@ -4,6 +4,7 @@ Please note in particular the following simulation examples:
 
 - `discharge.py` for a LevelSet-based simulation of a discharge of 1000 superquadric particles, as discussed in Section 6 of [[Duriez2021b](https://www.sciencedirect.com/science/article/pii/S0098300421002247)]
 - `levelSetBody.py` for a particle-scale (1 or 2 bodies) simulation in order to illustrate the various syntaxes available for defining a LevelSet-shaped body in YADE and the expected `O.engines`
+- `lsNodeGeom.py` for illustrating the use of [Ig2_LevelSet_LevelSet_LSnodeGeom](https://yade-dem.org/doc/yade.wrapper.html#yade.wrapper.Ig2_LevelSet_LevelSet_LSnodeGeom) for faster simulations in the case of a particle-scale example of a bouncing LevelSet sphere on a LevelSet floor
 - `multiScGeom.py` for a particle-scale example of the [MultiScGeom](https://yade-dem.org/doc/yade.wrapper.html#yade.wrapper.MultiScGeom) description of a contact between non-convex LevelSet shapes (with several contact points)
 
 The other files provide some utilities functions, each in a separate file, a number of those being dedicated to create LevelSet-shaped bodies from .stl shape data:

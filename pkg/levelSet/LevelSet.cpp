@@ -44,9 +44,31 @@ Vector3r LevelSet::getCenter()
 // // }
 Real LevelSet::smearedHeaviside(Real x) const
 {
-	// Passing smoothly (increasing sine-sort) from y = 0 to 1 when x goes from -1 to 1, see Eq. (3) of Kawamoto2016, middle part.
-	// For |x| beyond 1 returned value is outside of [0;1] so this is actually not really a smooth Heaviside, it is up to the developer to take care of this when using
-	return 0.5 * (1.0 + x + sin(Mathr::PI * x) / Mathr::PI);
+	// Passing smoothly (increasing sine-sort) from y = 0 to 1 when x goes from -1 to 1, see Eq. (3) of Kawamoto2016
+	Real ret;
+	if (x < -1.) ret = 0;
+	else if (x > 1.)
+		ret = 1;
+	else
+		ret = 0.5 * (1.0 + x + sin(Mathr::PI * x) / Mathr::PI);
+	return ret;
+}
+
+Real LevelSet::volumeInsideThreshold(Real epsilon) const
+{
+	if (smearCoeff <= 0)
+		LOG_WARN("Using volumeInsideThreshold (for surface measurement, probably) with a negative smearCoeff = " << smearCoeff << " is not expected");
+	Real vol(0.);                                                // to-be-returned volume which is inside phi = epsilon
+	Real phiRef(0.5 * sqrt(3.0) * lsGrid->spacing / smearCoeff); // the reference length for smoothing the Heaviside
+	Real volCell(pow(lsGrid->spacing, 3));                       // lsGrid voxel volume
+	for (int xIndex = 0; xIndex < lsGrid->nGP[0]; xIndex++) {
+		for (int yIndex = 0; yIndex < lsGrid->nGP[1]; yIndex++) {
+			for (int zIndex = 0; zIndex < lsGrid->nGP[2]; zIndex++) {
+				vol += smearedHeaviside((epsilon - distField[xIndex][yIndex][zIndex]) / phiRef) * volCell;
+			}
+		}
+	}
+	return vol;
 }
 
 std::vector<Vector3r> LevelSet::rayTrace(const Vector3r& ray, const Real& nodesTol)
@@ -360,7 +382,7 @@ void LevelSet::init() // computes stuff (center, volume, inertia, boundary nodes
 	volume     = 0.0;      // Initializing volume to zero
 	Real     phi, dV(-1.); // Distance value and considered particle volume for the current cell (the latter can be less than Vcell due to smearing)
 	Vector3r gp;
-	// Particle volume is now computed below from a voxellised description which is built upon the sign of distField values
+	// Particle volume is now computed below from a voxellised description which is built upon the sign of distField values. TODO: Code should be equivalent than volumeInsideThreshold(0) (but we here additionally compute *Mean for volume center)
 	for (int xIndex = 0; xIndex < nGPx; xIndex++) {
 		for (int yIndex = 0; yIndex < nGPy; yIndex++) {
 			for (int zIndex = 0; zIndex < nGPz; zIndex++) {
@@ -440,7 +462,66 @@ void LevelSet::init() // computes stuff (center, volume, inertia, boundary nodes
 	initDone   = true;
 }
 
-void LevelSet::postProcessNodes() { sphericity = maxRad / minRad; }
+void LevelSet::postProcessNodes()
+{
+	if (n_neighborsNodes >= 0) init_neighborsNodes();
+	sphericity = maxRad / minRad;
+}
+
+bool comp(const std::pair<int, Real> a, const std::pair<int, Real> b)
+{
+	// for use in init_neighborsNodes; arguments a and b are (node j idx ; distance from j to a reference node i) pairs
+	// should return False when a carries the smallest distance to i
+	// could be replaced with lambda expression in std::make_heap and std::pop_heap, but this would make duplicated code
+	return (a.second > b.second);
+}
+
+void LevelSet::init_neighborsNodes()
+{
+	unsigned int nNodes(surfNodes.size());
+	if (int(nNodes) < n_neighborsNodes)
+		LOG_FATAL(
+		        "We want to establish the " << n_neighborsNodes << " closest neighbors to each node while we have a total of " << nNodes
+		                                    << " of those. Impossible to pursue");
+	neighborsNodes.clear(); // let us to be sure to restart from scratch
+	neighborsNodes.resize(nNodes);
+	std::vector<std::vector<std::pair<int, Real>>>
+	        d_ijList; // d_ijList[i] has a number of (j,d_ij) pairs describing the distances between a node i and other nodes j (i excluded). Note that using a std::array< .. , nNodes > would probably be impossible to compile
+	Real    d_ij(-1),
+	        lChar((maxRad + minRad) / 2.) // some arbitrary threshold (D/4 for a sphere) beyond which we re sure not to find any node for neighborsNodes.
+	        ;
+	if (lChar < 0) LOG_ERROR("Having a negative lChar = " << lChar << "; how comes ?");
+	// we first fill d_ijList with (almost, see lChar test) all possible interdistance values
+	d_ijList.resize(nNodes);
+	for (unsigned int nodeI = 0; nodeI < nNodes; nodeI++) {
+		d_ijList[nodeI].reserve(nNodes); // this reserve will be useful for only half of the push_back commands below, but it probably can not hurt
+		for (unsigned int nodeJ = nodeI + 1; nodeJ < nNodes; nodeJ++) {
+			d_ij = (surfNodes[nodeI] - surfNodes[nodeJ]).norm();
+			if (d_ij < lChar) {
+				d_ijList[nodeI].push_back(std::make_pair(nodeJ, d_ij));
+				d_ijList[nodeJ].push_back(std::make_pair(nodeI, d_ij));
+			}
+		}
+	}
+	// we now pick from d_ijList[i] the n closest cases (thanks to a heap sort procedure), to store in neighborsNodes[i]:
+	for (unsigned int nodeI = 0; nodeI < nNodes; nodeI++) {
+		if (int(d_ijList[nodeI].size()) < n_neighborsNodes) {
+			LOG_ERROR(
+			        "We are establishing the list of the " << n_neighborsNodes << " closest nodes to node " << nodeI << " while only "
+			                                               << d_ijList[nodeI].size() << " interdistance could be established !");
+		}
+		neighborsNodes[nodeI].reserve(n_neighborsNodes + 1);
+		neighborsNodes[nodeI].push_back(nodeI);
+		std::make_heap(d_ijList[nodeI].begin(), d_ijList[nodeI].end(), comp);
+		for (int neighbrIdx = 0; neighbrIdx < n_neighborsNodes;
+		     neighbrIdx++) { // neighbrIdx not "unsigned" to have a signed-valid comparison with n_neighborsNodes
+			neighborsNodes[nodeI].push_back((d_ijList[nodeI].front()).first);
+			std::pop_heap(d_ijList[nodeI].begin(), d_ijList[nodeI].end(), comp);
+			d_ijList[nodeI].pop_back();
+		}
+	}
+	LOG_DEBUG("init_neighborsNodes() all done !");
+}
 
 Real LevelSet::distance(const Vector3r& pt, const bool& unbound) const
 {
@@ -520,20 +601,37 @@ Vector3r LevelSet::getInertia()
 	return inertia;
 }
 
-Real LevelSet::getSurface() const
+Real LevelSet::getSurface_epsilon(Real epsilon) const // to avoid code duplication in getSurface
 {
-	Real nbrAngles(sqrt(surfNodes.size() - 2));
-	if (nbrAngles != int(nbrAngles)) {
-		LOG_ERROR("Impossible to compute surface with " << surfNodes.size() << " surface nodes (squared integer + 2 expected). Returning -1");
-		return -1.;
+	Real volExcess(volumeInsideThreshold(epsilon)), volDefault(volumeInsideThreshold(-epsilon));
+	if (volExcess == volDefault) // may happen in case of failed iterative search in getSurface and an epsilon really fading to 0
+		LOG_WARN(
+		        "Measuring twice the same volume when using epsilon = " << epsilon << " for a grid spacing of " << lsGrid->spacing
+		                                                                << ", we will obtain a zero surface");
+	return (volExcess - volDefault) / (2 * epsilon);
+}
+Real LevelSet::getSurface(Real epsilon) const
+{
+	unsigned int cptr(0), cptrMax(100);
+	Real         surfOld(getSurface_epsilon(epsilon));
+	Real         surfNew(-1), relChange(-1);
+	while (cptr < cptrMax) {
+		epsilon   = epsilon / 2;
+		surfNew   = (getSurface_epsilon(epsilon));
+		relChange = math::abs(surfOld - surfNew) / surfOld;
+		LOG_INFO(
+		        "During the iteration nbr " << cptr + 1 << " (with new epsilon = " << epsilon << "), it is computed " << surfNew
+		                                    << " for new surface value, to compare with " << surfOld << " for old surface value, ie a " << relChange
+		                                    << " relative change");
+		if (relChange < 1.e-7) // we converged to a limit
+			break;
+		else { // we go for another round
+			surfOld = surfNew;
+			cptr++;
+		}
 	}
-	Real dtheta(Mathr::PI / (nbrAngles + 1)), dphi(2 * Mathr::PI / nbrAngles);
-	Real surf(0.);
-	for (unsigned int idx = 2; idx < surfNodes.size(); idx++) {
-		Vector3r spher = ShopLS::cart2spher(surfNodes[idx]); // (r,theta,phi) spherical coordinates
-		surf += pow(spher[0], 2) * sin(spher[1]) * dtheta * dphi;
-	}
-	return surf;
+	if (cptr == cptrMax) LOG_ERROR("We reached " << cptrMax << " iterations wo converging to a limit surface value");
+	return surfNew;
 }
 void LevelSet::computeMarchingCubes()
 {

@@ -11,6 +11,7 @@
 #include <pkg/common/Wall.hpp>
 #include <pkg/dem/ScGeom.hpp>
 #include <pkg/levelSet/LevelSet.hpp>
+#include <pkg/levelSet/LevelSetIGeom.hpp>
 
 namespace yade {
 
@@ -52,7 +53,32 @@ public:
 	        const shared_ptr<Interaction>& c,
 	        const Scene*                   scene); // static because also used in e.g., Ig2_Box_LevelSet_ScGeom
 	std::pair<std::pair<Vector3r, Vector3r>, std::pair<bool, bool>>
-	     boundOverlap(bool single, const State&, const State&, const shared_ptr<Interaction>&, const Vector3r&);
+	                                boundOverlap(bool single, const State&, const State&, const shared_ptr<Interaction>&, const Vector3r&);
+	std::tuple<Real, int, Vector3r> smallestDistanceLoop(
+	        vector<int> // indices of nodes to consider of "S" (with the special case of an empty vector triggering full consideration)
+	        ,
+	        const shared_ptr<LevelSet>&,
+	        const shared_ptr<LevelSet>& // both shapes
+	        ,
+	        Vector3r,
+	        Quaternionr // describing "S" configuration
+	        ,
+	        Vector3r,
+	        Quaternionr // describing "B" configuration
+	        ,
+	        Vector3r,
+	        Vector3r // the min and max of the bounds overlap
+	); // return the obtained smallest distance (without sign condition) in get<0> ; the idx of the corresponding node (wrt 1st argument) in get<1> ; its current position in global frame in get<2>. The latter two can be garbage quantity in case get<0> is infinite (which means no node was detected to be in contact)
+	std::tuple<Real, int, Vector3r>
+	     smallestDistanceFullLoop( // variant of the above that will take care once for all of defining a full list of node indices
+                const shared_ptr<LevelSet>&,
+                const shared_ptr<LevelSet>&,
+                Vector3r,
+                Quaternionr,
+                Vector3r,
+                Quaternionr,
+                Vector3r,
+                Vector3r);
 	bool goSingleOrMulti(
 	        bool single,
 	        const shared_ptr<Shape>&,
@@ -78,21 +104,61 @@ public:
 		        "We ended up calling goReverse.. How is this possible for symmetric IgFunctor ? Anyway, we now have to code something"); /* nothing, such as in TTetraGeom, mixed examples elsewhere*/
 		return false;
 	};
+	Real normalMismatch(const shared_ptr<Interaction>&);
 	// clang-format off
-	YADE_CLASS_BASE_DOC(Ig2_LevelSet_LevelSet_ScGeom,IGeomFunctor,R"""(Creates or updates a :yref:`ScGeom` instance representing the contact of two (convex) :yref:`LevelSet`-shaped bodies after executing a master-slave algorithm that combines distance function $\phi$ (:yref:`LevelSet.distField`) with surface nodes $\vec{N}$ (:yref:`LevelSet.surfNodes`) [Duriez2021a]_ [Duriez2021b]_. Denoting $S$, resp. $B$, the smallest, resp. biggest, contacting body, $\vec{N_c}$ the surface node of $S$ with the greatest penetration depth into $B$ (its current position), $u_n$ the corresponding :yref:`overlap<ScGeom.penetrationDepth>`, $\vec{C}$ the :yref:`contact point<ScGeom.contactPoint>` and $\vec{n}$ the contact :yref:`normal<ScGeom.normal>`, we have:
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Ig2_LevelSet_LevelSet_ScGeom,IGeomFunctor,R"""(Creates or updates a :yref:`ScGeom` instance representing the contact of two convex :yref:`LevelSet`-shaped bodies after executing a master-slave algorithm that combines distance function $\phi$ (:yref:`LevelSet.distField`) with surface nodes $\vec{N}$ (:yref:`LevelSet.surfNodes`) [Duriez2021a]_ [Duriez2021b]_. Denoting $S$, resp. $B$, the smallest, resp. biggest, contacting body, $\vec{N_c}$ the surface node of $S$ with the greatest penetration depth into $B$ (its current position), $u_n$ the corresponding :yref:`overlap<ScGeom.penetrationDepth>`, $\vec{C}$ the :yref:`contact point<ScGeom.contactPoint>` and $\vec{n}$ the contact :yref:`normal<ScGeom.normal>`, we have:
 
 * $u_n = - \phi_B(\vec{N_c})$
 * $\vec{n} = \pm \vec{\nabla} \phi_S(\vec{N_c})$  chosen to be oriented from :yref:`1<Interaction.id1>` to :yref:`2<Interaction.id2>`
 * $\vec{C} = \vec{N_c} - \dfrac{u_n}{2} \vec{n}$
 
-.. note:: in case the two :yref:`LevelSet grids<LevelSet.lsGrid>` no longer overlap for a previously existing interaction, the above workflow does not apply and $u_n$ is assigned an infinite tensile value that should insure interaction removal in the same DEM iteration (for sure with Law2_ScGeom_FrictPhys_CundallStrack).
-)""");
+.. note:: in case the two :yref:`LevelSet grids<LevelSet.lsGrid>` no longer overlap for a previously existing interaction, the above workflow does not apply and $u_n$ is assigned an infinite tensile value that should insure interaction removal in the same DEM iteration (for sure with :yref:`Law2_ScGeom_FrictPhys_CundallStrack`).
+
+While :yref:`Ig2_LevelSet_LevelSet_MultiScGeom` accomodates non-convex cases, :yref:`Ig2_LevelSet_LevelSet_LSnodeGeom` might be a better choice, towards faster simulations, when handling convex bodies.
+)"""
+	,/*attrs*/,/*ctor*/
+	,.def("normalMismatch",&Ig2_LevelSet_LevelSet_ScGeom::normalMismatch,(boost::python::arg("cont")),"Normal orientation mismatch (in radians) of given interaction *cont* if master and slave particles were to be exchanged. Does not support periodic boundary conditions at the moment."));
 	// clang-format on
 	DECLARE_LOGGER;
 	FUNCTOR2D(LevelSet, LevelSet);
 	DEFINE_FUNCTOR_ORDER_2D(LevelSet, LevelSet);
 };
 REGISTER_SERIALIZABLE(Ig2_LevelSet_LevelSet_ScGeom);
+
+class Ig2_LevelSet_LevelSet_LSnodeGeom : public Ig2_LevelSet_LevelSet_ScGeom {
+public:
+	bool go(const shared_ptr<Shape>&,
+	        const shared_ptr<Shape>&,
+	        const State&,
+	        const State&,
+	        const Vector3r&,
+	        const bool&,
+	        const shared_ptr<Interaction>&) override; // reminder: method signature is imposed by InteractionLoop.cpp
+	// clang-format-off
+	bool
+	goReverse(const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r&, const bool&, const shared_ptr<Interaction>&)
+	        override
+	{
+		LOG_ERROR(
+		        "We ended up calling goReverse.. How is this possible for symmetric IgFunctor ? Anyway, we now have to code something"); /* nothing, such as in TTetraGeom, mixed examples elsewhere*/
+		return false;
+	};
+	YADE_CLASS_BASE_DOC(
+	        Ig2_LevelSet_LevelSet_LSnodeGeom,
+	        Ig2_LevelSet_LevelSet_ScGeom,
+	        "Same as :yref:`Ig2_LevelSet_LevelSet_ScGeom` except for the additional information in :yref:`LSnodeGeom` which should enable faster "
+	        "simulations, provided that :yref:`Law2_ScGeom_FrictPhys_CundallStrack.neverErase` is defined as True. This functor actually creates an "
+	        "interaction geom, enabling the interaction to turn real, as soon as a closest node can be detected (even though there is not yet mechanical "
+	        "contact). On the contrary, in order to avoid a continuous increase in the interaction list, it will take the responsibility to ask for "
+	        "interaction removal as soon as node treatment is impossible (due to an excessive gap), even when the interaction was previously real (at "
+	        "variance with general YADE design), prompting the need for setting :yref:`InteractionLoop.warnRoleIg2` = False to avoid unnecessary warning "
+	        "messages in such cases, see :ysrc:`examples/levelSet/lsNodeGeom.py` for an example. Please also note that using this Functor is expected to bias (increase) unbalancedForce measurements as it artificially increases the number of real interactions, with a number of those carrying no force, making for a smaller mean average interaction force, hence a higher unbalanced force")
+	// clang-format on
+	DECLARE_LOGGER;
+	FUNCTOR2D(LevelSet, LevelSet);
+	DEFINE_FUNCTOR_ORDER_2D(LevelSet, LevelSet);
+};
+REGISTER_SERIALIZABLE(Ig2_LevelSet_LevelSet_LSnodeGeom);
 
 class Ig2_LevelSet_LevelSet_MultiScGeom : public Ig2_LevelSet_LevelSet_ScGeom {
 public:
