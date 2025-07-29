@@ -33,7 +33,7 @@ public:
 	RENDERS(LevelSet);
 };
 REGISTER_SERIALIZABLE(Gl1_LevelSet);
-#endif // YADE_OPENGL
-
 } // namespace yade
+
+#endif // YADE_OPENGL
 #endif //YADE_LS_DEM
