@@ -67,7 +67,7 @@ O.bodies[0].state.angVel = (1, 0, 0)
 O.dt = 1
 O.run(3, True)
 
-# bodies can be displayed after simulation in Paraview / ipython calling e.g.
+# bodies can be displayed after simulation in Paraview / ipython calling therein e.g.
 # pvVisu(idBodies = [0,1],itSnap = range(3))
 # where pvVisu() is defined in pvVisu.py, same folder
 
