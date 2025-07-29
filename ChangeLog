@@ -53,6 +53,7 @@ LevelSet & Volume-interacting LevelSet
   Updates of examples/levelSet with in particular new .py functions that should come handy for defining LevelSet bodies from .stl data (!1105)
   Faster FastMarchingMethod thanks to a heap sort procedure (!1106)
   LSnodeGeom-based faster contact treatment of LevelSet (and better LevelSet.getSurface) (!1108)
+  New rendering options to display LevelSet surface nodes and surface (!1117)
 
 Polyhedra / Facets
 ------------------
