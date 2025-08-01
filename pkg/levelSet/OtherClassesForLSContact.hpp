@@ -19,21 +19,29 @@ public:
 };
 REGISTER_SERIALIZABLE(Bo1_LevelSet_Aabb);
 
-
-class MultiFrictPhys : public IPhys {
-public:
+class MultiPhys: public IPhys {
+	public:
 	// clang-format off
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MultiFrictPhys,IPhys,"A set of :yref:`FrictPhys` for describing the physical part of an interaction with multiple frictional contact points between two :yref:`LevelSet` bodies, as a set of :yref:`FrictPhys` items in :yref:`contacts<MultiFrictPhys.contacts>`. To combine with :yref:`MultiScGeom` and associated classes.",
-	((vector< shared_ptr<FrictPhys> >,contacts,,,"The actual list of :yref:`FrictPhys` items corresponding to the different contact points."))
-	((vector< int >,nodesIds,,,"The physics counterpart of :yref:`MultiScGeom.nodesIds` (both should be equal by design).")) // do we need both ?
-	((Real,kn,0,,"Mother value of :yref:`FrictPhys.kn` that will apply to each contact point."))
-	((Real,ks,0,,"Mother value of :yref:`FrictPhys.ks` that will apply to each contact point."))
-	((Real,frictAngle,0,,"Mother value of atan(:yref:`FrictPhys.tangensOfFrictionAngle`) in radians that will apply to each contact point."))
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MultiPhys,IPhys,"Describes the physical part of an interaction with multiple contact points, e.g., between two :yref:`LevelSet` bodies, as a set of :yref:`IPhys` items. This class is actually not intended to be used directly but to serve as a common ancestor for children classes such as :yref:`MultiFrictPhys`.",
+	((vector< shared_ptr<IPhys> >,contacts,,,"The actual list of :yref:`IPhys` (for the mother class, actually obtained types can be different for derived classes such as :yref:`MultiFrictPhys` which will include :yref:`FrictPhys` instances) items corresponding to the different contact points."))
+	((vector< int >,nodesIds,,,"The physics counterpart of :yref:`MultiScGeom.nodesIds` (both should be equal by design).")) // let us keep both for verification purpose
 	,
 	createIndex(); // this class will enter InteractionLoop dispatch, we need a create_index() here, and a REGISTER_*_INDEX below (https://yade-dem.org/doc/prog.html#indexing-dispatch-types)
 	);
 	// clang-format on
-	REGISTER_CLASS_INDEX(MultiFrictPhys, IPhys); // see createIndex() remark
+	REGISTER_CLASS_INDEX(MultiPhys, IPhys); // see createIndex() remark
+};
+REGISTER_SERIALIZABLE(MultiPhys);
+
+class MultiFrictPhys : public MultiPhys {
+public:
+	// clang-format off
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MultiFrictPhys,MultiPhys,"Describes the physical part of an interaction with multiple frictional contact points, e.g., between two :yref:`LevelSet` bodies, through a set of :yref:`FrictPhys` instances in :yref:`contacts<MultiFrictPhys.contacts>`. To combine with :yref:`MultiScGeom` and associated classes.",
+	,
+	createIndex(); // this class will enter InteractionLoop dispatch, we need a create_index() here, and a REGISTER_*_INDEX below (https://yade-dem.org/doc/prog.html#indexing-dispatch-types)
+	);
+	// clang-format on
+	REGISTER_CLASS_INDEX(MultiFrictPhys, MultiPhys); // see createIndex() remark
 };
 REGISTER_SERIALIZABLE(MultiFrictPhys);
 
@@ -42,7 +50,7 @@ public:
 	void go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) override;
 	FUNCTOR2D(FrictMat, FrictMat);
 	// clang-format off
-	YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_MultiFrictPhys,IPhysFunctor,"Create a :yref:`MultiFrictPhys` from two :yref:`FrictMats<FrictMat>`. Mother contact stiffnesses (:yref:`MultiFrictPhys.kn` and :yref:`MultiFrictPhys.ks`) are directly assigned from below attributes, independent of FrictMat properties. Global friction angle (:yref:`MultiFrictPhys.frictAngle`) is taken as the minimum of the 2 material friction angles (:yref:`FrictMat.frictionAngle`).",
+	YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_MultiFrictPhys,IPhysFunctor,"Handles the :yref:`MultiFrictPhys` physical description of the contact between two :yref:`FrictMats<FrictMat>`. Contact stiffnesses (for every :yref:`contact<MultiFrictPhys.contacts>`) are directly assigned from below attributes, independent of FrictMat properties. Contact friction angle is taken as the minimum of the 2 material friction angles (:yref:`FrictMat.frictionAngle`).",
 		((Real,kn,0,,"Chosen value for :yref:`MultiFrictPhys.kn`"))
 		((Real,ks,0,,"Chosen value for :yref:`MultiFrictPhys.ks`"))
 	);

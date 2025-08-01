@@ -8,7 +8,7 @@
 #include <pkg/levelSet/ShopLS.hpp>
 
 namespace yade {
-YADE_PLUGIN((Bo1_LevelSet_Aabb)(MultiFrictPhys)(Ip2_FrictMat_FrictMat_MultiFrictPhys));
+YADE_PLUGIN((Bo1_LevelSet_Aabb)(MultiFrictPhys)(MultiPhys)(Ip2_FrictMat_FrictMat_MultiFrictPhys));
 CREATE_LOGGER(Bo1_LevelSet_Aabb);
 CREATE_LOGGER(Ip2_FrictMat_FrictMat_MultiFrictPhys);
 
@@ -84,31 +84,49 @@ void Bo1_LevelSet_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, c
 
 void Ip2_FrictMat_FrictMat_MultiFrictPhys::go(const shared_ptr<Material>& mat1, const shared_ptr<Material>& mat2, const shared_ptr<Interaction>& interaction)
 {
-	// As usual, we maybe do not need to reexecute several times Ip2::go for a given interaction. But testing interaction->phys is inappropriate here because Ig2_LS_LS_MultiScGeom did actually already define a phys.. (if only Ip2 would execute before Ig2 in InteractionLoop..)
-	if (interaction->iterMadeReal >= 0)
-		return; // we thus rather test iterMadeReal, which is assigned to sthg else than -1 in the InteractionLoop, after Ig2 and Ip2 have executed
-	LOG_DEBUG("Passing here because iterMadeReal = " << interaction->iterMadeReal);
+	//NB: we will execute that Ip2::go at every iteration, because new items in interaction->phys->contacts have to be touched here (e.g., assigned kn)
+	shared_ptr<MultiFrictPhys> multiFrictPhysPtr(new MultiFrictPhys);
+	if (interaction->phys->getClassName() == "MultiPhys"){ // this interaction has just been created (and already populated with a phys, of MultiPhys type), by the Ig2*MultiScGeom::go
+		LOG_DEBUG("Interaction " << interaction->id1 << " - " << interaction->id2 << " seen for the first time in the Ip2" << std::endl);
+		// we will backport interaction->phys->contacts and ->nodesIds;
+		shared_ptr<MultiPhys> iPhysPtrAsMultiPhys(YADE_PTR_CAST<MultiPhys>(interaction->phys));
+		multiFrictPhysPtr->contacts = iPhysPtrAsMultiPhys->contacts;
+		multiFrictPhysPtr->nodesIds = iPhysPtrAsMultiPhys->nodesIds;
+	}
+	else if(interaction->phys->getClassName() == "MultiFrictPhys") { // it has existed for a while: i->phys is already of MultiFrictPhys type
+		LOG_DEBUG("Interaction " << interaction->id1 << " - " << interaction->id2 << " had already been Ip2-handled in the past, its phys is of " << interaction->phys->getClassName() << " at least" << std::endl);
+		multiFrictPhysPtr = YADE_PTR_CAST<MultiFrictPhys>(interaction->phys);
+	}
+	else{
+		LOG_ERROR("Interaction " << interaction->id1 << " - " << interaction->id2 << " has a phys of " << interaction->phys->getClassName() << ", that is clearly not expected ! (only MultiPhys or MultiFrictPhys are)" << std::endl);
+	}
 	LOG_DEBUG(
-	        "YADE_PTR_DYN_CAST<MultiFrictPhys>(interaction->phys) = "
-	        << YADE_PTR_DYN_CAST<MultiFrictPhys>(interaction->phys)
-	        << " (0 would be a problem)"); // the dynamic cast will never be executed here unless LOG_DEBUG level is actually effective
-	const shared_ptr<MultiFrictPhys>& contactPhysics = YADE_PTR_CAST<MultiFrictPhys>(interaction->phys); // phys already exists, no need for new ..
-	// Direct assignment of mother values of stiffnesses:
-	contactPhysics->kn = kn;
-	contactPhysics->ks = ks;
-	// Contact friction from Materials' frictionAngle(s):
+		"YADE_PTR_DYN_CAST<MultiFrictPhys>(interaction->phys) = "
+		<< YADE_PTR_DYN_CAST<MultiFrictPhys>(interaction->phys)
+		<< " (0 would be a problem)"); // the dynamic cast will never be executed here unless LOG_DEBUG level is actually effective
+	// Computing once for all (outside of below loop) the to-be-assigned contact friction from the Materials frictionAngle(s):
 	const shared_ptr<FrictMat>& fmat1 = YADE_PTR_CAST<FrictMat>(mat1);
 	const shared_ptr<FrictMat>& fmat2 = YADE_PTR_CAST<FrictMat>(mat2);
-	contactPhysics->frictAngle        = std::min(fmat1->frictionAngle, fmat2->frictionAngle);
-	LOG_DEBUG("Mother friction angle assigned into MultiFrictPhys data from FrictMat");
-	// And we still need to go through the following loop for contacts which were created at the very first iteration (and filled with 0 at that time by Ig2)
-	LOG_DEBUG("About to looping over nodes");
-	for (unsigned int idx = 0; idx < contactPhysics->contacts.size(); idx++) {
-		contactPhysics->contacts[idx]->kn                     = kn;
-		contactPhysics->contacts[idx]->ks                     = ks;
-		contactPhysics->contacts[idx]->tangensOfFrictionAngle = std::tan(contactPhysics->frictAngle);
+	Real frictAngle( std::min(fmat1->frictionAngle, fmat2->frictionAngle) );
+	// Looping over contacting nodes to assign mechanical properties into individual contacts items:
+	LOG_DEBUG("About to looping over contacting nodes");
+	for (unsigned int idx = 0; idx < multiFrictPhysPtr->contacts.size(); idx++) {
+		if (multiFrictPhysPtr->contacts[idx]->getClassName() == "IPhys") { // this contacts[idx] item has just been created in Ig2::go
+			LOG_DEBUG("Contact at node " << multiFrictPhysPtr->nodesIds[idx] << " is detected by the Ip2 as being just created" << std::endl);
+			shared_ptr<FrictPhys> frictPhysPtr(new FrictPhys);
+			// Direct assignment of values of stiffnesses:
+			frictPhysPtr->kn                     = kn;
+			frictPhysPtr->ks                     = ks;
+			// Assignment of (tangent of) friction angle:
+			frictPhysPtr->tangensOfFrictionAngle = std::tan(frictAngle);
+			multiFrictPhysPtr->contacts[idx] = frictPhysPtr;
+		}
+		else { // this contacts[idx] item shall have existed for a while, there is nothing to do
+			LOG_DEBUG("Contact at node " << multiFrictPhysPtr->nodesIds[idx] << " is detected by the Ip2 as existing for a while" << std::endl);
+		}
 	}
 	LOG_DEBUG("Nodes loop done");
+	interaction->phys = multiFrictPhysPtr;
 };
 
 } // namespace yade

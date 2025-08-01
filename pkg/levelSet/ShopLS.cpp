@@ -352,7 +352,7 @@ Vector3r ShopLS::grad_fioRose(Vector3r gp)
 	return grad_fio;
 }
 
-void ShopLS::handleNonTouchingNodeForMulti(shared_ptr<MultiScGeom>& geomMulti, shared_ptr<MultiFrictPhys>& physMulti, int nodeIdx)
+void ShopLS::handleNonTouchingNodeForMulti(shared_ptr<MultiScGeom>& geomMulti, shared_ptr<MultiPhys>& physMulti, int nodeIdx)
 {
 	// For a surface node being detected not to be in contact, makes what is needed in a Multi* case, i.e. remove it from Multi*.contacts if it was contacting before
 	// Implemented here to avoid code duplication in a number of Ig2_*_MultiScGeom
@@ -371,7 +371,7 @@ void ShopLS::handleNonTouchingNodeForMulti(shared_ptr<MultiScGeom>& geomMulti, s
 
 void ShopLS::handleTouchingNodeForMulti(
         shared_ptr<MultiScGeom>&       geomMulti,
-        shared_ptr<MultiFrictPhys>&    physMulti,
+        shared_ptr<MultiPhys>&         physMulti,
         int                            nodeIdx,
         Vector3r                       ctctPt,
         Real                           un,
@@ -385,7 +385,7 @@ void ShopLS::handleTouchingNodeForMulti(
         const Vector3r&                shift2)
 {
 	const auto findIt(geomMulti->iteratorToNode(nodeIdx));
-	if (findIt != geomMulti->nodesIds.end()) // same remark as in handleNonTouchingNodeForMulti
+	if (findIt != geomMulti->nodesIds.end()) // that node was already contacting before (same approach as in handleNonTouchingNodeForMulti)
 	{
 		// we update the geom:
 		geomMulti->contacts[std::distance(geomMulti->nodesIds.begin(), findIt)]->doIg2Work(
@@ -401,14 +401,9 @@ void ShopLS::handleTouchingNodeForMulti(
 		scGeomPtr->doIg2Work(ctctPt, un, rad1, rad2, state1, state2, scene, c, currentNormal, shift2, true, false);
 		// that we store in MultiScGeom::contacts:
 		geomMulti->contacts.push_back(scGeomPtr);
-		// we also have to create a new FrictPhys shared_ptr:
-		shared_ptr<FrictPhys> frictPhysPtr(new FrictPhys);
-		// with properties (these below lines unfortunately just give 0 at interaction creation ! Because Ip2 could not enter into play yet. It would have helped if Ip2 would be executed *before* Ig2 in InteractionLoop.. Will be corrected in Ip2):
-		frictPhysPtr->kn                     = physMulti->kn;
-		frictPhysPtr->ks                     = physMulti->ks;
-		frictPhysPtr->tangensOfFrictionAngle = std::tan(physMulti->frictAngle);
-		// we store in MultiFrictPhys::contacts:
-		physMulti->contacts.push_back(frictPhysPtr);
+		// we also have to create a new shared_ptr<IPhys> to put into physMulti->contacts :
+		shared_ptr<IPhys> physPtr(new IPhys()); // https://stackoverflow.com/a/620402 about IPhys() or IPhys..
+		physMulti->contacts.push_back(physPtr);
 	}
 }
 

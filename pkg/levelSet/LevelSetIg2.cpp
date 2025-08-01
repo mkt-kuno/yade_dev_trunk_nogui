@@ -280,10 +280,10 @@ bool Ig2_Wall_LevelSet_MultiScGeom::go(
 {
 	bool                       newIgeom(!bool(c->geom));
 	shared_ptr<MultiScGeom>    geomMulti(new MultiScGeom);
-	shared_ptr<MultiFrictPhys> physMulti(new MultiFrictPhys); // As a reminder, Ig2_*MultiScGeom have to handle the physics
+	shared_ptr<MultiPhys> physMulti(new MultiPhys); // As a reminder, Ig2_*MultiScGeom have to touch the physics
 	if (!newIgeom) {
 		geomMulti = YADE_PTR_CAST<MultiScGeom>(c->geom);
-		physMulti = YADE_PTR_CAST<MultiFrictPhys>(c->phys);
+		physMulti = YADE_PTR_CAST<MultiPhys>(c->phys);
 	} // nothing to do in else
 	shared_ptr<Wall>     wallSh = YADE_PTR_CAST<Wall>(shape1);
 	shared_ptr<LevelSet> lsSh   = YADE_PTR_CAST<LevelSet>(shape2);
@@ -783,13 +783,13 @@ bool Ig2_LevelSet_LevelSet_ScGeom::goSingleOrMulti(
 	bool                       newIgeom(!bool(c->geom));
 	shared_ptr<ScGeom>         geomSingle(new ScGeom);     // useful only if single but let s also make it here in full scope
 	shared_ptr<MultiScGeom>    geomMulti(new MultiScGeom); // useful only if !single but has to be in full scope
-	shared_ptr<MultiFrictPhys> physMulti(
-	        new MultiFrictPhys); // useful only if !single but has to be in full scope. As a reminder, Ig2_*MultiScGeom have to handle the physics
+	shared_ptr<MultiPhys> physMulti(
+	        new MultiPhys); // useful only if !single but has to be in full scope. As a reminder, Ig2_*MultiScGeom have to touch the physics
 	if (!newIgeom) {
 		if (single) geomSingle = YADE_PTR_CAST<ScGeom>(c->geom);
 		else {
 			geomMulti = YADE_PTR_CAST<MultiScGeom>(c->geom);
-			physMulti = YADE_PTR_CAST<MultiFrictPhys>(c->phys);
+			physMulti = YADE_PTR_CAST<MultiPhys>(c->phys);
 		}
 	} // nothing to do in else
 	shared_ptr<LevelSet> sh1 = YADE_PTR_CAST<LevelSet>(shape1);

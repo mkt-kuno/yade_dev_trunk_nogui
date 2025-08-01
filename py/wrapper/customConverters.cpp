@@ -422,6 +422,7 @@ try {
 		VECTOR_SEQ_CONV(shared_ptr<Interaction>);
 		VECTOR_SEQ_CONV(shared_ptr<ScGeom>);    // MultiScGeom.contacts
 		VECTOR_SEQ_CONV(shared_ptr<FrictPhys>); // MultiFrictPhys.contacts
+		VECTOR_SEQ_CONV(shared_ptr<IPhys>); // MultiPhys.contacts
 #ifdef YADE_BODY_CALLBACK
 		VECTOR_SEQ_CONV(shared_ptr<BodyCallback>);
 #endif

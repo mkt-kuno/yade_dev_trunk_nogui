@@ -54,6 +54,7 @@ LevelSet & Volume-interacting LevelSet
   Faster FastMarchingMethod thanks to a heap sort procedure (!1106)
   LSnodeGeom-based faster contact treatment of LevelSet (and better LevelSet.getSurface) (!1108)
   New rendering options to display LevelSet surface nodes and surface (!1117)
+  Uncoupling Ig2*MultiScGeom from Ip2 operations for easier inclusion of new Multi*Phys (!1118)
 
 Polyhedra / Facets
 ------------------

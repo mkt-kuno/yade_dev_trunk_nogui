@@ -64,10 +64,10 @@ public:
                 std::array<Real, 2>,
                 std::array<Real, 2>,
                 std::array<std::array<Real, 2>, 2>); // bi-interpolation in a plane, used in LevelSet.distance()
-	static void handleNonTouchingNodeForMulti(shared_ptr<MultiScGeom>&, shared_ptr<MultiFrictPhys>&, int);
+	static void handleNonTouchingNodeForMulti(shared_ptr<MultiScGeom>&, shared_ptr<MultiPhys>&, int);
 	static void handleTouchingNodeForMulti(
 	        shared_ptr<MultiScGeom>&,
-	        shared_ptr<MultiFrictPhys>&,
+	        shared_ptr<MultiPhys>&,
 	        int,
 	        Vector3r                       ctctPt,
 	        Real                           un,

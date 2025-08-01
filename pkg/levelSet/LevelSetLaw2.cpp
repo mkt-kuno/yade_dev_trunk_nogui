@@ -19,7 +19,7 @@ bool Law2_MultiScGeom_MultiFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, sh
                 new IGeom); // keep it as IGeom ! Otherwise (if directly defined as ScGeom) a temporary will have to be created when calling CS::go below, and it will not work with the expected reference type
 	shared_ptr<IPhys> ipOne(new IPhys);
 	bool              retVal(false);
-	LOG_DEBUG("Will loop over " << igMulti->contacts.size() << " contacts looking at igMulti, vs " << ipMulti->contacts.size() << " in ipMulti");
+	LOG_DEBUG("Will loop over " << igMulti->contacts.size() << " contact items when looking at i->geom->contacts (in MultiScGeom), vs " << ipMulti->contacts.size() << " in i->phys->contacts (in MultiFrictPhys)");
 	for (unsigned int idx = 0; idx < igMulti->contacts.size(); idx++) {
 		LOG_TRACE("Looping over contact " << idx << " out of " << igMulti->contacts.size());
 		igOne  = igMulti->contacts[idx];

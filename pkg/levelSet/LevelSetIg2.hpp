@@ -184,7 +184,7 @@ public:
 	        "Multiple contact points version of :yref:`Ig2_LevelSet_LevelSet_ScGeom` for a :yref:`MultiScGeom` description of a contact between two "
 	        "(non-convex typically) :yref:`LevelSet`-shaped bodies (with a :yref:`ScGeom` interaction at each contacting surface node). Does not support "
 	        "periodic boundary conditions at the moment. It is designed to be used in combination with :yref:`MultiFrictPhys` for what concerns the "
-	        ":yref:`interaction physics<Interaction.phys>` (which is here also touched by that Ig2 in some contrast with general YADE design, from a "
+	        ":yref:`interaction physics<Interaction.phys>` (which is here also created by that Ig2 in some contrast with general YADE design, from a "
 	        "developer point of view) [Duriez2023]_.");
 	// clang-format on
 	DECLARE_LOGGER;

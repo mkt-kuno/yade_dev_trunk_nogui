@@ -72,7 +72,7 @@ public:
 		((bool,skipNondynamic,false,,"Skip non-dynamic spheres (but not facets)."))
 		#ifdef YADE_VTK_MULTIBLOCK
 			((bool,multiblock,false,,"Use multi-block (``.vtm``) files to store data, rather than separate ``.vtu`` files."))
-			((bool,multiblockLS,false,,"For executing, when True and with lsBodies in *recorders*, a serial export of the :yref:`LevelSet` bodies into one unique multi-block (``.vtm``) file, rather than a OpenMP export of separate ``.vtu`` files, when False. Compatibility with *multiblock* has not been implemented yet"))
+			((bool,multiblockLS,false,,"For executing, when True and with lsBodies in *recorders*, a serial export of the :yref:`LevelSet` bodies into one unique multi-block (``.vtm``) file, rather than a OpenMP export of separate ``.vts`` files, when False. Compatibility with *multiblock* has not been implemented yet"))
 		#endif
 		#ifdef YADE_MPI
 			((bool,parallelMode,false,,"For MPI parallel runs, each proc writes their own vtu/vtp files. Master proc writes a pvtu/pvtp file containing metadata about worker vtu files. load the pvtu/pvtp in paraview for visualization."))
