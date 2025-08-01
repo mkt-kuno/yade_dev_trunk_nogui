@@ -46,7 +46,7 @@ void MatchMaker::postLoad(MatchMaker&)
 		fbPtr         = &MatchMaker::fbHarmAvg;
 		fbNeedsValues = true;
 	} else
-		throw std::invalid_argument("MatchMaker:: algo '" + algo + "' not recognized (possible values: val, avg, min, max, harmAvg).");
+		throw std::invalid_argument("MatchMaker:: algo '" + algo + "' not recognized (possible values: val, zero, avg, min, max, harmAvg).");
 
 	// Fill matchSet with values for a fast coefficient search
 	for (const auto& m : matches) {
