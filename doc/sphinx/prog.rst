@@ -1070,7 +1070,7 @@ The macro :ref:`YADE_CLASS_BASE_DOC` introduced above is (behind the scenes) als
 YADE_CLASS_BASE_DOC_* macro family
 -----------------------------------
 
-There is several macros that hide behind them the functionality of :ref:`sphinxdocumentation`, :ref:`rtti`, :ref:`attributeregistration`, :ref:`pythonattributeaccess`, plus automatic attribute initialization and documentation. They are all defined as shorthands for base macro ``YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY`` with some arguments left out. They must be placed in class declaration's body (``.hpp`` file):
+There are several macros that hide behind them the functionality of :ref:`sphinxdocumentation`, :ref:`rtti`, :ref:`attributeregistration`, :ref:`pythonattributeaccess`, plus automatic attribute initialization and documentation. They are all defined as shorthands for the macro ``YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY``, which is itself a shorthand for the base macro ``YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY`` with some arguments left out. They must be placed in class declaration's body (``.hpp`` file):
 
 .. code-block:: c++
 
