@@ -8,7 +8,7 @@
 
 namespace yade { // Cannot have #include directive inside.
 
-YADE_PLUGIN((Law2_MultiScGeom_MultiFrictPhys_CundallStrack));
+YADE_PLUGIN((Law2_MultiScGeom_MultiFrictPhys_CundallStrack)(Law2_MultiScGeom_MultiViscElPhys_Basic));
 CREATE_LOGGER(Law2_MultiScGeom_MultiFrictPhys_CundallStrack);
 
 bool Law2_MultiScGeom_MultiFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
@@ -26,6 +26,27 @@ bool Law2_MultiScGeom_MultiFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, sh
 		ipOne  = ipMulti->contacts[idx];
 		retVal = Law2_ScGeom_FrictPhys_CundallStrack::go(igOne, ipOne, contact) || retVal;
 		// NB: in the above, value of Law2_MultiScGeom_MultiFrictPhys_CundallStrack.sphericalBodies is indeed taken into account
+	}
+	return retVal;
+}
+
+
+CREATE_LOGGER(Law2_MultiScGeom_MultiViscElPhys_Basic);
+
+bool Law2_MultiScGeom_MultiViscElPhys_Basic::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
+{
+	shared_ptr<MultiScGeom>    igMulti = YADE_PTR_CAST<MultiScGeom>(ig);
+	shared_ptr<MultiViscElPhys> ipMulti = YADE_PTR_CAST<MultiViscElPhys>(ip);
+	shared_ptr<IGeom>          igOne(
+                new IGeom); // keep it as IGeom ! Otherwise (if directly defined as ScGeom) a temporary will have to be created when calling CS::go below, and it will not work with the expected reference type
+	shared_ptr<IPhys> ipOne(new IPhys);
+	bool              retVal(false);
+	LOG_DEBUG("Will loop over " << igMulti->contacts.size() << " contact items when looking at i->geom->contacts (in MultiScGeom), vs " << ipMulti->contacts.size() << " in i->phys->contacts (in MultiViscElPhys)");
+	for (unsigned int idx = 0; idx < igMulti->contacts.size(); idx++) {
+		LOG_TRACE("Looping over contact " << idx << " out of " << igMulti->contacts.size());
+		igOne  = igMulti->contacts[idx];
+		ipOne  = ipMulti->contacts[idx];
+		retVal = Law2_ScGeom_ViscElPhys_Basic::go(igOne, ipOne, contact) || retVal;
 	}
 	return retVal;
 }

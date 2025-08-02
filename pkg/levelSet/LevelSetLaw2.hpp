@@ -7,7 +7,7 @@
 #pragma once
 #include <pkg/dem/ElasticContactLaw.hpp>
 #include <pkg/levelSet/LevelSetIGeom.hpp>            // for MultiScGeom
-#include <pkg/levelSet/OtherClassesForLSContact.hpp> // for MultiFrictPhys
+#include <pkg/levelSet/OtherClassesForLSContact.hpp> // for MultiPhys
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -22,6 +22,19 @@ public:
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_MultiScGeom_MultiFrictPhys_CundallStrack);
+
+
+class Law2_MultiScGeom_MultiViscElPhys_Basic : public Law2_ScGeom_ViscElPhys_Basic {
+public:
+	bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I) override;
+	// clang-format off
+  YADE_CLASS_BASE_DOC(Law2_MultiScGeom_MultiViscElPhys_Basic,Law2_ScGeom_ViscElPhys_Basic,"Applies :yref:`Law2_ScGeom_ViscElPhys_Basic` at each contact point of a (yref:`MultiScGeom`;yref:`MultiViscElPhys`) contact [Duriez2023]_."//,TODO: check (and correct ?) behavior of Python .def-ed functions being inherited from mother class
+	);
+	// clang-format on
+	FUNCTOR2D(MultiScGeom, MultiViscElPhys);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Law2_MultiScGeom_MultiViscElPhys_Basic);
 
 } // namespace yade
 #endif //YADE_LS_DEM
