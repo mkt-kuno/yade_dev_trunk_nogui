@@ -7,7 +7,9 @@
 #pragma once
 #include <core/Dispatching.hpp>
 #include <pkg/dem/FrictPhys.hpp>
+#include <pkg/dem/ViscoelasticPM.hpp>
 #include <pkg/levelSet/LevelSet.hpp>
+#include <pkg/common/MatchMaker.hpp>
 
 namespace yade {
 class Bo1_LevelSet_Aabb : public BoundFunctor {
@@ -19,6 +21,9 @@ public:
 };
 REGISTER_SERIALIZABLE(Bo1_LevelSet_Aabb);
 
+
+/* ------------------------------------------------------------------------ */
+/* MultiPhys */
 class MultiPhys: public IPhys {
 	public:
 	// clang-format off
@@ -33,6 +38,9 @@ class MultiPhys: public IPhys {
 };
 REGISTER_SERIALIZABLE(MultiPhys);
 
+
+/* ------------------------------------------------------------------------ */
+/* MultiFrictPhys */
 class MultiFrictPhys : public MultiPhys {
 public:
 	// clang-format off
@@ -45,6 +53,24 @@ public:
 };
 REGISTER_SERIALIZABLE(MultiFrictPhys);
 
+
+/* ------------------------------------------------------------------------ */
+/* MultiViscElPhys */
+class MultiViscElPhys : public MultiPhys {
+public:
+	// clang-format off
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MultiViscElPhys,MultiPhys,"Describes the physical part of an interaction with multiple viscoelastic frictional contact points, e.g., between two :yref:`LevelSet` bodies, through a set of :yref:`ViscElPhys` instances in :yref:`contacts<MultiViscElPhys.contacts>`. To combine with :yref:`MultiScGeom` and associated classes.",
+	,
+	createIndex(); // this class will enter InteractionLoop dispatch, we need a create_index() here, and a REGISTER_*_INDEX below (https://yade-dem.org/doc/prog.html#indexing-dispatch-types)
+	);
+	// clang-format on
+	REGISTER_CLASS_INDEX(MultiViscElPhys, MultiPhys); // see createIndex() remark
+};
+REGISTER_SERIALIZABLE(MultiViscElPhys);
+
+
+/* ------------------------------------------------------------------------ */
+/* Ip2_FrictMat_FrictMat_MultiFrictPhys */
 class Ip2_FrictMat_FrictMat_MultiFrictPhys : public IPhysFunctor {
 public:
 	void go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) override;
@@ -58,6 +84,25 @@ public:
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_MultiFrictPhys);
+
+
+/* ------------------------------------------------------------------------ */
+/* Ip2_ViscElMat_ViscElMat_MultiViscElPhys */
+class Ip2_ViscElMat_ViscElMat_MultiViscElPhys : public IPhysFunctor {
+public:
+	void go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) override;
+	FUNCTOR2D(ViscElMat, ViscElMat);
+	// clang-format off
+	YADE_CLASS_BASE_DOC_ATTRS(Ip2_ViscElMat_ViscElMat_MultiViscElPhys,IPhysFunctor,"Handles the :yref:`MultiViscElPhys` physical description of the contact between two :yref:`ViscElMats<ViscElMat>`. Contact stiffnesses (for every :yref:`contact<MultiViscElPhys.contacts>`) are directly assigned from below attributes, independent of ViscElMat properties. Contact friction angle is taken as the minimum of the 2 material friction angles (:yref:`ViscElMat.frictionAngle`).",
+		((shared_ptr<MatchMaker>,kn,,,"Instance of :yref:`MatchMaker` determining how to compute interaction's normal stiffness. If ``None``, harmonic average is used."))
+		((shared_ptr<MatchMaker>,ks,,,"Instance of :yref:`MatchMaker` determining how to compute interaction's shear stiffness. If ``None``, harmonic average is used."))
+		((shared_ptr<MatchMaker>,en,,,"Instance of :yref:`MatchMaker` determining how to compute interaction's normal coefficient of restitution. If ``None``, harmonic average is used."))
+		((shared_ptr<MatchMaker>,et,,,"Instance of :yref:`MatchMaker` determining how to compute interaction's shear coefficient of restitution. If ``None``, harmonic average is used."))
+	);
+	// clang-format on
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Ip2_ViscElMat_ViscElMat_MultiViscElPhys);
 
 } // namespace yade
 #endif // YADE_LS_DEM
