@@ -7,6 +7,7 @@ Please note in particular the following simulation examples:
 - `lsNodeGeom.py` for illustrating the use of [Ig2_LevelSet_LevelSet_LSnodeGeom](https://yade-dem.org/doc/yade.wrapper.html#yade.wrapper.Ig2_LevelSet_LevelSet_LSnodeGeom) for faster simulations in the case of a particle-scale example of a bouncing LevelSet sphere on a LevelSet floor
 - `multiScGeom.py` for a particle-scale example of the [MultiScGeom](https://yade-dem.org/doc/yade.wrapper.html#yade.wrapper.MultiScGeom) description of a contact between non-convex LevelSet shapes (with several contact points)
 - `rendering.py` for a particle-scale example of rendering options
+- `viscoelastic.py` for a particle-scale example of a viscoelastic interaction using [MultiScGeom](https://yade-dem.org/doc/yade.wrapper.html#yade.wrapper.MultiScGeom) and [MultiViscElPhys](https://yade-dem.org/doc/yade.wrapper.html#yade.wrapper.MultiViscElPhys)
 
 The other files provide some utilities functions, each in a separate file, a number of those being dedicated to create LevelSet-shaped bodies from .stl shape data:
 
