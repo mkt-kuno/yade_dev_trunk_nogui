@@ -165,18 +165,43 @@ void ThermalEngine::setReynoldsNumbers()
 void ThermalEngine::setInitialValues()
 {
 	if (not checkThermal()) makeThermal();
-	//     scene = Omega::instance().getScene().get(); //already assigned in checkThermal()
+	// scene = Omega::instance().getScene().get(); //already assigned in checkThermal()
+
+	// Check for periodic boundary conditions
+	if (scene->isPeriodic) {
+		if (advection)
+			throw std::runtime_error("ThermalEngine with periodic conditions does not yet support advection, please set thermal.advection=False.");
+		else if (fluidBeta != 0.0)
+			throw std::runtime_error("ThermalEngine with periodic conditions does not yet support fluid thermal expansion, please set thermal.fluidBeta=0.");
+		else { // Adjust other flags to enable using a non-triangulated periodic domain
+			boundarySet = true;
+			flowTempBoundarySet = true;
+			letThermalRunFlowForceUpdates = false;
+			if (flow) flow->updateTriangulation = false;
+		}
+	}
+
+	// Set particle properties
+	std::atomic<bool> hasExpansion(false);
 	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies)
 	{
 		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b) continue;
 		auto* state  = static_cast<ThermalState*>(b->state.get());
-		state->temp  = particleT0;
-		state->k     = particleK;
-		state->Cp    = particleCp;
-		state->alpha = particleAlpha;
+		if (!math::isnan(particleT0))    state->temp  = particleT0;
+		if (!math::isnan(particleK))     state->k     = particleK;
+		if (!math::isnan(particleCp))    state->Cp    = particleCp;
+		if (!math::isnan(particleAlpha)) state->alpha = particleAlpha;
+
+		if (state->alpha != 0.0) hasExpansion.store(true, std::memory_order_relaxed);
 		if (advection) state->isCavity = true; // easiest to start by assuming cavity and flip if touching non-cavity
+
+		// Set particle thermal mass, which can be different from mechanical mass when particleDensity is used
+		Sphere* sphere = static_cast<Sphere*>(b->shape.get());
+		const Real vol = (4.0/3.0) * M_PI * pow(sphere->radius, 3);
+		state->thermalMass = (particleDensity > 0 ? particleDensity * vol : state->mass);
 	}
 	YADE_PARALLEL_FOREACH_BODY_END();
+	particleExpansion = hasExpansion.load(std::memory_order_relaxed);
 }
 
 void ThermalEngine::timeStepEstimate()
@@ -185,14 +210,11 @@ void ThermalEngine::timeStepEstimate()
 	for (const auto& b : *scene->bodies) {
 		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b) continue;
 		auto*      thState            = static_cast<ThermalState*>(b->state.get());
-		Sphere*    sphere             = static_cast<Sphere*>(b->shape.get());
-		const Real mass               = (particleDensity > 0 ? particleDensity * M_PI * pow(sphere->radius, 2) : thState->mass);
-		const Real bodyTimeStep       = mass * thState->Cp / thState->stabilityCoefficient;
+		const Real bodyTimeStep = thState->thermalMass * thState->Cp / thState->stabilityCoefficient;
 		thState->stabilityCoefficient = 0; // reset the stability coefficient
 		if (!maxTimeStep) maxTimeStep = bodyTimeStep;
 		if (bodyTimeStep < maxTimeStep) maxTimeStep = bodyTimeStep;
 	}
-
 	if (advection && fluidConduction) {
 		Tesselation& Tes = flow->solver->T[flow->solver->currentTes];
 		//	#ifdef YADE_OPENMP
@@ -213,7 +235,6 @@ void ThermalEngine::timeStepEstimate()
 			if (poreTimeStep < maxTimeStep) maxTimeStep = poreTimeStep;
 		}
 	}
-
 
 	if (debug) cout << "body steps done" << endl;
 	timeStepEstimated = true;
@@ -449,7 +470,7 @@ void ThermalEngine::computeSolidSolidFluxes()
 			const Real T2   = thState2->temp;
 			const Real d    = r1 + r2 - pd;
 			const Real E1   = mat1->young;
-			const Real E2   = mat1->young;
+			const Real E2   = mat2->young;
 			const Real nu1  = mat1->poisson;
 			const Real nu2  = mat2->poisson;
 			const Real F    = phys->normalForce.squaredNorm();
@@ -481,9 +502,12 @@ void ThermalEngine::computeSolidSolidFluxes()
 			if (useKernMethod) {
 				const Real numerator = pow((-d + r - R) * (-d - r + R) * (-d + r + R) * (d + r + R), 0.5);
 				const Real rc        = numerator / (2. * d);
-				//thermalResist = 4.*rc / (1./k1 + 1./k2);
 				thermalResist = 2. * (k1 + k2) * rc * rc / (r1 + r2 - pd);
 			} //thermalResist = ((k1+k2)/2.)*area/(r1+r2-pd);}
+			else if (useBoBMethod) {
+				const Real rc = pow((-d + r - R) * (-d - r + R) * (-d + r + R) * (d + r + R), 0.5) / (2.0 * d);
+				thermalResist = 4.0 * rc / (1.0/k1 + 1.0/k2);
+			}
 			else if (useHertzMethod) {
 				const Real re    = 1. / r1 + 1. / r2;
 				const Real Eavg  = (E1 + E2) / 2.;
@@ -491,7 +515,8 @@ void ThermalEngine::computeSolidSolidFluxes()
 				const Real Estar = Eavg / (1. - pow(Nuavg, 2));
 				const Real a     = pow(3. * F * re / (4. * Estar), 1. / 3.);
 				thermalResist    = ((k1 + k2) / 2.) / (r1 + r2) * M_PI * pow(a, 2);
-			} else {
+			}
+			else {
 				thermalResist = 2. * (k1 + k2) * r1 * r2 / (r1 + r2 - pd);
 			}
 			const Real fluxij = thermalResist * (T1 - T2);
@@ -616,12 +641,9 @@ void ThermalEngine::computeNewParticleTemperatures()
 		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b) continue;
 		auto* thState = static_cast<ThermalState*>(b->state.get());
 		if (!first && thState->isCavity) continue;
-		Sphere*    sphere  = static_cast<Sphere*>(b->shape.get());
-		const Real density = (particleDensity > 0 ? particleDensity : b->material->density);
-		const Real volume  = 4. / 3. * M_PI * pow(sphere->radius, 3); // - thState->capVol;
 		if (thState->Tcondition) continue;
 		thState->oldTemp  = thState->temp;
-		thState->temp     = thState->stepFlux * thermalDT / (thState->Cp * density * volume) + thState->oldTemp; // first order forward difference
+		thState->temp     = thState->stepFlux * thermalDT / (thState->Cp * thState->thermalMass) + thState->oldTemp; // first order forward difference
 		thState->stepFlux = 0;
 	}
 	YADE_PARALLEL_FOREACH_BODY_END();
@@ -631,18 +653,22 @@ void ThermalEngine::computeNewParticleTemperatures()
 void ThermalEngine::thermalExpansion()
 {
 	// adjust particle size
-	if (particleAlpha > 0) {
+	if (particleExpansion) {
 		YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies)
 		{
 			if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b) continue;
 			Sphere* sphere  = static_cast<Sphere*>(b->shape.get());
 			auto*   thState = static_cast<ThermalState*>(b->state.get());
 			if (!first && thState->isCavity) continue;
-			if (!thState->Tcondition) {
+			if (!thState->Tcondition && thState->temp != thState->oldTemp) {
+				// Update radius
+				// ATTENTION: Material density is not updated, so density should not be used anywhere to calculate particle mass in order to respect mass conservation.
 				thState->delRadius = thState->alpha * sphere->radius * (thState->temp - thState->oldTemp);
 				sphere->radius += thState->delRadius;
+
+				// Update inertia for momentum conservation
+				thState->inertia = (2.0/5.0) * thState->mass * pow(sphere->radius, 2) * Vector3r::Ones();
 			}
-			//}
 		}
 		YADE_PARALLEL_FOREACH_BODY_END();
 	}
@@ -663,10 +689,10 @@ void ThermalEngine::thermalExpansion()
 			if (cell->info().isFictious || cell->info().blocked) continue;
 			cell->info().dv() = 0; // reset dv so we can start adding to it
 			if (cell->info().isCavity) cavityVolume += 1. / cell->info().invVoidVolume();
-			if (solidThermoMech && particleAlpha > 0) computeCellVolumeChangeFromSolidVolumeChange(cell);
+			if (solidThermoMech && particleExpansion) computeCellVolumeChangeFromSolidVolumeChange(cell);
 			if (fluidThermoMech) computeCellVolumeChangeFromDeltaTemp(cell, cavDens);
 		}
-		if (solidThermoMech && particleAlpha > 0 && flow->controlCavityPressure) accountForCavitySolidVolumeChange();
+		if (solidThermoMech && particleExpansion && flow->controlCavityPressure) accountForCavitySolidVolumeChange();
 	}
 	if (fluidThermoMech && flow->controlCavityVolumeChange) accountForCavityThermalVolumeChange();
 }

@@ -61,6 +61,7 @@ public:
 	Real         elapsedTime;
 	bool         first;
 	bool         runConduction;
+	bool         particleExpansion;
 	Real         maxTimeStep;
 	Real         Pr;
 	Real         Nu;
@@ -117,6 +118,7 @@ public:
 		((bool,boundarySet,false,,"set false to change boundary conditions"))
 		((bool,useKernMethod,false,,"flag to use Kern method for thermal conductivity area calc"))
 		((bool,useHertzMethod,false,,"flag to use hertzmethod for thermal conductivity area calc"))
+		((bool,useBoBMethod,false,,"flag to use Batchelor and O'Brien method for thermal conductivity area calc"))
         	((Real,fluidBeta,0.0002,,"volumetric temperature coefficient m^3/m^3C, default water, <= 0 deactivates"))
         	((Real,particleT0,0,,"Initial temperature of particles"))
 		//((bool,useVolumeChange,false,,"Use volume change for thermal-mechanical-hydraulic coupling instead of pressure change. False by default."))

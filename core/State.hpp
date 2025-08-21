@@ -123,6 +123,7 @@ public:
 		((Real,temp,0,,"temperature of the body"))
 		((Real,oldTemp,0,,"change of temp (for thermal expansion)"))
 		((Real,stepFlux,0,,"flux during current step"))
+		((Real,thermalMass,0,,"mass of the body used for thermal calculations"))
 		((Real,Cp,0,,"Heat capacity of the body"))
 		((Real,k,0,,"thermal conductivity of the body"))
 		((Real,alpha,0,,"coefficient of thermal expansion"))
