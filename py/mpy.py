@@ -291,6 +291,14 @@ def makeMpiArgv():
 
 def initialize(np):
 	global comm, comm_slave, rank, numThreads, userScriptInCheckList, colorScale, waitingCommands
+	# Minimal root-run allowance (only needed before spawning workers)
+	try:
+		import os
+		if hasattr(os,'geteuid') and os.geteuid()==0:
+			for v in ('OMPI_ALLOW_RUN_AS_ROOT','OMPI_ALLOW_RUN_AS_ROOT_CONFIRM','PRTE_ALLOW_RUN_AS_ROOT','PRTE_ALLOW_RUN_AS_ROOT_CONFIRM'):
+				os.environ.setdefault(v,'1')
+	except Exception:
+		pass
 	if (comm != None and yade.runtime.opts.mpi_mode == True):
 		if rank == 0:
 			disconnect()  # reset to virgin context
@@ -1337,6 +1345,7 @@ def mpirun(nSteps, np=None, withMerge=False):
 	np :  number of mpi workers (master+subdomains), if=1 the function fallback to O.run()
 	withMerge : wether subdomains should be merged into master at the end of the run (default False). If True the scene in the master process is exactly in the same state as after O.run(nSteps,True). The merge can be time consumming, it is recommended to activate only if post-processing or other similar tasks require it.
 	'''
+
 
 	if comm == None:
 		configure()

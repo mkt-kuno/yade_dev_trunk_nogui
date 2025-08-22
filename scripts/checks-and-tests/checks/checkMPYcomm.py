@@ -1,10 +1,18 @@
-if 'MPI' in yade.config.features:
+import yade
+try:
+	from checkList import YadeCheckError  # same directory
+except Exception:
+	class YadeCheckError(Exception):
+		pass
 
+if 'MPI' in yade.config.features:
+	from yade import mpy as mp
+	import traceback
 	try:
-		from yade import mpy as mp
 		mp.initialize(3)
-	except:
-		raise YadeCheckError("Error in initializing mpy ")
+	except Exception as e:
+		traceback.print_exc()
+		raise YadeCheckError(f"Error in initializing mpy: {e}")
 
 	if mp.rank == 0:
 		lenOther = mp.sendCommand(executors="all", command="len(O.bodies)", wait=True)

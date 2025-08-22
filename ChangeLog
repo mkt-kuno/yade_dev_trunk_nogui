@@ -26,6 +26,7 @@ Documentation & Comments
   Fix sphinx issue with plot module
   Add new literature (!1116)
   Mention the YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY macro in the docs
+  Improve README wording: grammar, capitalization (C++/Python), hyphenation, clearer link labels
 
 Examples
 ********
@@ -75,6 +76,9 @@ Packaging & Build Improvements
 ******************************
 
   Relax constraints on Python versions.
+  Add Debian forky as new supported distribution: build/test/check jobs, deb packages.
+  Switch documentation (sphinx/html/pdf/epub) and website pages generation to Debian forky image.
+  Allow OpenMPI to run inside CI root containers by auto-setting OMPI/PRTE *_ALLOW_RUN_AS_ROOT vars (minimal change in initialize()).
 
 Small Enhancements
 ******************
@@ -90,6 +94,8 @@ Testing & Continuous Integration
   Fix success/failure message for GUI test. (!1104)
   New possibility to focus tests execution onto a list of check scripts (!1106)
   Fix CI pipline (fix Archlinux, skip ompi:5.0.8, temporarily disable deb_*_long_double for CGAL) and remove allow_failure: true (!1099)
+  Add Debian forky CI jobs (make/test/check, precision variants, deb package builds, doc & pages pipeline migration).
+  Improve MPI tests reliability in root-run CI by setting OpenMPI root allowance env vars before spawning workers.
 
 High precision RealHP<N> ComplexHP<N>
 *************************************

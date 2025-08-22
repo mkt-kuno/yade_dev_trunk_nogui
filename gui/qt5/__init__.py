@@ -15,11 +15,27 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 USE_QT_WEB_ENGINE = False
+_WEB_BACKEND_AVAILABLE = True
 try:
-	from PyQt5 import QtWebKit, QtWebKitWidgets
-except ImportError:
-	from PyQt5 import QtWebEngineWidgets
-	USE_QT_WEB_ENGINE = True
+	from PyQt5 import QtWebKit, QtWebKitWidgets  # legacy backend
+except Exception:
+	try:
+		from PyQt5 import QtWebEngineWidgets  # modern backend (needs separate package: python3-pyqt5.qtwebengine or PyQtWebEngine)
+		USE_QT_WEB_ENGINE = True
+		QtWebKit = None  # type: ignore
+		QtWebKitWidgets = None  # type: ignore
+	except Exception as _qt_web_import_err:
+		# Final graceful fallback: no in-app web view available
+		QtWebEngineWidgets = None  # type: ignore
+		QtWebKit = None  # type: ignore
+		QtWebKitWidgets = None  # type: ignore
+		_WEB_BACKEND_AVAILABLE = False
+		import warnings
+		warnings.warn(
+			"Neither QtWebKit nor QtWebEngine backends are available. Help/documentation windows will open in the external browser.\n"
+			"Install one of: 'python3-pyqt5.qtwebengine' (Debian/Ubuntu), or via pip: 'pip install PyQt5 PyQtWebEngine'. Original error: %s" % _qt_web_import_err,
+			RuntimeWarning,
+		)
 
 from yade.qt.ui_controller import Ui_Controller
 
@@ -58,23 +74,40 @@ def sslErrorHandler(reply, errorList):
 
 def openUrl(url):
 	global maxWebWindows, webWindows
+	# If no backend, fallback to system browser
+	if not _WEB_BACKEND_AVAILABLE or (QtWebEngineWidgets is None and QtWebKitWidgets is None):
+		import webbrowser
+		webbrowser.open(url)
+		return
+
 	reuseLast = False
-	# use the last window if the class is the same and only the attribute differs
 	try:
-		reuseLast = (len(webWindows) > 0 and str(webWindows[-1].url()).split('#')[-1].split('.')[2] == url.split('#')[-1].split('.')[2])
-		#print str(webWindows[-1].url()).split('#')[-1].split('.')[2],url.split('#')[-1].split('.')[2]
-	except:
+		reuseLast = (
+			len(webWindows) > 0
+			and str(webWindows[-1].url()).split('#')[-1].split('.')[2] == url.split('#')[-1].split('.')[2]
+		)
+	except Exception:
 		pass
 	if not reuseLast:
 		if len(webWindows) < maxWebWindows:
-			if USE_QT_WEB_ENGINE:
+			if USE_QT_WEB_ENGINE and QtWebEngineWidgets is not None:
 				webWindows.append(QtWebEngineWidgets.QWebEngineView())
 			else:
-				webWindows.append(QtWebKitWidgets.QWebView())
+				# fallback to QtWebKit if present
+				if QtWebKitWidgets is not None:
+					webWindows.append(QtWebKitWidgets.QWebView())
+				else:  # ultimate fallback: external browser
+					import webbrowser
+					webbrowser.open(url)
+					return
 		else:
 			webWindows = webWindows[1:] + [webWindows[0]]
 	web = webWindows[-1]
-	web.page().networkAccessManager().sslErrors.connect(sslErrorHandler)
+	# Guard: some minimalistic builds might lack networkAccessManager (QtWebEngine differences)
+	try:
+		web.page().networkAccessManager().sslErrors.connect(sslErrorHandler)  # type: ignore
+	except Exception:
+		pass
 	web.load(QUrl(url))
 	web.setWindowTitle(url)
 	web.setFocus()

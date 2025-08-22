@@ -1,11 +1,11 @@
 '''
-Module for domain decomposition based on the Orthogonal Recursive bisection Algorithm, see [1] and [2] for full details. 
-Working : The master processor assigns subdomains determines the min and max bounds from all the bodies (excluding wall, subdomain and box), 
-This space is the subdivided into regions based on a splitting axis. The axis of split is along the largest dimension and each split results into 
+Module for domain decomposition based on the Orthogonal Recursive bisection Algorithm, see [1] and [2] for full details.
+Working : The master processor assigns subdomains determines the min and max bounds from all the bodies (excluding wall, subdomain and box),
+This space is the subdivided into regions based on a splitting axis. The axis of split is along the largest dimension and each split results into
 2 subregions** until a certain 'depth' based on the number of workers is reached.
 The maximum depth/number of levels is defined as log2(N_{w}), where N_{w} is the number of workers. The algorithm can be used for any number of workers.
 
-(c) Deepak Kunhappan, deepak.kn1990@gmail.com, deepak.kunhappan@3sr-grenoble.fr 
+(c) Deepak Kunhappan, deepak.kn1990@gmail.com, deepak.kunhappan@3sr-grenoble.fr
 
 '''
 
@@ -60,14 +60,17 @@ class decompBodiesSerial:
 
 	def setPartList(self, lst, numThreads):
 		''' Used when the number of workers are not a power of 2. Bisectioning divides the space into 2 regions, hence equal divisions are created when the number of workers are in power of 2. If not
-		one or more workers end up having more number of bodies compared to other workers, leading to a load imbalance. In-order to overcome this we first express the numW in terms sums of 2^{n}, with each 2^{n} defining 
-		a sub group in which bisectioning can be done. 
-		For example : we have 11 workers, so : 11 = 2^{0} + 2^{1} + 2^{3} = [1, 2, 8] 
-		with 1 worker from 1 level of bisectioning,(a part of the domain is assigned to 1 worker) 
+		one or more workers end up having more number of bodies compared to other workers, leading to a load imbalance. In-order to overcome this we first express the numW in terms sums of 2^{n}, with each 2^{n} defining
+		a sub group in which bisectioning can be done.
+		For example : we have 11 workers, so : 11 = 2^{0} + 2^{1} + 2^{3} = [1, 2, 8]
+		with 1 worker from 1 level of bisectioning,(a part of the domain is assigned to 1 worker)
 		2 workers from 1 level/depth of bisectioning
 		8 workers from 3 levels/depth of bisectioning
 		'''
 
+		# Graceful fallback: if numThreads is 0/None treat as 1 (single-thread decomposition)
+		if not numThreads:
+			numThreads = 1
 		nb = len(lst) // numThreads
 		parts = self.numThreadsinPw2(numThreads)
 		wIds = [[] for x in range(len(parts))]
@@ -117,8 +120,8 @@ class decompBodiesSerial:
 		return sortD[:splitPt], sortD[splitPt:]
 
 	def domainPreProc(self, data):
-		''' determines the max extends of the domain, the splitting axis is based on the axis of the largest extend. Also used to determine the dimensionality of the 
-		configuration, eg: 2D or 3D. 
+		''' determines the max extends of the domain, the splitting axis is based on the axis of the largest extend. Also used to determine the dimensionality of the
+		configuration, eg: 2D or 3D.
 		'''
 
 		domainMin = Vector3(maxVal, maxVal, maxVal)

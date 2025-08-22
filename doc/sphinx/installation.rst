@@ -63,6 +63,11 @@ To install the daily-version you need to add the repository to your
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ trixie main" >> /etc/apt/sources.list.d/yadedaily.list'
 
 
+- Debian 14 **forky** also with :ref:`high precision<highPrecisionReal>` ``long double``, ``float128`` and ``mpfr150`` packages::
+
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ forky main" >> /etc/apt/sources.list.d/yadedaily.list'
+
+
 - Ubuntu 18.04 **bionic**::
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ bionic main" >> /etc/apt/sources.list.d/yadedaily.list'
@@ -236,6 +241,18 @@ They can be installed from the command line of your Linux distribution, assuming
 		help2man libbz2-dev zlib1g-dev libopenblas-dev libsuitesparse-dev \
 		libmetis-dev python3-bibtexparser python3-future coinor-clp coinor-libclp-dev \
 		python3-mpmath libmpfr-dev libmpfrc++-dev libmpc-dev texlive-xetex python3-pickleshare python3-ipython-genutils
+
+.. note:: Qt Web component package name changes on newer Debian releases.
+
+	* On Debian 12 (bookworm) and earlier, Ubuntu LTS up to 24.04: the GUI help/web view uses the legacy ``python3-pyqt5.qtwebkit`` package if available (falling back to WebEngine if only that is installed).
+	* On Debian 13 (trixie) and Debian 14 (forky) the ``qtwebkit`` binary packages are removed from the archive. Install ``python3-pyqt5.qtwebengine`` to provide the WebEngine backend. Yade will automatically switch to ``QtWebEngineWidgets`` when ``QtWebKit`` imports fail.
+
+If you maintain your own dependency list for trixie/forky replace ``python3-pyqt5.qtwebkit`` with:
+
+::
+
+	python3-pyqt5.qtwebengine
+
 
 Note: on Ubuntu 22.04 and newer, the VTK library should be ``libvtk9-dev`` instead of ``libvtk6-dev``.
 

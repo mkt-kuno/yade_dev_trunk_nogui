@@ -1,3 +1,4 @@
 [submodule "data"]
 	path = data
 	url = ../yade-data.git
+	branch = main

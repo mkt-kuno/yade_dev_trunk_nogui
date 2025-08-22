@@ -10,6 +10,8 @@
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bookworm
+# image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
+# image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
 # image: registry.gitlab.com/yade-dev/docker-yade:suse15
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-mips64el # crashes, as predicted by warnings -Wcast-align
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-ppc64el
@@ -167,8 +169,12 @@ variables:
     - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
     - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
     - ld --version
-    - if grep -q "Arch Linux" /etc/lsb-release; then echo "skip ld setting"; else update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" $LINK_GOLD   ; fi
-    - if grep -q "Arch Linux" /etc/lsb-release; then echo "skip ld setting"; else update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" $LINK_REGULAR ; fi
+    - |
+      if [ -r /etc/os-release ]; then . /etc/os-release; fi; DISTRO=${NAME:-unknown};
+      case "$DISTRO" in *Arch*|*arch*) echo "skip ld setting (Arch)" ;;
+        *) if [ -x /usr/bin/ld.gold ]; then update-alternatives --install /usr/bin/ld ld /usr/bin/ld.gold $LINK_GOLD; else echo "ld.gold not present"; fi;
+           if [ -x /usr/bin/ld.bfd ]; then update-alternatives --install /usr/bin/ld ld /usr/bin/ld.bfd $LINK_REGULAR; else echo "ld.bfd missing?!"; fi; ;;
+      esac
     - ld --version
     # 4pak has 64cores 256GB RAM, and has concurrent = 5 ← amount of simultaneous gitlab jobs
     # 6pak has 48cores 128GB RAM, and has concurrent = 3 , but 6pak must have a little smaller load than the maximum
@@ -209,7 +215,9 @@ variables:
     - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then xvfb-run -a -s "-screen 0 1600x1200x24" scripts/checks-and-tests/gui/testGui.sh; fi
     - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then install/bin/yade-ci --quickperformance -j8; fi
     - cat /etc/os-release
-    - if grep -q "Arch Linux" /etc/lsb-release; then /usr/sbin/uname -m; else  /usr/bin/dpkg --print-architecture ; fi
+    - |
+      if [ -r /etc/os-release ]; then . /etc/os-release; fi; DISTRO=${NAME:-unknown};
+      case "$DISTRO" in *Arch*|*arch*) /usr/sbin/uname -m ;; * ) /usr/bin/dpkg --print-architecture ;; esac
     - echo -e "\n\e[93m===\n(make_minimal only) scripts/clang-formatter.sh and scripts/python-formatter.sh report CHANGED_LINES = "$CHANGED_LINES"\n===\e[0m\n";
     - echo -e "\n\e[93m===\n(make_minimal only) ChangeLog diff had CHANGELOG_LINES = "$CHANGELOG_LINES" lines added in this merge request\n===\e[0m\n";
   tags:
@@ -273,6 +281,16 @@ make_trixie:
   <<: *make_definition
   <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
+
+make_forky:
+  <<: *make_definition
+  <<: *artifacts_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
+  artifacts:
+    paths:
+      - install
+      - build
+    expire_in: 2 weeks
 
 make_archlinux:
   <<: *make_definition
@@ -364,7 +382,7 @@ make_asan:
     - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 -DENABLE_ASAN=1 $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
     - export ASAN_OPTIONS=detect_leaks=0:log_path=stdout:verify_asan_link_order=false
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
   tags:
     - debug
   artifacts:
@@ -400,7 +418,7 @@ make_asan_HP:
     - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 -DENABLE_ASAN=1 -DREAL_DECIMAL_PLACES=$TEST_DECIMAL_PLACES -DENABLE_MPFR=$TEST_USE_MPFR $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
     - export ASAN_OPTIONS=detect_leaks=0:log_path=stdout:verify_asan_link_order=false
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
   tags:
     - debug
   artifacts:
@@ -461,11 +479,11 @@ make_clang:
   <<: *artifacts_definition
   <<: *skip_WIP
   before_script:
-    - export CC="/usr/bin/clang-11"
-    - export CXX="/usr/bin/clang++-11"
+    - export CC="/usr/bin/clang"
+    - export CXX="/usr/bin/clang++"
     # We should escape disabling features for the clang-build. Clang should work exactly like gcc.
     - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 $EXTRA_CMAKE_ARGS"
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
 
 ## High precision - testing debian bullseye
 
@@ -595,6 +613,13 @@ test_trixie:
     - make_trixie
   needs: ["make_trixie"]
 
+test_forky:
+  <<: *test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
+  dependencies:
+    - make_forky
+  needs: ["make_forky"]
+
 test_archlinux:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:archlinux-current
@@ -690,7 +715,7 @@ test_18_04_nogui:
 test_clang:
   <<: *test_definition
   <<: *skip_WIP
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
   dependencies:
     - make_clang
   needs: ["make_clang"]
@@ -741,7 +766,7 @@ test_SSE:
   dependencies:
     - make_SSE
   needs: ["make_SSE"]
-  
+
 ## 3.1.2 Yade-OFoam sub-section (for clarity) - there is room for template magic in the "script" part
 
 test_22_foam2312:
@@ -771,6 +796,8 @@ test_22_foam2306:
     - make_22_04
   needs: ["make_22_04"]
   timeout: 4 hours
+  # sometimes downloading openfoam fails, and it's not a problem with yade.
+  allow_failure: true
   script:
     - export PYTHONUNBUFFERED=1
     - cat /etc/os-release
@@ -811,6 +838,8 @@ test_22_foam2112:
     - make_22_04
   needs: ["make_22_04"]
   timeout: 25 minutes
+  # sometimes downloading openfoam fails, and it's not a problem with yade.
+  allow_failure: true
   before_script:
     - export NO_GUI="NO_GUI"
     - apt-get update && apt-get install -y openfoam2112-default
@@ -831,6 +860,8 @@ test_22_foam2006:
     - make_22_04
   needs: ["make_22_04"]
   timeout: 25 minutes
+  # sometimes downloading openfoam fails, and it's not a problem with yade.
+  allow_failure: true
   before_script:
     - export NO_GUI="NO_GUI"
     - apt-get update && apt-get install -y openfoam2006-default
@@ -851,6 +882,8 @@ test_22_foam11:
     - make_22_04
   needs: ["make_22_04"]
   timeout: 25 minutes
+  # sometimes downloading openfoam fails, and it's not a problem with yade.
+  allow_failure: true
   before_script:
     - export NO_GUI="NO_GUI"
     - sh -c "wget -O - https://dl.openfoam.org/gpg.key > /etc/apt/trusted.gpg.d/openfoam.asc"
@@ -873,6 +906,8 @@ test_22_foam10:
     - make_22_04
   needs: ["make_22_04"]
   timeout: 4 hours
+  # sometimes downloading openfoam fails, and it's not a problem with yade.
+  allow_failure: true
   before_script:
     - export NO_GUI="NO_GUI"
     - sh -c "wget -O - https://dl.openfoam.org/gpg.key > /etc/apt/trusted.gpg.d/openfoam.asc"
@@ -884,8 +919,8 @@ test_22_foam10:
     - export OMPI_MCA_btl_vader_single_copy_mechanism=none
     - pwd
     - source /opt/openfoam10/etc/bashrc && scripts/checks-and-tests/testOpenFoam.sh
-  
-  
+
+
 
 
 # 3.2. check stage
@@ -962,6 +997,14 @@ check_trixie:
   dependencies:
     - make_trixie
   needs: ["make_trixie"]
+
+check_forky:
+  <<: *check_definition
+  before_script:
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
+  dependencies:
+    - make_forky
+  needs: ["make_forky"]
 
 check_archlinux:
   <<: *check_definition
@@ -1048,7 +1091,7 @@ check_suse15:
 check_clang:
   <<: *check_definition
   <<: *skip_WIP
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
   dependencies:
     - make_clang
   needs: ["make_clang"]
@@ -1114,18 +1157,18 @@ check_SSE:
 
 # 4. doc stage
 
-doc_24_04:
+doc_forky:
   <<: *doc_definition
   <<: *skip_WIP
   <<: *gitlab_runner_retry_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
   dependencies:
-    - make_24_04
-  needs: ["make_24_04"]
+    - make_forky
+  needs: ["make_forky"]
 
 # 5. pages stage; uploads documentation to the website
 pages:
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
   stage: pages
   <<: *gitlab_runner_retry_definition
   only:
@@ -1135,8 +1178,8 @@ pages:
     - mv install/share/doc/yade-ci/Yade.pdf public
     - mv install/share/doc/yade-ci/Yade.epub public
   dependencies:
-    - doc_24_04
-  needs: ["doc_24_04"]
+    - doc_forky
+  needs: ["doc_forky"]
   artifacts:
     paths:
       - public
@@ -1256,6 +1299,30 @@ deb_trixie_mpfr150:
     - rm -rf ./deb
     - export PREC_NAME="-mpfr150"
     - ./scripts/ppa_ci/builddeb.py -d "trixie" -p "mpfr150"
+  timeout: 9 hours
+
+deb_forky:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
+  before_script:
+    - rm -rf ./deb
+    - ./scripts/ppa_ci/builddeb.py -d "forky"
+
+deb_forky_float128:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
+  before_script:
+    - rm -rf ./deb
+    - export PREC_NAME="-float128"
+    - ./scripts/ppa_ci/builddeb.py -d "forky" -p "float128"
+
+deb_forky_mpfr150:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
+  before_script:
+    - rm -rf ./deb
+    - export PREC_NAME="-mpfr150"
+    - ./scripts/ppa_ci/builddeb.py -d "forky" -p "mpfr150"
   timeout: 9 hours
 
 deb_bionic:
