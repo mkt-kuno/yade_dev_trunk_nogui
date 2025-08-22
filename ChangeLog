@@ -100,6 +100,8 @@ Testing & Continuous Integration
 High precision RealHP<N> ComplexHP<N>
 *************************************
 
+  Temporarily disable CGAL when compiling with long double, see https://gitlab.com/yade-dev/trunk/-/issues/382 (!1126)
+
 ==================================================
 yade-2025.2.0
 Mon, Feb 10 06:15:00 2025 +0100

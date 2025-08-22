@@ -726,6 +726,12 @@ ELSE()
   SET(MARK_FLOAT128_AVAILABLE "ON")
 ENDIF()
 
+IF(REAL_DECIMAL_PLACES EQUAL 18)
+  MESSAGE(STATUS "Disabling CGAL (long double) because it does not work well with long double, it even fails to compile with CGAL 6.0.1. Comment out this line to start debugging CGAL + long double")
+  # I opened an issue to track progress with this problem: https://gitlab.com/yade-dev/trunk/-/issues/382 , I think the bug is in CGAL library.
+  SET(ENABLE_CGAL OFF)
+ENDIF()
+
 MESSAGE(STATUS "Will use ${Esc}[93m${REAL_PREC_NAME}${Esc}[0m as Real type with ${Esc}[36m${REAL_DECIMAL_PLACES}${Esc}[0m decimal places precision and use ${Esc}[36m${REAL_PRECISION_BITS}${Esc}[0m bits of storage.")
 #======================================
 #====== * Unsupported features * ======

@@ -1240,15 +1240,15 @@ deb_bookworm:
     - rm -rf ./deb
     - ./scripts/ppa_ci/builddeb.py -d "bookworm"
 
-# Temporarily disable, to get a green CI pipeline. (but float128 works, so really no idea why we have a problem here!)
-#deb_bookworm_long_double:
-#  <<: *deb_definition
-#  image: registry.gitlab.com/yade-dev/docker-yade:debian-bookworm
-#  allow_failure: true
-#  before_script:
-#    - rm -rf ./deb
-#    - export PREC_NAME="-long-double"
-#    - ./scripts/ppa_ci/builddeb.py -d "bookworm" -p "long-double"
+### Enable but without CGAL, see https://gitlab.com/yade-dev/trunk/-/issues/382
+deb_bookworm_long_double:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bookworm
+  allow_failure: true
+  before_script:
+    - rm -rf ./deb
+    - export PREC_NAME="-long-double"
+    - ./scripts/ppa_ci/builddeb.py -d "bookworm" -p "long-double"
 
 deb_bookworm_float128:
   <<: *deb_definition
@@ -1274,15 +1274,15 @@ deb_trixie:
     - rm -rf ./deb
     - ./scripts/ppa_ci/builddeb.py -d "trixie"
 
-# Temporarily disable, to get a green CI pipeline. (but float128 works, so really no idea why we have a problem here!)
-#deb_trixie_long_double:
-#  <<: *deb_definition
-#  image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
-#  allow_failure: true
-#  before_script:
-#    - rm -rf ./deb
-#    - export PREC_NAME="-long-double"
-#    - ./scripts/ppa_ci/builddeb.py -d "trixie" -p "long-double"
+### Enable but without CGAL, see https://gitlab.com/yade-dev/trunk/-/issues/382
+deb_trixie_long_double:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
+  allow_failure: true
+  before_script:
+    - rm -rf ./deb
+    - export PREC_NAME="-long-double"
+    - ./scripts/ppa_ci/builddeb.py -d "trixie" -p "long-double"
 
 deb_trixie_float128:
   <<: *deb_definition
@@ -1307,6 +1307,16 @@ deb_forky:
   before_script:
     - rm -rf ./deb
     - ./scripts/ppa_ci/builddeb.py -d "forky"
+
+### Enable but without CGAL, see https://gitlab.com/yade-dev/trunk/-/issues/382
+deb_forky_long_double:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
+  allow_failure: true
+  before_script:
+    - rm -rf ./deb
+    - export PREC_NAME="-long-double"
+    - ./scripts/ppa_ci/builddeb.py -d "forky" -p "long-double"
 
 deb_forky_float128:
   <<: *deb_definition
@@ -1346,15 +1356,15 @@ deb_jammy:
     - rm -rf ./deb
     - ./scripts/ppa_ci/builddeb.py -d "jammy"
 
-# Temporarily disable, to get a green CI pipeline. (but float128 works, so really no idea why we have a problem here!)
-#deb_jammy_long_double:
-#  <<: *deb_definition
-#  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04
-#  allow_failure: true
-#  before_script:
-#    - rm -rf ./deb
-#    - export PREC_NAME="-long-double"
-#    - ./scripts/ppa_ci/builddeb.py -d "jammy" -p "long-double"
+### Enable but without CGAL, see https://gitlab.com/yade-dev/trunk/-/issues/382
+deb_jammy_long_double:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04
+  allow_failure: true
+  before_script:
+    - rm -rf ./deb
+    - export PREC_NAME="-long-double"
+    - ./scripts/ppa_ci/builddeb.py -d "jammy" -p "long-double"
 
 deb_jammy_float128:
   <<: *deb_definition
