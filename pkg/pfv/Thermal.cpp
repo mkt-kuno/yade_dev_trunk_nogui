@@ -60,7 +60,7 @@ void ThermalEngine::action()
 			setReynoldsNumbers();
 		}
 		first = false;
-	} else if (tsSafetyFactor <= 0) {
+	} else if (tsSafetyFactor <= 0 && thermalFreq <= 1) {
 		thermalDT = scene->dt;
 	}
 	if (flow->updateTriangulation) {
@@ -102,9 +102,9 @@ void ThermalEngine::action()
 			updateForces(); // currently not working. thermal must be run each step to see delp reflected
 			                //			flow->decoupleForces=false;  // let flow take control back of forces
 	}
-	if (!timeStepEstimated && tsSafetyFactor > 0) timeStepEstimate();
+	if (!timeStepEstimated && (tsSafetyFactor > 0 || thermalFreq > 1)) timeStepEstimate();
 	if (debug) cout << "timeStepEstimated " << timeStepEstimated << endl;
-	if (tsSafetyFactor > 0) elapsedIters += 1;
+	if (tsSafetyFactor > 0 || thermalFreq > 1) elapsedIters += 1;
 }
 
 void ThermalEngine::setReynoldsNumbers()
@@ -206,40 +206,44 @@ void ThermalEngine::setInitialValues()
 
 void ThermalEngine::timeStepEstimate()
 {
-	//	#pragma omp parallel for
-	for (const auto& b : *scene->bodies) {
-		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b) continue;
-		auto*      thState            = static_cast<ThermalState*>(b->state.get());
-		const Real bodyTimeStep = thState->thermalMass * thState->Cp / thState->stabilityCoefficient;
-		thState->stabilityCoefficient = 0; // reset the stability coefficient
-		if (!maxTimeStep) maxTimeStep = bodyTimeStep;
-		if (bodyTimeStep < maxTimeStep) maxTimeStep = bodyTimeStep;
-	}
-	if (advection && fluidConduction) {
-		Tesselation& Tes = flow->solver->T[flow->solver->currentTes];
-		//	#ifdef YADE_OPENMP
-		const long sizeCells = Tes.cellHandles.size();
+	if (tsSafetyFactor > 0) {
 		//	#pragma omp parallel for
-		for (long i = 0; i < sizeCells; i++) {
-			CellHandle& cell = Tes.cellHandles[i];
-			Real        poreVolume;
-			if (cell->info().isCavity) poreVolume = cell->info().volume();
-			else if (porosityFactor > 0)
-				poreVolume = cell->info().volume() * porosityFactor;
-			else
-				poreVolume = 1. / cell->info().invVoidVolume();
-			const Real mass                   = flow->fluidRho * poreVolume;
-			const Real poreTimeStep           = mass * flow->fluidCp / cell->info().stabilityCoefficient;
-			cell->info().stabilityCoefficient = 0;
-			if (!maxTimeStep) maxTimeStep = poreTimeStep;
-			if (poreTimeStep < maxTimeStep) maxTimeStep = poreTimeStep;
+		for (const auto& b : *scene->bodies) {
+			if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b) continue;
+			auto*      thState            = static_cast<ThermalState*>(b->state.get());
+			const Real bodyTimeStep = thState->thermalMass * thState->Cp / thState->stabilityCoefficient;
+			thState->stabilityCoefficient = 0; // reset the stability coefficient
+			if (!maxTimeStep) maxTimeStep = bodyTimeStep;
+			if (bodyTimeStep < maxTimeStep) maxTimeStep = bodyTimeStep;
 		}
+		if (advection && fluidConduction) {
+			Tesselation& Tes = flow->solver->T[flow->solver->currentTes];
+			//	#ifdef YADE_OPENMP
+			const long sizeCells = Tes.cellHandles.size();
+			//	#pragma omp parallel for
+			for (long i = 0; i < sizeCells; i++) {
+				CellHandle& cell = Tes.cellHandles[i];
+				Real        poreVolume;
+				if (cell->info().isCavity) poreVolume = cell->info().volume();
+				else if (porosityFactor > 0)
+					poreVolume = cell->info().volume() * porosityFactor;
+				else
+					poreVolume = 1. / cell->info().invVoidVolume();
+				const Real mass                   = flow->fluidRho * poreVolume;
+				const Real poreTimeStep           = mass * flow->fluidCp / cell->info().stabilityCoefficient;
+				cell->info().stabilityCoefficient = 0;
+				if (!maxTimeStep) maxTimeStep = poreTimeStep;
+				if (poreTimeStep < maxTimeStep) maxTimeStep = poreTimeStep;
+			}
+		}
+		if (debug) cout << "body steps done" << endl;
+		// estimate the conduction iterperiod based on current mechanical/fluid timestep
+		conductionIterPeriod = int(tsSafetyFactor * maxTimeStep / scene->dt);
 	}
-
-	if (debug) cout << "body steps done" << endl;
-	timeStepEstimated = true;
-	// estimate the conduction iterperiod based on current mechanical/fluid timestep
-	conductionIterPeriod = int(tsSafetyFactor * maxTimeStep / scene->dt);
+	else if (thermalFreq > 1) {
+		conductionIterPeriod = thermalFreq;
+	}
+	
 	if (debug) cout << "conduction iter period set" << conductionIterPeriod << endl;
 	elapsedIters      = 0;
 	elapsedTime       = 0;
@@ -441,98 +445,160 @@ void ThermalEngine::computeSolidSolidFluxes()
 		//	#else
 		//	for (const auto & I : *scene->interactions){
 		//	#endif
-		const ScGeom* geom;
 		if (!I || !I->geom.get() || !I->phys.get() || !I->isReal()) continue;
-		if (I->geom.get()) {
-			geom = YADE_CAST<ScGeom*>(I->geom.get());
-			if (!geom) continue;
-			const Real pd = geom->penetrationDepth;
-			if (!Body::byId(I->getId1(), scene) or !Body::byId(I->getId2(), scene)) continue;
-			const shared_ptr<Body>& b1_ = Body::byId(I->getId1(), scene);
-			const shared_ptr<Body>& b2_ = Body::byId(I->getId2(), scene);
-			if (b1_->shape->getClassIndex() != Sphere::getClassIndexStatic() || b2_->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b1_
-			    || !b2_)
-				continue;
-			auto*      thState1 = static_cast<ThermalState*>(b1_->state.get()); //b1_->state.get();
-			auto*      thState2 = static_cast<ThermalState*>(b2_->state.get()); //b2_->state.get();
-			FrictPhys* phys     = static_cast<FrictPhys*>(I->phys.get());
-			if (!first && (thState1->isCavity || thState2->isCavity)) continue; // avoid conduction with placeholder cavity bodies
-			Sphere* sphere1 = static_cast<Sphere*>(b1_->shape.get());
-			Sphere* sphere2 = static_cast<Sphere*>(b2_->shape.get());
+		computeSolidSolidConduction(I);
+		if (heatGenerationRatio > 0.0)
+			computeSolidSolidHeatGeneration(I);
+	}
+}
 
-			FrictMat*  mat1 = static_cast<FrictMat*>(b1_->material.get());
-			FrictMat*  mat2 = static_cast<FrictMat*>(b2_->material.get());
-			const Real k1   = thState1->k;
-			const Real k2   = thState2->k;
-			const Real r1   = sphere1->radius;
-			const Real r2   = sphere2->radius;
-			const Real T1   = thState1->temp;
-			const Real T2   = thState2->temp;
-			const Real d    = r1 + r2 - pd;
-			const Real E1   = mat1->young;
-			const Real E2   = mat2->young;
-			const Real nu1  = mat1->poisson;
-			const Real nu2  = mat2->poisson;
-			const Real F    = phys->normalForce.squaredNorm();
-			if (d == 0) continue;
-			Real R = 0;
-			Real r = 0;
-			// for equation:
-			if (r1 >= r2) {
-				R = r1;
-				r = r2;
-			} else if (r1 < r2) {
-				R = r2;
-				r = r1;
-			}
-			// The radius of the intersection found by: Kern, W. F. and Bland, J. R. Solid Mensuration with Proofs, 2nd ed. New York: Wiley, p. 97, 1948.	http://mathworld.wolfram.com/Sphere-SphereIntersection.html
-			//const Real area = M_PI*pow(rc,2);
+void ThermalEngine::computeSolidSolidConduction(const shared_ptr<Interaction>& I)
+{
+	if (I->geom.get()) {
+		const ScGeom* geom;
+		geom = YADE_CAST<ScGeom*>(I->geom.get());
+		if (!geom) return;
+		const Real pd = geom->penetrationDepth;
+		if (!Body::byId(I->getId1(), scene) or !Body::byId(I->getId2(), scene)) return;
+		const shared_ptr<Body>& b1_ = Body::byId(I->getId1(), scene);
+		const shared_ptr<Body>& b2_ = Body::byId(I->getId2(), scene);
+		if (b1_->shape->getClassIndex() != Sphere::getClassIndexStatic() || b2_->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b1_
+		    || !b2_)
+			return;
+		auto*      thState1 = static_cast<ThermalState*>(b1_->state.get()); //b1_->state.get();
+		auto*      thState2 = static_cast<ThermalState*>(b2_->state.get()); //b2_->state.get();
+		FrictPhys* phys     = static_cast<FrictPhys*>(I->phys.get());
+		if (!first && (thState1->isCavity || thState2->isCavity)) return; // avoid conduction with placeholder cavity bodies
+		Sphere* sphere1 = static_cast<Sphere*>(b1_->shape.get());
+		Sphere* sphere2 = static_cast<Sphere*>(b2_->shape.get());
 
-			//const Real dt = scene->dt;
-			//const Real fluxij = 4.*rc*(T1-T2) / (1./k1 + 1./k2);
-
-			// compute the overlapping volume for thermodynamic considerations
-			//		const Real capHeight1 = (r1-r2+d)*(r1+r2-d)/2*d;
-			//		const Real capHeight2 = (r2-r1+d)*(r2+r1-d)/2*d;
-			//		thState1->capVol += (1./3.)*M_PI*pow(capHeight1,2)*(3.*r1-capHeight1);
-			//		thState2->capVol += (1./3.)*M_PI*pow(capHeight2,2)*(3.*r2-capHeight2);
-
-			// compute the thermal resistance of the pair and the associated flux
-			Real thermalResist;
-			if (useKernMethod) {
-				const Real numerator = pow((-d + r - R) * (-d - r + R) * (-d + r + R) * (d + r + R), 0.5);
-				const Real rc        = numerator / (2. * d);
-				thermalResist = 2. * (k1 + k2) * rc * rc / (r1 + r2 - pd);
-			} //thermalResist = ((k1+k2)/2.)*area/(r1+r2-pd);}
-			else if (useBoBMethod) {
-				const Real rc = pow((-d + r - R) * (-d - r + R) * (-d + r + R) * (d + r + R), 0.5) / (2.0 * d);
-				thermalResist = 4.0 * rc / (1.0/k1 + 1.0/k2);
-			}
-			else if (useHertzMethod) {
-				const Real re    = 1. / r1 + 1. / r2;
-				const Real Eavg  = (E1 + E2) / 2.;
-				const Real Nuavg = (nu1 + nu2) / 2.;
-				const Real Estar = Eavg / (1. - pow(Nuavg, 2));
-				const Real a     = pow(3. * F * re / (4. * Estar), 1. / 3.);
-				thermalResist    = ((k1 + k2) / 2.) / (r1 + r2) * M_PI * pow(a, 2);
-			}
-			else {
-				thermalResist = 2. * (k1 + k2) * r1 * r2 / (r1 + r2 - pd);
-			}
-			const Real fluxij = thermalResist * (T1 - T2);
-
-			//cout << "Flux b/w "<< b1_->id << " & "<< b2_->id << " fluxij " << fluxij << endl;
-			if (runConduction && tsSafetyFactor > 0) {
-				thState1->stabilityCoefficient += thermalResist;
-				thState2->stabilityCoefficient += thermalResist;
-			}
-			if (!thState1->Tcondition) thState1->stepFlux -= fluxij; //U1 -= fluxij*dt;
-			else
-				thermalBndFlux[thState1->boundaryId] -= fluxij;
-			if (!thState2->Tcondition) thState2->stepFlux += fluxij; // U2 += fluxij*dt;
-			else
-				thermalBndFlux[thState2->boundaryId] += fluxij;
+		FrictMat*  mat1 = static_cast<FrictMat*>(b1_->material.get());
+		FrictMat*  mat2 = static_cast<FrictMat*>(b2_->material.get());
+		const Real k1   = thState1->k;
+		const Real k2   = thState2->k;
+		const Real r1   = sphere1->radius;
+		const Real r2   = sphere2->radius;
+		const Real T1   = thState1->temp;
+		const Real T2   = thState2->temp;
+		const Real d    = r1 + r2 - pd;
+		const Real E1   = mat1->young;
+		const Real E2   = mat2->young;
+		const Real nu1  = mat1->poisson;
+		const Real nu2  = mat2->poisson;
+		const Real F    = phys->normalForce.squaredNorm();
+		if (d == 0) return;
+		Real R = 0;
+		Real r = 0;
+		// for equation:
+		if (r1 >= r2) {
+			R = r1;
+			r = r2;
+		} else if (r1 < r2) {
+			R = r2;
+			r = r1;
 		}
+		// The radius of the intersection found by: Kern, W. F. and Bland, J. R. Solid Mensuration with Proofs, 2nd ed. New York: Wiley, p. 97, 1948.	http://mathworld.wolfram.com/Sphere-SphereIntersection.html
+		//const Real area = M_PI*pow(rc,2);
+
+		//const Real dt = scene->dt;
+		//const Real fluxij = 4.*rc*(T1-T2) / (1./k1 + 1./k2);
+
+		// compute the overlapping volume for thermodynamic considerations
+		//		const Real capHeight1 = (r1-r2+d)*(r1+r2-d)/2*d;
+		//		const Real capHeight2 = (r2-r1+d)*(r2+r1-d)/2*d;
+		//		thState1->capVol += (1./3.)*M_PI*pow(capHeight1,2)*(3.*r1-capHeight1);
+		//		thState2->capVol += (1./3.)*M_PI*pow(capHeight2,2)*(3.*r2-capHeight2);
+
+		// compute the thermal resistance of the pair and the associated flux
+		Real thermalResist;
+		if (useKernMethod) {
+			const Real numerator = pow((-d + r - R) * (-d - r + R) * (-d + r + R) * (d + r + R), 0.5);
+			const Real rc        = numerator / (2. * d);
+			thermalResist = 2. * (k1 + k2) * rc * rc / (r1 + r2 - pd);
+		} //thermalResist = ((k1+k2)/2.)*area/(r1+r2-pd);}
+		else if (useBoBMethod) {
+			const Real rc = pow((-d + r - R) * (-d - r + R) * (-d + r + R) * (d + r + R), 0.5) / (2.0 * d);
+			thermalResist = 4.0 * rc / (1.0/k1 + 1.0/k2);
+		}
+		else if (useHertzMethod) {
+			const Real re    = 1. / r1 + 1. / r2;
+			const Real Eavg  = (E1 + E2) / 2.;
+			const Real Nuavg = (nu1 + nu2) / 2.;
+			const Real Estar = Eavg / (1. - pow(Nuavg, 2));
+			const Real a     = pow(3. * F * re / (4. * Estar), 1. / 3.);
+			thermalResist    = ((k1 + k2) / 2.) / (r1 + r2) * M_PI * pow(a, 2);
+		}
+		else {
+			thermalResist = 2. * (k1 + k2) * r1 * r2 / (r1 + r2 - pd);
+		}
+		const Real fluxij = thermalResist * (T1 - T2);
+
+		//cout << "Flux b/w "<< b1_->id << " & "<< b2_->id << " fluxij " << fluxij << endl;
+		if (runConduction && tsSafetyFactor > 0) {
+			thState1->stabilityCoefficient += thermalResist;
+			thState2->stabilityCoefficient += thermalResist;
+		}
+		if (!thState1->Tcondition) {
+			#pragma omp atomic update
+			thState1->stepFlux -= fluxij; //U1 -= fluxij*dt;
+		}
+		else {
+			#pragma omp atomic update
+			thermalBndFlux[thState1->boundaryId] -= fluxij;
+		}
+		if (!thState2->Tcondition) {
+			#pragma omp atomic update
+			thState2->stepFlux += fluxij; // U2 += fluxij*dt;
+		}
+		else {
+			#pragma omp atomic update
+			thermalBndFlux[thState2->boundaryId] += fluxij;
+		}
+	}
+}
+
+void ThermalEngine::computeSolidSolidHeatGeneration(const shared_ptr<Interaction>& I)
+{
+	FrictPhys* phys = static_cast<FrictPhys*>(I->phys.get());
+	if (!phys || phys->frictDissip == 0.0) return;
+
+	if (!Body::byId(I->getId1(), scene) or !Body::byId(I->getId2(), scene)) return;
+	const shared_ptr<Body>& b1_ = Body::byId(I->getId1(), scene);
+	const shared_ptr<Body>& b2_ = Body::byId(I->getId2(), scene);
+	if (b1_->shape->getClassIndex() != Sphere::getClassIndexStatic() || b2_->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b1_ || !b2_) return;
+
+	auto* thState1 = static_cast<ThermalState*>(b1_->state.get());
+	auto* thState2 = static_cast<ThermalState*>(b2_->state.get());
+	if (!first && (thState1->isCavity || thState2->isCavity)) return;
+
+	// Calculate average heat generation rate since last thermal step (frictDissip accumulates energy dissipated between thermal steps)
+	const Real heat_gen_rate = heatGenerationRatio * phys->frictDissip / thermalDT;
+	phys->frictDissip = 0.0;
+
+	// Calculate partition coefficient
+	const Real k1 = thState1->k;
+	const Real k2 = thState2->k;
+	const Real partition = k1 / (k1 + k2);
+
+	// Split heat between particles
+	const Real heat1 = partition * heat_gen_rate;
+	const Real heat2 = (1.0 - partition) * heat_gen_rate;
+
+	if (!thState1->Tcondition) {
+		#pragma omp atomic update
+		thState1->stepFlux += heat1;
+	}
+	else {
+		#pragma omp atomic update
+		thermalBndFlux[thState1->boundaryId] += heat1;
+	}
+	if (!thState2->Tcondition) {
+		#pragma omp atomic update
+		thState2->stepFlux += heat2;
+	}
+	else {
+		#pragma omp atomic update
+		thermalBndFlux[thState2->boundaryId] += heat2;
 	}
 }
 

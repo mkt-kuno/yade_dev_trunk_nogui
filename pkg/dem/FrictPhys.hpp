@@ -19,7 +19,8 @@ public:
 	virtual ~FrictPhys() = default;
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(FrictPhys,NormShearPhys,"The simple linear elastic-plastic interaction with friction angle, like in the traditional [CundallStrack1979]_",
-		((Real,tangensOfFrictionAngle,NaN,,"tan of angle of friction")),
+		((Real,tangensOfFrictionAngle,NaN,,"tan of angle of friction"))
+		((Real,frictDissip,0.0,,"frictional energy dissipation in the contact (this value is updated by contact laws applicable to FrictPhys - currently only :yref:`Law2_ScGeom_FrictPhys_CundallStrack`) |yupdate|")),
 		createIndex()
 	);
 	// clang-format on

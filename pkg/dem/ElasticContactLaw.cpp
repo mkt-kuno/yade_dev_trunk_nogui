@@ -89,6 +89,7 @@ bool Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 			//define the plastic work input and increment the total plastic energy dissipated
 			shearForce *= ratio;
 			Real dissip = ((1 / phys->ks) * (trialForce - shearForce)) /*plastic disp*/.dot(shearForce) /*active force*/;
+			phys->frictDissip += dissip;
 			if (traceEnergy) plasticDissipation += dissip;
 			else if (dissip > 0)
 				scene->energy->add(dissip, "plastDissip", plastDissipIx, /*reset*/ false);

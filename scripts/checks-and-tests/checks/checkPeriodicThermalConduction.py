@@ -1,8 +1,10 @@
 """
-Check test for ThermalEngine with periodic conditions, considering the following:
+Check test for ThermalEngine with periodic conditions,
+The test involves the compression of a periodic assembly of particles considering the following:
 - Particles with different initial temperatures.
 - Thermal conduction between particles.
 - Thermal expansion of particles.
+- Heat generation by energy dissipation during particle interactions.
 """
 from yade import pack, ymport, plot, utils, export, timing
 import numpy as np
@@ -12,10 +14,10 @@ if ('THERMAL' in features):
     # Material properties
     mat_young           = 1e6
     mat_poisson         = 0.3
-    mat_friction        = 0.5
+    mat_friction        = 0.1
     mat_density         = 1.0
     mat_heat_capacity   = 10.0
-    mat_conductivity    = 100.0
+    mat_conductivity    = 1000.0
     mat_expansion_coeff = 1e-4
 
     # Sizes
@@ -24,18 +26,26 @@ if ('THERMAL' in features):
     cell_size  = 1.0
 
     # Analysis settings
-    time_step_ratio = 0.1
-    limit_steps     = 10000
-    temp_ref        = 364.1620967973047
-    tolerance       = 1e-2
+    time_step_ratio       = 0.1
+    thermal_frequency     = 2
+    temperature_avg       = 300.0
+    temperature_dev       = 10.0
+    heat_generation_ratio = 10.0
+    strain_rate           = -0.1
+    limit_steps           = 10000
+    temp_ref              = 312.2663320345086
+    tolerance             = 1e-2
 
 # EXECUTION ===============================================================================
     # Create materials
     mat_particles = FrictMat(young=mat_young, poisson=mat_poisson, density=mat_density, frictionAngle=mat_friction)
     O.materials.append(mat_particles)
 
-    # Create particles
+    # Set boundary properties
     O.periodic = True
+    O.cell.velGrad = Matrix3(strain_rate,strain_rate,strain_rate,strain_rate,strain_rate,strain_rate,strain_rate,strain_rate,strain_rate)
+    
+    # Create particles
     sp = pack.randomPeriPack(initSize=Vector3(cell_size,cell_size,cell_size), radius=radius_avg, rRelFuzz=radius_var, seed=1)
     sp.toSimulation(material=mat_particles)
 
@@ -63,6 +73,8 @@ if ('THERMAL' in features):
             particleK           = float('nan'), # If NaN, set individually for each particle
             particleAlpha       = float('nan'), # If NaN, set individually for each particle
             tsSafetyFactor      = 0.0,
+            thermalFreq         = thermal_frequency,
+            heatGenerationRatio = heat_generation_ratio,
             conduction          = True,
             useBoBMethod        = True,
             thermoMech          = True,
@@ -78,12 +90,14 @@ if ('THERMAL' in features):
     ]
 
     # Set particle thermal properties individually
-    for b in O.bodies:
-        if isinstance(b.shape, Sphere):
-            b.state.temp  = 400.0 if 0.0 < b.state.pos[0] < 0.5 * cell_size else 300.0
-            b.state.Cp    = mat_heat_capacity
-            b.state.k     = mat_conductivity
-            b.state.alpha = mat_expansion_coeff
+    spheres = [b for b in O.bodies if isinstance(b.shape, Sphere)]
+    np.random.seed(1)
+    temps = np.random.normal(loc=temperature_avg, scale=temperature_dev, size=len(spheres))
+    for b, temp in zip(spheres, temps):
+        b.state.temp  = temp
+        b.state.Cp    = mat_heat_capacity
+        b.state.k     = mat_conductivity
+        b.state.alpha = mat_expansion_coeff
 
     # Run simulation
     O.run(limit_steps, wait=True)

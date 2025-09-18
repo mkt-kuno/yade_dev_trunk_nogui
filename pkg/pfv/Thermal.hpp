@@ -88,6 +88,8 @@ public:
 	void    computeVertexSphericalArea();
 	void    computeFlux(CellHandle& cell, const shared_ptr<Body>& b, const Real surfaceArea);
 	void    computeSolidSolidFluxes();
+	void    computeSolidSolidConduction(const shared_ptr<Interaction>& I);
+	void    computeSolidSolidHeatGeneration(const shared_ptr<Interaction>& I);
 	void    timeStepEstimate();
 	CVector cellBarycenter(const CellHandle& cell);
 	void    computeCellVolumeChangeFromDeltaTemp(CellHandle& cell, Real cavDens);
@@ -130,11 +132,13 @@ public:
 		((Real,fluidConductionAreaFactor,1.,,"Factor for the porethroat area (used for fluid-fluid conduction model)"))
 		((Real,particleAlpha,11.6e-6,,"Particle volumetric thermal expansion coeffcient"))
 		((Real,particleDensity,0,,"If > 0, this value will override material density for thermodynamic calculations (useful for quasi-static simulations involving unphysical particle densities)"))
+		((Real,heatGenerationRatio,0,,"If > 0, this value will be used to calculate heat generation as a fraction of frictional energy dissipation."))
         ((Real,fluidK,0.580,,"Thermal conductivity of the fluid."))
 		((Real,uniformReynolds,-1.,,"Control reynolds number in all cells (mostly debugging purposes). "))
 		((Real,fluidBulkModulus,0,,"If > 0, thermalEngine uses this value instead of flow.fluidBulkModulus."))
 		((Real, delT, 0,,"Allows user to apply a delT to solids and observe macro thermal expansion. Resets to 0 after one conduction step."))
         	((Real,tsSafetyFactor,0.8,,"Allow user to control the timstep estimate with a safety factor. Default 0.8. If <= 0, thermal timestep is equal to DEM"))
+			((int,thermalFreq,0,,"If > 1, this value will be used as the frequency of thermal solution (number of DEM steps to solve thermal behavior). Only effective when tsSafetyFactor <= 0, otherwise tsSafetyFactor controls thermal timestep."))
         	((Real,porosityFactor,0,,"If >0, factors the fluid thermal expansion. Useful for simulating low porosity matrices."))
         	((bool,tempDependentFluidBeta,false,,"If true, fluid volumetric thermal expansion coefficient, :yref:`ThermalEngine::fluidBeta`, is temperature dependent (linear model between 20-70 degC)"))
         	((Real,minimumFluidCondDist,0,,"Useful for maintaining stability despite poor external triangulations involving flat tetrahedrals. Consider setting to minimum particle diameter to keep scale."))
