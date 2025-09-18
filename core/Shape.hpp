@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <lib/base/Logging.hpp>
 #include <lib/multimethods/Indexable.hpp>
 #include <lib/serialization/Serializable.hpp>
 #include <core/Dispatcher.hpp>
@@ -30,6 +31,14 @@ public:
 	//! cache functor that are called for this type of DeformableElement. Used by FEInternalForceEngine
 	shared_ptr<InternalForceFunctor> internalforcefunctor;
 #endif
+	virtual Real getVolume()
+	{ // a number of overriden methods in child classes may execute some update operations before returning a value, and constness can not apply
+		LOG_ERROR( // LOG_ERROR shall suffice here ? Maybe the calculation can still continue (with the results being all wrong as with LOG_ERROR)
+		        "Shape " << getClassName()
+		                 << " calling virtual method Shape::getVolume(). This shall not happen, please submit bug report at "
+		                    "https://gitlab.com/yade-dev/trunk/issues");
+		return -1.;
+	}
 
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Shape,Serializable,"Geometry of a body",
@@ -41,6 +50,7 @@ public:
 	);
 	// clang-format on
 	REGISTER_INDEX_COUNTER(Shape);
+	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Shape);
 

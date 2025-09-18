@@ -44,7 +44,8 @@ public:
 	Real             minRad, maxRad;                                               // for sphericity. Public for use in Ig2 for distant interactions
 	Real             distance(const Vector3r&, const bool& unbound = false) const; // gives the distance from a point to the surface
 	Vector3r         normal(const Vector3r&, const bool& unbound = false) const;   // gives the outwards normal at some point
-	Real             getVolume(); // these 3 get*() may call init() if not already done, they can not be const-declared
+	Real             getVolume() override; // these 3 get*() may call init() if not already done, they can not be const-declared
+	Real             getVolumeDep();
 	Vector3r         getCenter();
 	Vector3r         getInertia();
 	Real             getSurface(Real epsilon = 1) const; // this one can be const-declared
@@ -81,9 +82,10 @@ public:
 		center = Vector3r(std::numeric_limits<Real>::infinity(),std::numeric_limits<Real>::infinity(),std::numeric_limits<Real>::infinity());
 		createIndex(); // necessary for such a Shape-derived class, see https://yade-dem.org/doc/prog.html#indexing-dispatch-types
  		,
-		.def("volume",&LevelSet::getVolume,"The volume defined by the negative domain of the :yref:`level set function<LevelSet.distField>`, in a voxellised fashion, where a negative value of the level set, :yref:`distField[i][j][k]<LevelSet.distField>` $\\leq$ 0, is considered to correspond to a material cubic voxel of side :yref:`lsGrid.spacing<RegularGrid.spacing>` and centered at :yref:`lsGrid.gridPoint(i,j,k)<RegularGrid.gridPoint>`. Smearing considerations may apply as per :yref:`smearCoeff<LevelSet.smearCoeff>`.")
+		.def("volume",&LevelSet::getVolumeDep,"A 2025/09-deprecated version of :yref:`getVolume<LevelSet.getVolume>`. Please use the latter instead.")
+		.def("getVolume",&LevelSet::getVolume,"Returns the shape volume as the negative domain of the :yref:`level set function<LevelSet.distField>`, in a voxellised fashion, where a negative value of the level set, :yref:`distField[i][j][k]<LevelSet.distField>` $\\leq$ 0, is considered to correspond to a material cubic voxel of side :yref:`lsGrid.spacing<RegularGrid.spacing>` and centered at :yref:`lsGrid.gridPoint(i,j,k)<RegularGrid.gridPoint>`. Smearing considerations may apply as per :yref:`smearCoeff<LevelSet.smearCoeff>`.")
 		.def("center",&LevelSet::getCenter,"The center of mass of the :yref:`volume<LevelSet.volume>` (considering obviously an uniform density for this volume), in local axes (for verification purposes, by comparison with the origin).")
-		.def("inertia",&LevelSet::getInertia,"The diagonal coefficients (i.e., eigenvalues, in a consistent workflow) of the geometric inertia matrix (the one considering the infinitesimal volume as the integrand, instead of infinitesimal mass) of the particle :yref:`volume<LevelSet.volume>`, as a (xx,yy,zz) Vector3r.")
+		.def("inertia",&LevelSet::getInertia,"The diagonal coefficients (i.e., eigenvalues, in a consistent workflow) of the geometric inertia matrix (the one considering the infinitesimal volume as the integrand, instead of infinitesimal mass) of the particle :yref:`volume<LevelSet.getVolume>`, as a (xx,yy,zz) Vector3r.")
 // 		.def("nodesInCell",&LevelSet::getNodesInCellCube,(boost::python::args("i", "j", "k")),"Which boundary nodes belong to a given grid cube (given by its i,j,k indices)")
 		.def("distance",&LevelSet::distance,(boost::python::arg("pt"),boost::python::arg("unbound")=false),"Distance to surface at pt, with pt being expressed in the local frame. The 'unbound' flag (if True) allows the computation of distance values outside of the :yref:`grid<LevelSet.lsGrid>` extents, which otherwise returns NaN together with an error.")
 		.def("normal",&LevelSet::normal,(boost::python::arg("pt"),boost::python::arg("unbound")=false),"Unit normal vector to the surface, at some pt. Local frame applies to both output normal and input pt. Has an 'unbound' flag signaling whether to allow (if True) the computation of the normal outside of the :yref:`grid<LevelSet.lsGrid>` extents.")

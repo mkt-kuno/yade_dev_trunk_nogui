@@ -44,7 +44,7 @@ def potentialblock(material, a=[], b=[], c=[], d=[], r=0.0, R=0.0, mask=1, isBou
 	        a=a, b=b, c=c, d=d, r=r, R=R, isBoundary=isBoundary, AabbMinMax=True
 	)  #id=len(O.bodies) #FIXME: Check if I need id for vtk output
 	if color[0] == -1:
-		pb.shape.color = randomColor(seed=random.randint(0, 1E6))
+		pb.shape.color = randomColor(seed=random.randint(0, int(1E6)))
 	else:
 		pb.shape.color = color
 	utils._commonBodySetup(pb, pb.shape.volume, pb.shape.inertia, material, pos=pb.shape.position, fixed=fixed)

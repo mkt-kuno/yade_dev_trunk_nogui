@@ -47,6 +47,7 @@ public:
 	void                Initialize();
 	bool                IsInitialized() const;
 	Real                GetVolume();
+	Real                getVolume() override;
 	Quaternionr         GetOri();
 	Polyhedron          GetPolyhedron() const;
 	void                Clear();
@@ -80,6 +81,7 @@ protected:
 			createIndex();
 			init = 0,
 			.def("Initialize",&Polyhedra::Initialize,"Initialization")
+			.def("getVolume",&Polyhedra::getVolume,"Return polyhedra volume (duplicate of :yref:`GetVolume<Polyhedra.GetVolume>`, though with a better syntax)")
 			.def("GetVolume",&Polyhedra::GetVolume,"return polyhedra's volume")
 			.def("GetInertia",&Polyhedra::GetInertia,"return polyhedra's inertia tensor")
 			.def("GetOri",&Polyhedra::GetOri,"return polyhedra's orientation")

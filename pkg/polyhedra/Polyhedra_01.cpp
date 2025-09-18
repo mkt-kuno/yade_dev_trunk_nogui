@@ -331,6 +331,11 @@ Real Polyhedra::GetVolume()
 	return volume;
 }
 
+Real Polyhedra::getVolume() // duplicate of GetVolume() to override virtual Shape::getVolume() while not changing name of GetVolume()
+{
+	return GetVolume();
+}
+
 Quaternionr Polyhedra::GetOri()
 {
 	Initialize();

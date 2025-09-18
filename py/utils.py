@@ -558,7 +558,7 @@ def levelSetBody(
 		b.shape = lsSimpleShape(4, AlignedBox3(minExt, maxExt), step=spacing, clump=clump, smearCoeff=smearCoeff)
 	inertia = b.shape.inertia()  # this line will call LevelSet::init(), if not already done.
 	_commonBodySetup(
-	        b, b.shape.volume(), inertia, material, pos=center, dynamic=dynamic
+	        b, b.shape.getVolume(), inertia, material, pos=center, dynamic=dynamic
 	)  # will assign state.mass,inertia,pos,refPos,blockedDOFs, but NOT state.ori (see below)
 	iMean = inertia.mean()
 	if abs(inertia[0] - iMean) / iMean < 5.e-4 and abs(inertia[1] - iMean) / iMean < 5.e-4 and abs(inertia[2] - iMean) / iMean < 5.e-4:

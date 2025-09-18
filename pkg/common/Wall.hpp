@@ -13,11 +13,14 @@ namespace yade { // Cannot have #include directive inside.
 class Wall : public Shape {
 public:
 	virtual ~Wall(); // vtable
+	Real getVolume() override;
 	// clang-format off
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Wall,Shape,"Object representing infinite plane aligned with the coordinate system (axis-aligned wall).",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Wall,Shape,"Object representing infinite plane aligned with the coordinate system (axis-aligned wall).",
 		((int,sense,0,,"Which side of the wall interacts: -1 for negative only, 0 for both, +1 for positive only"))
 		((int,axis,0,,"Axis of the normal; can be 0,1,2 for +x, +y, +z respectively (Body's orientation is disregarded for walls)")),
 		/*ctor*/createIndex();
+		,
+		.def("getVolume",&Wall::getVolume,"Returns the shape volume (0 here).")
 	);
 	// clang-format on
 	REGISTER_CLASS_INDEX(Wall, Shape);

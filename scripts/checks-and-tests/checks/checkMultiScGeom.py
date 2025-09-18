@@ -53,7 +53,7 @@ if ('LS_DEM' in features):
 		        NewtonIntegrator(gravity=Vector3(-9.8, 0, 0), label='ni', damping=0.3)
 		]
 		O.dt = 0.7 * (
-		        lsClump.shape.volume() * lsClump.mat.density / knVal
+		        lsClump.shape.getVolume() * lsClump.mat.density / knVal
 		)**0.5  # 0.8 * .. ~ the maximum value for some numeric settings and above maximum for others. We use 0.7
 		O.run(2500, True)  # 2200 ~ the smallest value with O.dt = 0.8 * .. possible to lead to equilibrium. Using 2500 with 0.7 * ..
 
@@ -63,7 +63,7 @@ if ('LS_DEM' in features):
 			        "step of the script)"
 			)
 		cont = O.interactions[bId, lsClump.id]
-		weight = lsClump.shape.volume() * lsClump.mat.density * ni.gravity
+		weight = lsClump.shape.getVolume() * lsClump.mat.density * ni.gravity
 		if not equalVectors(O.forces.f(bId), weight, 0.05):
 			raise YadeCheckError("Incorrect equilibrium state between applied force onto the ground =", O.forces.f(bId), "and weight", weight)
 		expectedCtctPts = [

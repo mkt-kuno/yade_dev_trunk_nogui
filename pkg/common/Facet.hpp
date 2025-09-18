@@ -34,6 +34,7 @@ public:
 	/// Unit vertice vectors (vu[i] = vertices[i]/vl[i])
 	Vector3r vu[3];
 
+	Real getVolume() override { return 0.; }
 	void postLoad(Facet&);
 
 	void setVertices(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2)
@@ -61,6 +62,7 @@ public:
 :param Vector3 v1: second vertex
 :param Vector3 v2: third vertex
 :returns: nothing)""")
+		.def("getVolume",&Facet::getVolume,"Returns the shape volume (0 here).")
 	);
 	// clang-format on
 	DECLARE_LOGGER;

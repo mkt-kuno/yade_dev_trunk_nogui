@@ -163,7 +163,7 @@ for sph in sp:  # before directly using for the present definition of bodies
 	nNtot += len(b.shape.surfNodes)
 	epP0 += b.state.mass * newton.gravity.norm() * b.state.pos[2]
 	totP += b.state.mass * newton.gravity[2]
-	volS += b.shape.volume()
+	volS += b.shape.getVolume()
 tEnd = time.time()
 print(
         len(O.bodies), 'LS superellipsoids for a total of', nGP, 'grid points and', nNtot, 'boundary nodes generated in', tEnd - tStart, 's, and',

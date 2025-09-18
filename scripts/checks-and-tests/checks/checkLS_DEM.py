@@ -50,8 +50,8 @@ if ('LS_DEM' in features):
 		if not equalVectors(normalCalc, normalTh, 0.06):
 			raise YadeCheckError("Incorrect normal for a unit sphere for an outside point", pts[idx], ":", normalCalc, "vs", normalTh, "expected.")
 	volTh = 4. / 3. * pi  # expected volume
-	if not equalNbr(lsSph.shape.volume(), volTh, 4.e-3):
-		raise YadeCheckError("Failed because of an incorrect sphere volume in LS-DEM:", lsSph.shape.volume(), "vs", volTh, "expected")
+	if not equalNbr(lsSph.shape.getVolume(), volTh, 4.e-3):
+		raise YadeCheckError("Failed because of an incorrect sphere volume in LS-DEM:", lsSph.shape.getVolume(), "vs", volTh, "expected")
 	lNorm = [nod.norm() for nod in lsSph.shape.surfNodes]
 	if not equalNbr(max(lNorm), 1, 1.e-3) or not equalNbr(min(lNorm), 1, 1.e-3):
 		raise YadeCheckError("Failed because of incorrect boundary nodes on a sphere in LS-DEM")
@@ -83,8 +83,8 @@ if ('LS_DEM' in features):
 		return funGamma(x) * funGamma(y) / funGamma(x + y)
 
 	volExp = 2. / 3. * rx * ry**rz * epsE * epsN * beta(epsE / 2, epsE / 2) * beta(epsN, epsN / 2)
-	if not equalNbr(lsSe.shape.volume(), volExp, 0.05):
-		raise YadeCheckError("Failed because of an incorrect superellipsoid volume in LS-DEM:", lsSe.shape.volume(), "vs", volExp, "expected")
+	if not equalNbr(lsSe.shape.getVolume(), volExp, 0.05):
+		raise YadeCheckError("Failed because of an incorrect superellipsoid volume in LS-DEM:", lsSe.shape.getVolume(), "vs", volExp, "expected")
 
 	### With respect to previous YADE-obtained results (this is ~ the script of https://gitlab.com/yade-dev/trunk/-/issues/375):
 	rx, ry, rz, epsE, epsN = [0.4, 1., 0.8, 0.4, 1.6]  # Shape E from Duriez2021b = Duriez & Galusinski (2021) Computers & Geosciences 157
@@ -109,7 +109,7 @@ if ('LS_DEM' in features):
 	# the LS description:
 	for idx, res in enumerate(resVals):
 		b = levelSetBody("superellipsoid", extents=(rx, ry, rz), epsilons=(epsE, epsN), spacing=2 * min(rx, ry, rz) / res, nSurfNodes=0, smearCoeff=-1)
-		volLS, inertiaLS = b.shape.volume(), numpy.array(b.shape.inertia())
+		volLS, inertiaLS = b.shape.getVolume(), numpy.array(b.shape.inertia())
 		volObtainedError[idx] = volLS / volTh
 		inertiaObtainedError[idx, :] = inertiaLS / inertiaTh
 	# the comparisons, with a higher tolerance for the finer grid to accept numeric variation in a FAST_NATIVE build:
@@ -130,7 +130,7 @@ if ('LS_DEM' in features):
 	# reference values from Yade 2025-05-13.git-5018262:
 	volExpected, inertiaExpected = 1.1241686219537839, numpy.array(Vector3(0.3439694527863318974, 0.1415271320033010538, 0.2850711020402842966))
 	# LS values and comparisons:
-	volLS, inertiaLS = b.shape.volume(), numpy.array(b.shape.inertia())
+	volLS, inertiaLS = b.shape.getVolume(), numpy.array(b.shape.inertia())
 	if not numpy.isclose(volLS, volExpected):
 		raise YadeCheckError('Problem on LS volume (inertia not yet tested) of Duriez2021b shape E with smearing, got', volLS, 'vs', volExpected)
 	if not numpy.all(numpy.isclose(inertiaLS, inertiaExpected)):
@@ -333,7 +333,7 @@ if ('LS_DEM' in features):
 	O.reset()
 	O.bodies.appendClumped([sphere((0,0,0),1)] + [sphere((2,0,-4+k*2),1) for k in range(5)])
 	O.bodies.append(levelSetBody(clump = O.bodies[6].shape,spacing = 0.1,nSurfNodes = 0))
-	vLSclump = O.bodies[7].shape.volume()
+	vLSclump = O.bodies[7].shape.getVolume()
 	vclump = 6*4./3*pi # = the one of the Clump body, indeed
 	if not equalNbr(vLSclump,vclump,5.e-4):
 		raise YadeCheckError("LStwin of a 6 unit-spheres clump has a volume of", vLSclump, "vs", vclump, "expected")

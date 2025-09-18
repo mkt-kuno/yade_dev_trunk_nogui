@@ -222,6 +222,12 @@ Real PotentialBlock::getSignedArea(const Vector3r pt1, const Vector3r pt2, const
 	return determinant; //triangle.determinant();
 }
 
+Real PotentialBlock::getVolume()
+{
+	if (volume < 0) // that would be the case if calculateInertia has not executed yet and volume is still at its -1 default value
+		LOG_ERROR("PotentialBlock::getVolume() will return a negative value, probably calculateInertia could not execute yet");
+	return volume;
+}
 
 void PotentialBlock::calculateVertices()
 {

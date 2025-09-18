@@ -299,7 +299,7 @@ Real Shop::getSpheresVolume(const shared_ptr<Scene>& _scene, int mask)
 		if (!b) continue;
 		Sphere* s = dynamic_cast<Sphere*>(b->shape.get());
 		if ((!s) or ((mask > 0) and ((b->groupMask & mask) == 0))) continue;
-		vol += (4 / 3.) * Mathr::PI * pow(s->radius, 3);
+		vol += s->getVolume();
 	}
 	return vol;
 }

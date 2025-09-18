@@ -31,7 +31,7 @@ for xInd in range(grid.nGP[0]):
 	distField.append(field_x)
 sph2 = levelSetBody(grid=grid, distField=distField)
 
-# print('sph1 vs sph2 volume comparison',sph1.shape.volume()/sph2.shape.volume()) # you can check eg here they're the same bodies
+# print('sph1 vs sph2 volume comparison',sph1.shape.getVolume()/sph2.shape.getVolume()) # you can check eg here they're the same bodies
 
 # yet another definition: direct assignment of distance field, but using numpy arrays
 axis = numpy.linspace(-1.1, 1.1, 23)

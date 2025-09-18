@@ -36,11 +36,12 @@ public:
 
 	Real getDet(const MatrixXr A) const;
 	Real getSignedArea(const Vector3r pt1, const Vector3r pt2, const Vector3r pt3) const;
+	Real getVolume() override;
 	void calculateVertices();
 	void calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, Real& Izz, Real& Ixy, Real& Ixz, Real& Iyz);
 
 	// clang-format off
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PotentialBlock,Shape,"Geometry of PotentialBlock.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PotentialBlock,Shape,"Geometry of PotentialBlock.",
 		((bool, isLining, false,, "Whether particle is part of tunnel lining (used in the RockLining.cpp script)"))
 		((Real, liningStiffness, pow(10.0,8),, "Lining stiffness"))
 		((Real, liningFriction, 20.0,, "Lining friction"))
@@ -65,7 +66,7 @@ public:
 		((Real, r, 0.0,, "r in Potential Particles"))
 		((Real, R, 0.0,, "R in Potential Particles. If left zero, a default value is calculated as half the distance of the farthest vertices"))
 		((Real, k, 0.0,, "k in Potential Particles (not used)"))
-		((Real, volume, ,, "Volume |yupdate|"))
+		((Real, volume, -1,, "Volume |yupdate|"))
 		((Vector3r, inertia, Vector3r::Zero(),, "Principal inertia tensor |yupdate|"))
 		((Vector3r, position, Vector3r::Zero(),, "Initial position of the particle, if initially defined eccentrically to the centroid |yupdate|"))
 		((Quaternionr, orientation, Quaternionr::Identity(),, "Principal orientation"))
@@ -106,6 +107,8 @@ public:
 			Dmatrix(i,0) = d[i] + r;
 	 	}
 		#endif
+		,
+		.def("getVolume",&PotentialBlock::getVolume,"Returns the shape volume.")
 	);
 	// clang-format on
 	//#endif

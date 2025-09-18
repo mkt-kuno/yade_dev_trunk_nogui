@@ -87,6 +87,7 @@ Small Enhancements
   MatchMaker minor update for a log message and doc (!1120)
   Add restrictions for using thermalEngine with periodicity, fix mass conservation during thermal expansion, allow individual thermal properties, new conduction formula, new test for thermalEngine with periodicity (!1123!)
   Add heat generation by frictional energy dissipation between particles, add option to solve heat generation and conduction in a given frequency of time steps (!1127)
+  A virtual method Shape::getVolume() is now defined, aimed at giving the volume value for any kind of Shape (effective for only some of them at the moment) (!1119)
 
 Testing & Continuous Integration
 ********************************

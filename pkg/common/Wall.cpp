@@ -16,6 +16,8 @@ YADE_PLUGIN((Wall)(Bo1_Wall_Aabb)
 
 Wall::~Wall() { } // vtable
 
+Real Wall::getVolume(){ return 0.; }
+
 void Bo1_Wall_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* /*b*/)
 {
 	Wall* wall = static_cast<Wall*>(cm.get());

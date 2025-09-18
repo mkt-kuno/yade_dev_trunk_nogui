@@ -60,7 +60,7 @@ public:
 
 	boost::python::dict localmap_get();
 
-	virtual Real getVolume() const { return -1; }
+	Real getVolume() override { return -1; }
 	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DeformableElement,Shape,"Deformable aggregate of nodes",
 		((NodeMap,localmap,,,"Ids and relative positions+orientations of members of the deformable element (should not be accessed directly)"))

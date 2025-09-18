@@ -360,7 +360,7 @@ void LevelSet::rayTraceSurfNodes(const int& nSurfNodes, const int& nodesPath, co
 	postProcessNodes();
 }
 
-void LevelSet::init() // computes stuff (center, volume, inertia, boundary nodes, ...) once distField exists
+void LevelSet::init() // computes stuff (center, volume, inertia, nVoxInside) once distField exists
 {
 	if (initDone) LOG_WARN("How comes we run a second time init ?")
 	if (!distField.size()) LOG_ERROR("You are interested into center/volume before that distField has been defined");
@@ -407,7 +407,7 @@ void LevelSet::init() // computes stuff (center, volume, inertia, boundary nodes
 	}
 	if (nVoxInside == 0)
 		LOG_ERROR(
-		        "We have a level set body with 0 voxels being considered inside, this is not expected neither supported."); // may happen when positive values restrict to point, line, or surface just along some lsGrid boundaries. Note that a body with only one gridpoint with a positive level set value, strictly within lsGrid, leads to a non zero volume
+		        "We have a level set body with 0 voxels being considered inside (0 positive values in distField ?), this is not expected neither supported.");
 
 	xMean /= volume;
 	yMean /= volume;
@@ -587,6 +587,12 @@ Real LevelSet::distanceInterpolation(const Vector3r& pt, const int& xInd, const 
 	f0yz             = ShopLS::biInterpolate(yzCoord, yExtr, zExtr, knownValx0);
 	f1yz             = ShopLS::biInterpolate(yzCoord, yExtr, zExtr, knownValx1);
 	return (pt[0] - lsGrid->gridPoint(xInd, yInd, zInd)[0]) / lsGrid->spacing * (f1yz - f0yz) + f0yz;
+}
+
+Real LevelSet::getVolumeDep()
+{
+	LOG_WARN("LevelSet.volume() has been deprecated in September 2025 and shall be replaced in user-scripts with LevelSet.getVolume()");
+	return getVolume();
 }
 
 Real LevelSet::getVolume()

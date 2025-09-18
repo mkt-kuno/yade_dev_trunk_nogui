@@ -28,7 +28,7 @@ public:
 	MatrixXr             calculateMassMatrix(Real, Real);
 	virtual ~Lin4NodeTetra();
 	void initialize(void);
-	Real getVolume(void) const override
+	Real getVolume(void) override
 	{
 		NodeMap::const_iterator i0(localmap.cbegin());
 		NodeMap::const_iterator i1(i0);
