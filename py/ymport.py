@@ -10,10 +10,10 @@ from yade.minieigenHP import *
 
 
 def textExt(fileName, format='x_y_z_r', shift=Vector3.Zero, scale=1.0, attrs=[], **kw):
-	r"""Load sphere coordinates from file in a format selected by the ``format`` argument, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
+	r"""Load sphere coordinates from file in a format selected by the ``format`` argument, returns a list of corresponding bodies; that may be inserted to the simulation with ``O.bodies.append()``.
 
 	:param str filename: file name
-	:param str format: selected input format. Supported ``'x_y_z_r'``(default), ``'x_y_z_r_matId'``, ``'x_y_z_r_attrs'``
+	:param str format: selected input format. Supported ``'x_y_z_r'`` (default), ``'x_y_z_r_matId'``, ``'id_x_y_z_r_matId'`` (with ``id`` left unused), ``'x_y_z_r_attrs'``; with whitespace delimiters in all cases
 	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
 	:param float scale: factor scales the given data.
 	:param list attrs: attrs read from file if export.textExt(format='x_y_z_r_attrs') were used ('passed by reference' style)
