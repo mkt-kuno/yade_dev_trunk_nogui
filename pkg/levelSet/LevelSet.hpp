@@ -14,18 +14,19 @@ namespace yade {
 
 class LevelSet : public Shape {
 private:
-	Vector3r         center;
-	Real             volume, lengthChar;
-	Vector3r         inertia; // the eigenvalues of the inertia matrix: its diagonal expression in localAxes basis (in a Vector3r form here)
-	bool             initDone;
-	bool             initDoneMarchingCubes;
-	int              nVoxInside;
-	vector<Vector3r> nodesOnRay; // computed in rayTrace
-	void             assignSurfNodes(vector<Vector3r>);
-	void             postProcessNodes(); // applies necessary operations (e.g., computing sphericity) after surfNodes is filled
-	void             init();             // compute nVoxInside, center, volume, and inertia
-	void             rayTraceSurfNodes(const int&, const int&, const Real&);               // fills surfNodes by ray tracing
-	void             init_neighborsNodes();                                            // fills neighborsNodes
+	Vector3r                    center;
+	Real                        volume, lengthChar;
+	Vector3r                    inertia; // the eigenvalues of the inertia matrix: its diagonal expression in localAxes basis (in a Vector3r form here)
+	bool                        initDone;
+	bool                        initDoneMarchingCubes;
+	int                         nVoxInside;
+	vector<Vector3r>            nodesOnRay; // computed in rayTrace
+	void                        assignSurfNodes(vector<Vector3r>);
+	vector<vector<vector<int>>> binarize(bool);
+	void                        postProcessNodes(); // applies necessary operations (e.g., computing sphericity) after surfNodes is filled
+	void                        init();             // compute nVoxInside, center, volume, and inertia
+	void                        rayTraceSurfNodes(const int&, const int&, const Real&);    // fills surfNodes by ray tracing
+	void                        init_neighborsNodes();                                     // fills neighborsNodes
 	Real distanceInterpolation(const Vector3r&, const int&, const int&, const int&) const; // trilinear interpolation of distance in a given cell
 	bool rayTraceInCell(
 	        const Vector3r&, const Vector3r&, const Vector3r&, const Vector3i&, const Real&); // handles the ray tracing from a given point in a given cell
@@ -44,19 +45,19 @@ public:
 	Real             minRad, maxRad;                                               // for sphericity. Public for use in Ig2 for distant interactions
 	Real             distance(const Vector3r&, const bool& unbound = false) const; // gives the distance from a point to the surface
 	Vector3r         normal(const Vector3r&, const bool& unbound = false) const;   // gives the outwards normal at some point
-	Real             getVolume() override; // these 3 get*() may call init() if not already done, they can not be const-declared
+	Real             getVolume() override; // these 4 get*() may call init() if not already done, they can not be const-declared
 	Real             getVolumeDep();
 	Vector3r         getCenter();
 	Vector3r         getInertia();
 	Real             getSurface(Real epsilon = 1) const; // this one can be const-declared
 	Real             getSurface_epsilon(Real) const;     // handy function for getSurface
-	void             computeMarchingCubes();       // Compute the marching cube triangulation for the LS shape
-	vector<Vector3r> getMarchingCubeTriangles();   // Retrieve marching cube triangles
-	vector<Vector3r> getMarchingCubeNormals();     // Retrieve marching cube normals
-	int              getMarchingCubeNbTriangles(); // Retrieve marching cube number of triangles
+	void             computeMarchingCubes();             // Compute the marching cube triangulation for the LS shape
+	vector<Vector3r> getMarchingCubeTriangles();         // Retrieve marching cube triangles
+	vector<Vector3r> getMarchingCubeNormals();           // Retrieve marching cube normals
+	int              getMarchingCubeNbTriangles();       // Retrieve marching cube number of triangles
 	virtual ~LevelSet() {};
 	// clang-format off
-  YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(LevelSet,Shape,"A level set description of particle shape based on a :yref:`discrete distance field<LevelSet.distField>` and :yref:`surface nodes<LevelSet.surfNodes>` [Duriez2021a]_ [Duriez2021b]_. See :ysrc:`examples/levelSet` for example scripts.",
+  YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(LevelSet,Shape,"A level set description of particle shape based on a :yref:`discrete distance field<LevelSet.distField>` (denoting $\\phi$ the underlying signed distance function) and :yref:`surface nodes<LevelSet.surfNodes>` [Duriez2021a]_ [Duriez2021b]_. See :ysrc:`examples/levelSet` for example scripts.",
 		((vector< vector< vector<Real> > >,distField,,Attr::readonly,"The signed (< 0 when inside) distance-to-surface function as a discrete scalar field on :yref:`lsGrid<LevelSet.lsGrid>`, with `distField[i][j][k]` corresponding to `lsGrid.gridPoint(i,j,k)`. From Python, slice this multi-dimensional list with care: while `distField[i][:][:]` corresponds to values on a x-cst plane, `distField[:][:][k]` is not at z-constant (use `[[distField[i][j][k] for j in ..] for i in ..]` instead)"))
 		((vector<Vector3r>,corners,,Attr::readonly,"The 8 corners of an axis-aligned bounding box, in local axes. It is computed once for all by :yref:`Bo1_LevelSet_Aabb` and used by the same Functor to get :yref:`Body.bound`."))
 		((vector<Vector3r>,surfNodes,,Attr::readonly,"Surface discretization in terms of (a list of) nodes, for the master-slave refined contact treatment in :yref:`Ig2_LevelSet_LevelSet_ScGeom`, previously coined boundNodes in [Duriez2021b]_. Expressed in local frame.")) // NB: just nodes as a name would "conflict" with many PFacet variables
@@ -82,12 +83,17 @@ public:
 		center = Vector3r(std::numeric_limits<Real>::infinity(),std::numeric_limits<Real>::infinity(),std::numeric_limits<Real>::infinity());
 		createIndex(); // necessary for such a Shape-derived class, see https://yade-dem.org/doc/prog.html#indexing-dispatch-types
  		,
+		.def("binarize",&LevelSet::binarize,(boost::python::arg("surface")=false),R"""(Returns (for any user-defined purpose) a voxellised description of the shape volume. Selection (as being part of the particle) of voxels associated with a strictly zero value of distance depends on *surface*.
+		
+		:param bool surface: whether to consider particle surface voxels (with a zero :yref:`distance<LevelSet.distField>` value) as being part of the volume (if True) or not (if False)
+		:returns: a 3D grid of 0/1 integers whose [i][j][k] term is 1, resp. 0, when the voxel associated to :yref:`lsGrid.gridPoint(i,j,k)<RegularGrid.gridPoint>` (see :yref:`volume<LevelSet.volume>` for an exact definition of that association) is inside, resp. outside, the particle. Modulo *surface* considerations, the returned 0/1 values actually correspond to $(\phi-|\phi|)/(2 \phi)$
+		)""")
 		.def("volume",&LevelSet::getVolumeDep,"A 2025/09-deprecated version of :yref:`getVolume<LevelSet.getVolume>`. Please use the latter instead.")
 		.def("getVolume",&LevelSet::getVolume,"Returns the shape volume as the negative domain of the :yref:`level set function<LevelSet.distField>`, in a voxellised fashion, where a negative value of the level set, :yref:`distField[i][j][k]<LevelSet.distField>` $\\leq$ 0, is considered to correspond to a material cubic voxel of side :yref:`lsGrid.spacing<RegularGrid.spacing>` and centered at :yref:`lsGrid.gridPoint(i,j,k)<RegularGrid.gridPoint>`. Smearing considerations may apply as per :yref:`smearCoeff<LevelSet.smearCoeff>`.")
 		.def("center",&LevelSet::getCenter,"The center of mass of the :yref:`volume<LevelSet.volume>` (considering obviously an uniform density for this volume), in local axes (for verification purposes, by comparison with the origin).")
 		.def("inertia",&LevelSet::getInertia,"The diagonal coefficients (i.e., eigenvalues, in a consistent workflow) of the geometric inertia matrix (the one considering the infinitesimal volume as the integrand, instead of infinitesimal mass) of the particle :yref:`volume<LevelSet.getVolume>`, as a (xx,yy,zz) Vector3r.")
 // 		.def("nodesInCell",&LevelSet::getNodesInCellCube,(boost::python::args("i", "j", "k")),"Which boundary nodes belong to a given grid cube (given by its i,j,k indices)")
-		.def("distance",&LevelSet::distance,(boost::python::arg("pt"),boost::python::arg("unbound")=false),"Distance to surface at pt, with pt being expressed in the local frame. The 'unbound' flag (if True) allows the computation of distance values outside of the :yref:`grid<LevelSet.lsGrid>` extents, which otherwise returns NaN together with an error.")
+		.def("distance",&LevelSet::distance,(boost::python::arg("pt"),boost::python::arg("unbound")=false),"Distance to surface at *pt*, with pt being expressed in the local frame. The 'unbound' flag (if True) allows the computation of distance values outside of the :yref:`grid<LevelSet.lsGrid>` extents, which otherwise returns NaN together with an error.")
 		.def("normal",&LevelSet::normal,(boost::python::arg("pt"),boost::python::arg("unbound")=false),"Unit normal vector to the surface, at some pt. Local frame applies to both output normal and input pt. Has an 'unbound' flag signaling whether to allow (if True) the computation of the normal outside of the :yref:`grid<LevelSet.lsGrid>` extents.")
 		.def("assignSurfNodes",&LevelSet::assignSurfNodes,(boost::python::arg("nodes")),"Assigns given *nodes* (as a list of Vector3r points conforming local frame) to :yref:`surfNodes<LevelSet.surfNodes>`, erasing pre-existing ones if any.")
 		.def("rayTrace",&LevelSet::rayTrace,(boost::python::arg("ray"),boost::python::arg("nodesTol")=50),"Performs one ray tracing along *ray* (to be given in cartesian coordinates, see spher2cart() if a conversion is useful from spherical ones; norm should not matter) and returns the obtained surface points (without modifying :yref:`surfNodes<LevelSet.surfNodes>`). Argument *nodesTol* has the same meaning as in :yref:`rayTraceSurfNodes<LevelSet.rayTraceSurfNodes>`, see therein. Provided for debugging or shape analysis purposes.")
@@ -97,7 +103,7 @@ public:
 		:param int nodesPath: defines how the space of spherical coordinates $(\theta \in [0;\pi] ,\varphi\in [0;2 \pi])$ is discretized when ray tracing the boundary nodes: 1 gives a rectangular partition of that space, plus two nodes at $\theta = 0 [\pi]$; 2 locates the nodes along a spiral path [Duriez2021a]_
 		:param real nodesTol: tolerance coefficient for accepting (if $|\phi| / L <$ nodesTol $\times$ numeric precision with $\phi$ the return value of :yref:`distance<LevelSet.distance>` and $L$ a body-characteristic length taken as $\sqrt[3]{V}$ with $V$ the :yref:`volume<LevelSet.volume>`, or $\sqrt{V/g_{grid}}$ with $g_{grid}$ the grid :yref:`spacing<RegularGrid.spacing>` if :yref:`twoD<LevelSet.twoD>`) surface nodes proposed by the ray tracing algorithm
 		)""")
-		.def("getSurface",&LevelSet::getSurface,(boost::python::arg("epsilon")=1.),"Compute particle surface by differentiation of Level Set volume around $\\phi = 0$, where best results have usually been obtained using :yref:`smearCoeff<LevelSet.smearCoeff>` = 1. Given argument *epsilon* (as a length quantity) serves to initialize the recursive limit search in the derivative expression (see [Duriez_TODO]_)")
+		.def("getSurface",&LevelSet::getSurface,(boost::python::arg("epsilon")=1.),"Compute particle surface by differentiation of Level Set volume around $\\phi = 0$, where best results have usually been obtained using :yref:`smearCoeff<LevelSet.smearCoeff>` = 1. Given argument *epsilon* (as a length quantity) serves to initialize the recursive limit search in the derivative expression (see [Duriez2025]_)")
 		.def("computeMarchingCubes",&LevelSet::computeMarchingCubes,"Compute or recompute the triangulation of the particle surface after using the Marching Cubes algorithm on :yref:`distField<LevelSet.distField>`.")
 		.def("marchingCubesVertices",&LevelSet::getMarchingCubeTriangles,"Returns the vertices for a surface triangulation obtained after executing the Marching Cubes algorithm on :yref:`distField<LevelSet.distField>`.")
 		.def("marchingCubesNormals",&LevelSet::getMarchingCubeNormals,"Returns the normals for a surface triangulation obtained after executing the Marching Cubes algorithm on :yref:`distField<LevelSet.distField>`.")

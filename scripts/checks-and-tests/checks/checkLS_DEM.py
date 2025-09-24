@@ -20,6 +20,11 @@ if ('LS_DEM' in features):
 
 	lsSph = levelSetBody('sphere', radius=1, spacing=0.05, nodesPath=1, smearCoeff = 1)
 
+	voxExpected = 33371 # 33371 grid voxels being inside (as detected by below numpy.sum operation) at the introduction of .binarize()
+	voxObtained = numpy.sum(numpy.array(lsSph.shape.binarize()))
+	if voxObtained != voxExpected:
+		raise YadeCheckError("Incorrect LevelSet.binarize() with",voxObtained,"voxels being detected as inside, vs",voxExpected,"expected")
+
 	def distSphereTh(pt, radius=1):
 		return Vector3(pt).norm() - radius
 

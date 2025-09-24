@@ -33,6 +33,24 @@ void LevelSet::assignSurfNodes(vector<Vector3r> givenNodes)
 	postProcessNodes();
 }
 
+vector<vector<vector<int>>> LevelSet::binarize(bool surface)
+{
+	vector<vector<vector<int>>> boolGrid; // the 3D grid to return, full of 0 (outside) or 1
+	boolGrid.resize(lsGrid->nGP[0]);
+	for (int xInd = 0; xInd < lsGrid->nGP[0]; xInd++) {
+		boolGrid[xInd].resize(lsGrid->nGP[1]);
+		for (int yInd = 0; yInd < lsGrid->nGP[1]; yInd++) {
+			boolGrid[xInd][yInd].resize(lsGrid->nGP[2]);
+			for (int zInd = 0; zInd < lsGrid->nGP[2]; zInd++) {
+				if (distField[xInd][yInd][zInd] == 0) boolGrid[xInd][yInd][zInd] = (surface ? 1 : 0);
+				else
+					boolGrid[xInd][yInd][zInd] = ((distField[xInd][yInd][zInd] < 0) ? 1 : 0);
+			}
+		}
+	}
+	return boolGrid;
+}
+
 Vector3r LevelSet::getCenter()
 {
 	if (!initDone) init();

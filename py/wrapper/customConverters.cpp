@@ -382,6 +382,7 @@ try {
 	//boost::python::to_python_converter<std::list<shared_ptr<Functor     > >, y::custom_list_to_list<shared_ptr<Functor> > >();
 	//boost::python::to_python_converter<std::list<shared_ptr<Functor     > >, y::custom_list_to_list<shared_ptr<Functor> > >();
 	boost::python::to_python_converter<std::vector<std::vector<std::vector<y::Real>>>, y::custom_vvvector_to_list<y::Real>>(); // eg for LevelSet.distField
+	boost::python::to_python_converter<std::vector<std::vector<std::vector<int>>>, y::custom_vvvector_to_list<int>>(); // eg, LevelSet.binarize()
 	// register the reciprocal conversion Python -> C++
 	y::custom_vvector_from_llist<y::Real>();
 	y::custom_vvvector_from_lllist<y::Real>();
