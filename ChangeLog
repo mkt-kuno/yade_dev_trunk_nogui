@@ -44,6 +44,8 @@ Alpha shapes
 Clumps
 ------
 
+  Clump generation algorithms of Fathipour2025 (!1129)
+
 Fluid & thermal & particle saturation
 -------------------------------------
 
@@ -58,6 +60,7 @@ LevelSet & Volume-interacting LevelSet
   New rendering options to display LevelSet surface nodes and surface (!1117)
   Uncoupling Ig2*MultiScGeom from Ip2 operations for easier inclusion of new Multi*Phys (!1118)
   Introduce MultiViscElPhys, Ip2_ViscElMat_ViscElMat_MultiViscElPhys, and Law2_MultiScGeom_MultiViscElPhys_Basic
+  LevelSet.binarize() for a binary image version of a LevelSet shape (!1129)
 
 Polyhedra / Facets
 ------------------
