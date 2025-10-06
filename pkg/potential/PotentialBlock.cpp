@@ -126,7 +126,6 @@ void PotentialBlock::postLoad(PotentialBlock&)
 			// calculate eigenvectors of I
 			Matrix3r inertia_tensor(Matrix3r::Zero());
 			inertia_tensor << Ixx, -Ixy, -Ixz, -Ixy, Iyy, -Iyz, -Ixz, -Iyz, Izz;
-			Vector3r rot;
 			Matrix3r I_rot(Matrix3r::Zero()), I_new(Matrix3r::Zero());
 			matrixEigenDecomposition(inertia_tensor, I_rot, I_new);
 

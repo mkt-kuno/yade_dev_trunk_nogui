@@ -26,7 +26,6 @@ YADE_PLUGIN((L3Geom)(L6Geom)(Ig2_Sphere_Sphere_L3Geom)(Ig2_Wall_Sphere_L3Geom)(I
 L3Geom::~L3Geom() { }
 void L3Geom::applyLocalForceTorque(const Vector3r& localF, const Vector3r& localT, const Interaction* I, Scene* scene, NormShearPhys* nsp) const
 {
-	Vector2r foo;                               // avoid undefined ~Vector2r with clang?
 	Vector3r globF = trsf.transpose() * localF; // trsf is orthonormal, therefore inverse==transpose
 	Vector3r x1c(normal * (refR1 + .5 * u[0])), x2c(-normal * (refR2 + .5 * u[0]));
 	if (nsp) {

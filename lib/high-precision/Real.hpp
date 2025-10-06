@@ -87,7 +87,13 @@ using float_fast80_t = long double;
 
 #define EIGEN_DONT_PARALLELIZE
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+// g++ 15.2.1 detects warning in Eigen/src/Core/Fill.h:128:11: error: 'void* memset(void*, int, size_t)' specified bound 18446744073709551612 exceeds maximum object size 9223372036854775807
+// so we disable this warning temporarily until Eigen fixes it.
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
 #include <Eigen/Core>
+#pragma GCC diagnostic pop
 
 /*************************************************************************/
 /*************************    float 32 bits     **************************/

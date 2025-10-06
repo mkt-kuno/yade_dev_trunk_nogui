@@ -307,7 +307,6 @@ vector<Vector3r> fillBox_cpp(Vector3r minCoord, Vector3r maxCoord, Vector3r size
 	}
 
 	//it - number of trials to make packing possibly more/less dense
-	Vector3r random_size;
 	while (it < 1000) {
 		it = it + 1;
 		if (it == 1) {
@@ -504,7 +503,6 @@ fillBoxByBalls_cpp(Vector3r minCoord, Vector3r maxCoord, Vector3r sizemin, Vecto
 	fixed_ratio = 1; //force spherical
 
 	//it - number of trials to make packing possibly more/less dense
-	Vector3r random_size;
 	while (it < 1000) {
 		it = it + 1;
 		if (it == 1) {

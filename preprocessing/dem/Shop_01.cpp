@@ -203,7 +203,6 @@ Vector3r Shop::angularMomentum(Vector3r origin)
 {
 	Vector3r ret   = Vector3r::Zero();
 	Scene*   scene = Omega::instance().getScene().get();
-	Matrix3r T, Iloc;
 	for (const auto& b : *scene->bodies) {
 		ret += (b->state->pos - origin).cross(b->state->mass * b->state->vel);
 		ret += b->state->angMom;

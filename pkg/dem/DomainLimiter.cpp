@@ -77,7 +77,6 @@ void LawTester::postLoad(LawTester&)
 
 void LawTester::action()
 {
-	Vector2r foo; // avoid undefined ~Vector2r with clang?
 	if (ids.size() != 2) throw std::invalid_argument("LawTester.ids: exactly two values must be given.");
 	LOG_DEBUG("=================== LawTester step " << step << " ========================");
 	const shared_ptr<Interaction> Inew = scene->interactions->find(ids[0], ids[1]);
