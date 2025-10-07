@@ -477,8 +477,8 @@ The quaternion $\Delta q$ representing rotation vector $\nnextangvel\Dt$ is cons
     :nowrap:
 
     \begin{align*}
-        (\Delta q)_{\theta}&=|\nnextangvel|, \\
-        (\Delta q)_{\vec{u}}&=\normalized{\nnextangvel}
+        (\Delta q)_{\theta}&=|\nnextangvel\Dt|, \\
+        (\Delta q)_{\vec{u}}&=\normalized{\nnextangvel\Dt}=\normalized{\nnextangvel}
     \end{align*}
 
 Finally, we compute the next orientation $\next{q}$ by rotation composition
