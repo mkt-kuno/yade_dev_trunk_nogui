@@ -5,7 +5,11 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include <lib/high-precision/Real.hpp>
+#pragma GCC diagnostic pop
 #include <boost/python.hpp>
 
 using yade::Index;

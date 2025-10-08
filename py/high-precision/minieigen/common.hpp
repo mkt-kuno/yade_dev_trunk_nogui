@@ -62,4 +62,8 @@ static inline void IDX2_CHECKED_TUPLE_INTS(py::tuple tuple, const Index max2[2],
 	}
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"	// Not sure why compiler thinks it's uninitialized, but we can allow it here, because we want faithful representation.
 static inline std::string object_class_name(const py::object& obj) { return py::extract<std::string>(obj.attr("__class__").attr("__name__"))(); }
+#pragma GCC diagnostic pop

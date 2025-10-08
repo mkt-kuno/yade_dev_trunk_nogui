@@ -475,6 +475,10 @@ This method is helpless for incremental re-compilation and might even be detrime
 
 	-DCMAKE_UNITY_BUILD=ON -DCMAKE_UNITY_BUILD_BATCH_SIZE=18 -DNO_UNITY=../trunk/pkg/dem/CohesiveFrictionalContactLaw.cpp
 
+Alternatively inside a C++ file place the following comment, to mark it as skipped in the unity build::
+
+	// SKIP_UNITY_BUILD
+
 Link time
 ^^^^^^^^^^^^^^^^^^^^^
 

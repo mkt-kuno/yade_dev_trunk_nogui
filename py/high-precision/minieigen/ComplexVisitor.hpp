@@ -181,9 +181,13 @@ private:
 	}
 	static std::string __repr__(const py::object& obj)
 	{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"	// Not sure why compiler thinks it's uninitialized, but we can allow it here, because we want faithful representation.
 		const ComplexT self = py::extract<ComplexT>(obj)();
 		return std::string(object_class_name(obj) + "(") + ::yade::minieigenHP::numToStringHP(self.real()) + ","
 		        + ::yade::minieigenHP::numToStringHP(self.imag()) + ")";
+#pragma GCC diagnostic pop
 	}
 	static py::tuple _mpc_(const py::object& obj)
 	{

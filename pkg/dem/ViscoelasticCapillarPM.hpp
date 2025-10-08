@@ -86,6 +86,9 @@ public:
 	Real                                                                     critDist(const Real& Vb, const Real& R, const Real& Theta);
 	FUNCTOR2D(ScGeom, ViscElCapPhys);
 	// clang-format off
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ViscElCapPhys_Basic,LawFunctor,"Extended version of Linear viscoelastic model with capillary parameters.",
 		((OpenMPAccumulator<Real>,VLiqBridg,,Attr::noSave,"The total volume of liquid bridges"))
 		((OpenMPAccumulator<int>, NLiqBridg,,Attr::noSave,"The total number of liquid bridges"))
@@ -103,6 +106,7 @@ public:
 		,/* py */
 		;
 	)
+#pragma GCC diagnostic pop
 	// clang-format on
 	DECLARE_LOGGER;
 };

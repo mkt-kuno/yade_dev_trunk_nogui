@@ -484,7 +484,11 @@ public:
 	static std::string __str__(const py::object& obj)
 	{
 		std::ostringstream oss;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 		const auto         self = py::extract<VectorT>(obj)();
+#pragma GCC diagnostic pop
 		bool               list = (Dim == Eigen::Dynamic && self.size() > 0);
 		oss << object_class_name(obj) << (list ? "([" : "(");
 		Vector_data_stream(self, oss);
@@ -1166,8 +1170,12 @@ private:
 	}
 	static QuaternionT* fromTuple(const py::tuple& tuple)
 	{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 		std::string s0 = py::extract<std::string>(tuple[0].attr("__class__").attr("__name__"));
 		std::string s1 = py::extract<std::string>(tuple[1].attr("__class__").attr("__name__"));
+#pragma GCC diagnostic pop
 		if (s0 == "Vector3") {
 			if (s1 == "Real") { // Vector3,Real
 				return fromAxisAngle(py::extract<CompatVec3>(tuple[0]), py::extract<Scalar>(tuple[1]));

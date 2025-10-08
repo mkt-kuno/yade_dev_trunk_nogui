@@ -7,7 +7,11 @@
 *************************************************************************/
 
 // compilation wall clock time: 0:06.92
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include <lib/high-precision/Real.hpp>
+#pragma GCC diagnostic pop
 #include <lib/high-precision/ToFromPythonConverter.hpp>
 using namespace ::yade::MathEigenTypes;
 // file minieigen/expose-boxes.cpp

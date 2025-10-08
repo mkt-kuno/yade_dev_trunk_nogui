@@ -380,8 +380,14 @@ if(ENABLE_USEFUL_ERRORS)
   # Three warnings are impossible to fix, because they are in older compiler, or in older library version
   #   (1) libeigen ver. <=3.3.4 : -Wshadow=compatible-local -Wno-error=float-conversion
   #   (2) numpy    ver. < 1.13  : -Wunused-function
-  # These impossible to fix warnings are in ${WORKAROUND_LIBRARY_WARNINGS}
-  SET(WORKAROUND_LIBRARY_WARNINGS " -Wno-error=maybe-uninitialized") # This one is always enabled, it is useful, but can be a false positive
+  # The impossible to fix warnings are stored in ${WORKAROUND_LIBRARY_WARNINGS}
+  SET(WORKAROUND_LIBRARY_WARNINGS " ")
+  IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 15.2.1)
+    MESSAGE(STATUS   "g++ version " ${CMAKE_CXX_COMPILER_VERSION} " < 15.2.1, cannot report -Wmaybe-uninitialized variables, setting -Wno-error=maybe-uninitialized")
+    SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=maybe-uninitialized") # g++ older than 15.2.1 has many false positives, so disable it.
+  ELSE()
+    MESSAGE(STATUS   "g++ version " ${CMAKE_CXX_COMPILER_VERSION} " >= 15.2.1 can report -Wmaybe-uninitialized variables.")
+  ENDIF()
   # to keep a warning printed as not an error add to WORKAROUND_LIBRARY_WARNINGS -Wno-error=cast-align, to disable the warning and not print it at all add: -Wno-cast-align
   # So depending on compiler version I need to turn these errors off.
   # They will be still printed as warnings. But they will not be an error due to -Werror flag.
@@ -1517,6 +1523,18 @@ IF(ENABLE_LOGGER AND CMAKE_UNITY_BUILD)
 		SET_PROPERTY(SOURCE ${CPP_LOGGER_USED_HERE} PROPERTY SKIP_UNITY_BUILD_INCLUSION ON)
 	ENDFOREACH(CPP_LOGGER_USED_HERE)
 ENDIF(ENABLE_LOGGER AND CMAKE_UNITY_BUILD)
+## Use this comment in .cpp file
+##   // SKIP_UNITY_BUILD
+## to skip UNITY build in particular file. Here, grep all files which contain this string.
+IF(CMAKE_UNITY_BUILD)
+	#MESSAGE(STATUS "${Esc}[93mENABLE_LOGGER needs a workaround with CMAKE_UNITY_BUILD, adding .cpp files containing SKIP_UNITY_BUILD to SKIP_UNITY_BUILD_INCLUSION.${Esc}[0m")
+	SET(FIND_SKIP_UNITY_BUILD -rZl SKIP_UNITY_BUILD ${CMAKE_SOURCE_DIR}/lib ${CMAKE_SOURCE_DIR}/core ${CMAKE_SOURCE_DIR}/pkg --include=*.cpp)
+	EXECUTE_PROCESS( COMMAND grep ${FIND_SKIP_UNITY_BUILD} COMMAND sed -e "s/\\x0/;/g" OUTPUT_VARIABLE FILES_WITH_SKIP_UNITY_BUILD OUTPUT_STRIP_TRAILING_WHITESPACE)
+	FOREACH(SKIP_UNITY_BUILD_USED_HERE ${FILES_WITH_SKIP_UNITY_BUILD})
+		MESSAGE(STATUS "Adding ${SKIP_UNITY_BUILD_USED_HERE} to SKIP_UNITY_BUILD_INCLUSION")
+		SET_PROPERTY(SOURCE ${SKIP_UNITY_BUILD_USED_HERE} PROPERTY SKIP_UNITY_BUILD_INCLUSION ON)
+	ENDFOREACH(SKIP_UNITY_BUILD_USED_HERE)
+ENDIF(CMAKE_UNITY_BUILD)
 IF(DEFINED NO_UNITY)
 FOREACH(SOURCFILE IN LISTS NO_UNITY)
 	SET_PROPERTY(SOURCE ${SOURCFILE} PROPERTY SKIP_UNITY_BUILD_INCLUSION ON)

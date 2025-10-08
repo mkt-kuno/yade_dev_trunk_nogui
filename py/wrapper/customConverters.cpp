@@ -212,9 +212,13 @@ template <typename containedType> struct custom_vector_from_seq {
 		int                         l = PySequence_Size(obj_ptr);
 		if (l < 0) abort(); /*std::cerr<<"l="<<l<<"; "<<typeid(containedType).name()<<std::endl;*/
 		v->reserve(l);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 		for (int i = 0; i < l; i++) {
 			v->push_back(boost::python::extract<containedType>(PySequence_GetItem(obj_ptr, i)));
 		}
+#pragma GCC diagnostic pop
 		data->convertible = storage;
 	}
 };

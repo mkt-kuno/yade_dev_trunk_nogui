@@ -208,7 +208,7 @@ bool Ig2_Wall_LevelSet_ScGeom::go(
 	        nodePos, // current position along the Wall->axis of one given boundary node
 	        maxOverlap(-std::numeric_limits<Real>::infinity());
 	Vector3r currNode,   // current position of one given boundary node
-	        contactNode; // the boundary node which is the most inside the wall
+	        contactNode(math::NaN,math::NaN,math::NaN); // the boundary node which is the most inside the wall
 #ifdef USE_TIMING_DELTAS
 	timingDeltas->checkpoint("Until nodes loop");
 #endif
@@ -298,9 +298,9 @@ bool Ig2_Wall_LevelSet_MultiScGeom::go(
 	wallNormal[wallSh->axis] = 1;
 	normal                   = (wallPos - lsPos > 0 ? -1 : 1) * wallNormal; // points from wall to particle center
 	// We will now look at nodes:
-	Real distToNode,   // one wall-level set distance value (< 0 when contact), for one node
-	        nodePos;   // current position along the Wall->axis of one given boundary node
-	Vector3r currNode; // current position of one given boundary node
+	Real distToNode{math::NaN},   // one wall-level set distance value (< 0 when contact), for one node
+	        nodePos{math::NaN};   // current position along the Wall->axis of one given boundary node
+	Vector3r currNode(math::NaN,math::NaN,math::NaN); // current position of one given boundary node
 	for (int node = 0; node < nNodes; node++) {
 		currNode = ShopLS::rigidMapping(lsSh->surfNodes[node], Vector3r::Zero(), state2.pos + shift2, state2.ori);
 		nodePos  = currNode[wallSh->axis];

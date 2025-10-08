@@ -145,10 +145,16 @@ template <typename Scalar> Vector6<Scalar> tensor_toVoigt(const Matrix3<Scalar>&
 	return ret;
 }
 
+namespace math {
 const Real
         NaN(std::numeric_limits<Real>::has_signaling_NaN
                     ? std::numeric_limits<Real>::signaling_NaN()
                     : (std::numeric_limits<Real>::has_quiet_NaN ? std::numeric_limits<Real>::quiet_NaN() : math::abs(Real(0) / Real(0))));
+
+}
+
+// If you don't want to initialize variable, then use NaN
+using ::yade::math::NaN;
 
 // void quaternionToEulerAngles (const Quaternionr& q, Vector3r& eulerAngles,Real threshold=1e-6f);
 template <typename Scalar> void quaterniontoGLMatrix(const Eigen::Quaternion<Scalar>& q, Scalar m[16])

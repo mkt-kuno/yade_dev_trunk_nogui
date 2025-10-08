@@ -58,7 +58,11 @@ template <typename ArbitraryEnum> struct ArbitraryEnum_from_python {
 				return false;
 			}
 		} else if (::boost::python::extract<std::string>(arg).check()) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 			std::string n = ::boost::python::extract<std::string>(arg)();
+#pragma GCC diagnostic pop
 			if (::boost::python::extract<::boost::python::dict>(meCol.attr("names"))().has_key(n)) {
 				col = ::boost::python::extract<ArbitraryEnum>(meCol.attr("names")[n])();
 			} else {

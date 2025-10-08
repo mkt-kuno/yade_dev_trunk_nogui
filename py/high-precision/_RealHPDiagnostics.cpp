@@ -10,7 +10,11 @@
 #include <lib/high-precision/Constants.hpp>
 #include <lib/high-precision/MathComplexFunctions.hpp>
 #include <lib/high-precision/MathSpecialFunctions.hpp>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include <lib/high-precision/Real.hpp>
+#pragma GCC diagnostic pop
 #include <lib/high-precision/RealHPConfig.hpp>
 #include <lib/high-precision/RealIO.hpp>
 #include <algorithm>
@@ -706,8 +710,12 @@ runTest(int                  testCount,
 		testHelper.prepare();
 		boost::mpl::for_each<boost::mpl::reverse<math::RealHPConfig::SupportedByMinieigen>::type>(testLoop);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 		if (((testCount % printEveryNth) == 0) and (testCount != 0))
 			LOG_INFO("minHP = " << minHP << ", testCount = " << testCount << "\n" << py::extract<std::string>(py::str(testHelper.getResult()))());
+#pragma GCC diagnostic pop
 	}
 	return testHelper.getResult();
 }
@@ -715,7 +723,11 @@ runTest(int                  testCount,
 py::dict
 getRealHPErrors(const py::list& testLevelsHP, int testCount, Real minX, Real maxX, bool useRandomArgs, int printEveryNth, bool collectArgs, bool extraChecks)
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 	TRVAR1(py::extract<std::string>(py::str(testLevelsHP))());
+#pragma GCC diagnostic pop
 	TRVAR5(testCount, minX, maxX, useRandomArgs, printEveryNth);
 	TRVAR2(collectArgs, extraChecks);
 	std::set<int> testSet { py::stl_input_iterator<int>(testLevelsHP), py::stl_input_iterator<int>() };

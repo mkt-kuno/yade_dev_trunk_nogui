@@ -48,7 +48,11 @@ void Serializable::pyUpdateAttrs(const boost::python::dict& d)
 	if (ll == 0) return;
 	for (size_t i = 0; i < ll; i++) {
 		boost::python::tuple t   = boost::python::extract<boost::python::tuple>(l[i]);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"	// t[0] is read from l[i], not sure why compiler thinks it's uninitialized ...
 		string               key = boost::python::extract<string>(t[0]);
+#pragma GCC diagnostic pop
 		pySetAttr(key, t[1]);
 	}
 	callPostLoad();

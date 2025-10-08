@@ -161,6 +161,9 @@ public:
 	Real ratioSlidingContacts();
 
 	FUNCTOR2D(ScGeom, MindlinPhys);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Law2_ScGeom_MindlinPhys_Mindlin,LawFunctor,"Constitutive law for the Hertz-Mindlin formulation. It includes non linear elasticity in the normal direction as predicted by Hertz for two non-conforming elastic contact bodies. In the shear direction, instead, it reseambles the simplified case without slip discussed in Mindlin's paper, where a linear relationship between shear force and tangential displacement is provided. Finally, the Mohr-Coulomb criterion is employed to established the maximum friction force which can be developed at the contact. Moreover, it is also possible to include the effect of linear viscous damping through the definition of the parameters $\\beta_{n}$ and $\\beta_{s}$.",
 			((bool,includeAdhesion,false,,"bool to include the adhesion force following the DMT formulation. If true, also the normal elastic energy takes into account the adhesion effect."))
@@ -185,6 +188,7 @@ public:
 // 			.add_property("preventGranularRatcheting",&Law2_ScGeom_MindlinPhys_Mindlin::deprecAttr,&Law2_ScGeom_MindlinPhys_Mindlin::deprecAttr,"Warn that this is no longer used")
 	);
 	// clang-format on
+#pragma GCC diagnostic pop
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_MindlinPhys_Mindlin);

@@ -13,7 +13,11 @@
 // Though it could be precompiled for some special types such as boost::multiprecision::float128
 
 #include <lib/base/Logging.hpp>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include <lib/high-precision/Real.hpp>
+#pragma GCC diagnostic pop
 #include <lib/high-precision/RealHPConfig.hpp>
 #include <lib/high-precision/ToFromPythonConverter.hpp>
 #include <lib/pyutil/doc_opts.hpp>

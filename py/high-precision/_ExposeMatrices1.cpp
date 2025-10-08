@@ -7,7 +7,11 @@
 *************************************************************************/
 
 // compilation wall clock time: 0:24.23 → split into two files → 0:14.75
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include <lib/high-precision/Real.hpp>
+#pragma GCC diagnostic pop
 #include <lib/high-precision/ToFromPythonConverter.hpp>
 using namespace ::yade::MathEigenTypes;
 // half of minieigen/expose-matrices.cpp

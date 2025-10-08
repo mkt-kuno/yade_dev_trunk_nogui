@@ -18,7 +18,11 @@
 #include <lib/high-precision/Constants.hpp>
 #include <lib/high-precision/MathComplexFunctions.hpp>
 #include <lib/high-precision/MathSpecialFunctions.hpp>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include <lib/high-precision/Real.hpp>
+#pragma GCC diagnostic pop
 #include <lib/high-precision/RealHPConfig.hpp>
 #include <lib/high-precision/RealIO.hpp>
 #include <lib/pyutil/doc_opts.hpp>
