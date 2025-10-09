@@ -20,3 +20,7 @@ Checktesting
 
 9. Failures are reported via exception using python command: raise YadeCheckError(stringMessage)
 
+10. It is recommended to run simulation for certain number of steps before checking the condition ("O.run(Nsteps,wait = True)") rather than pausing simulation with "O.pause()". The latter may cause segmentation fault during checks (related to execfile limitation described in the warning below).
+
+Warning:
+Due to the limitation of execfile the local variables created in one check script are passed down to the check scripts executed after it. Hence creating a local variable in one script called e.g. 'Body' will break the scripts executed after it, when they will try to create a new 'Body()'. The workaround is to use unique non-trivial variable names in the check scripts. 

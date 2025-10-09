@@ -289,6 +289,7 @@ bool Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::go(shared_ptr<IGeom>& /*ig*/, 
 
 	//shear force: in case the polyhdras are separated and come to contact again, one
 	//should not use the previous shear force
+	Vector3r shearForce = phys->shearForce;
 	if (contactGeom->isShearNew) shearForce = Vector3r::Zero();
 	else
 		shearForce = contactGeom->rotate(shearForce);

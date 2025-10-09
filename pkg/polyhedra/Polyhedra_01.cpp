@@ -106,6 +106,7 @@ void Polyhedra::Initialize()
 	Vector3r translation((-1) * centroid);
 
 	//set centroid to be [0,0,0]
+	N = (int)v.size(); //  in case N changed after convex Hull
 	for (int i = 0; i < N; i++) {
 		v[i] = v[i] - centroid;
 	}

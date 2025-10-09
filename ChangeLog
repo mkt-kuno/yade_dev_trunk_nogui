@@ -9,6 +9,7 @@ Bug Fixes
   Removing redundant declaration of young parameter in PolyhedraMat (!1099).
   Fix Archlinux compilation (!1109)
   Fix a bug that would make PFV solver crash with too many spheres(!1113)
+  Fix information leakage between polyhedra interactions that was caused by 'shearForce' declaration in the 'Law2_PolyhedraGeom_PolyhedraPhys_Volumetric' class (!1131)
 
 Code Formatting & Organization
 ******************************
@@ -28,6 +29,7 @@ Documentation & Comments
   Mention the YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY macro in the docs
   Improve README wording: grammar, capitalization (C++/Python), hyphenation, clearer link labels
   Removing a typo in spherical orientation time integration (!1133)
+  Add comment to the documentation (and README of checks) recommending against using O.pause() in check scripts (!1131)
 
 Examples
 ********
@@ -65,6 +67,7 @@ LevelSet & Volume-interacting LevelSet
 
 Polyhedra / Facets
 ------------------
+  New polyhedra check (checking if shearForce in one interaction affects another) (!1131)
 
 PotentialParticles / Blocks
 ---------------------------
