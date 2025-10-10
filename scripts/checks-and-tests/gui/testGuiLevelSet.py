@@ -17,7 +17,7 @@ if 'LS_DEM' in yade.config.features:
 
 	# Create a complicated level set shape to render
 	grid = RegularGrid(-4.99, 5.01, 41)
-	fmm = FastMarchingMethod(grid=grid, phiIni=phiIniPy(lambda x, y, z: distApproxRose((x, y, z)), grid), speed=1, heapSort = 1)
+	fmm = FastMarchingMethod(grid=grid, phiIni=phiIniPy(lambda x, y, z: distApproxRose((x, y, z)), grid), speed=1, heapSort=1)
 	phiField = fmm.phi()
 	O.bodies.append(levelSetBody(grid=grid, distField=phiField, center=(0, 0, 0), nSurfNodes=0))
 

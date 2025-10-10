@@ -482,13 +482,13 @@ def levelSetBody(
         surfNodes=[],
         nodesPath=2,
         nodesTol=50,
-        n_neighborsNodes = -1,
+        n_neighborsNodes=-1,
         orientation=Quaternion(1, 0, 0, 0),
         hasAABE=False,
         axesAABE=Vector3.Zero,
         dynamic=True,
         material=-1,
-        starLike = False
+        starLike=False
 ):
 	"""Creates a :yref:`LevelSet` shaped body through various workflows: one can choose to define the discrete distance field from pre-defined shapes (through *shape* and related arguments), or to mimick a :yref:`Clump` instance (*clump* argument, for comparison purposes), or directly assign the discrete distance field on some grid (*distField* and *grid* arguments). Surface nodes can also be either ray traced (see *nSurfNodes*, *nodesPath* and *nodesTol*) or directly assigned (see *surfNodes*)
 
@@ -567,7 +567,7 @@ def levelSetBody(
 	else:
 		b.aspherical = True
 	b.state.ori = b.state.refOri = orientation
-	b.shape.n_neighborsNodes = n_neighborsNodes # pass it before assigning / ray tracing surface nodes !
+	b.shape.n_neighborsNodes = n_neighborsNodes  # pass it before assigning / ray tracing surface nodes !
 	# Finally defining the nodes (unless nSurfNodes = 0 and surfNodes remains empty, probably because VLS-DEM with no nodes is used) in the below if block:
 	if len(surfNodes) > 0:
 		b.shape.assignSurfNodes(surfNodes)

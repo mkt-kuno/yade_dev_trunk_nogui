@@ -19,7 +19,9 @@ if ('LS_DEM' in features):
 	#######################################################################
 	# NB: because of the LStwin shape, physics is actually in a bifurcation regime and the exact dynamics may vary (e.g., on compilation options)
 
-	for repeat in range(2):  # we will repeat twice ~ the same thing, with either a LSbox (jduriez note: this is aor8) or a true Wall (jduriez note: this is aor8wall) for the ground
+	for repeat in range(
+	        2
+	):  # we will repeat twice ~ the same thing, with either a LSbox (jduriez note: this is aor8) or a true Wall (jduriez note: this is aor8wall) for the ground
 		# The bodies
 		############
 		O.bodies.appendClumped([sphere((0, 0, z), 1) for z in [-0.5, 0.5]])  # a 3*1*1 long body
@@ -77,7 +79,9 @@ if ('LS_DEM' in features):
 			)
 		nCtctPtsInPhys = len(cont.phys.contacts)
 		if not nCtctPtsInPhys == obtainedCtctPts:
-			raise YadeCheckError("From the Python side, we have",obtainedCtctPts,"items in geom.contacts, vs", nCtctPtsInPhys,"items in phys.contacts")
+			raise YadeCheckError(
+			        "From the Python side, we have", obtainedCtctPts, "items in geom.contacts, vs", nCtctPtsInPhys, "items in phys.contacts"
+			)
 		O.reset()
 else:
 	print("Skip checkMultiScGeom, LS-DEM feature not available")

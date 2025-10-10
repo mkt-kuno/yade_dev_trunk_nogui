@@ -32,9 +32,10 @@ except Exception:
 		_WEB_BACKEND_AVAILABLE = False
 		import warnings
 		warnings.warn(
-			"Neither QtWebKit nor QtWebEngine backends are available. Help/documentation windows will open in the external browser.\n"
-			"Install one of: 'python3-pyqt5.qtwebengine' (Debian/Ubuntu), or via pip: 'pip install PyQt5 PyQtWebEngine'. Original error: %s" % _qt_web_import_err,
-			RuntimeWarning,
+		        "Neither QtWebKit nor QtWebEngine backends are available. Help/documentation windows will open in the external browser.\n"
+		        "Install one of: 'python3-pyqt5.qtwebengine' (Debian/Ubuntu), or via pip: 'pip install PyQt5 PyQtWebEngine'. Original error: %s" %
+		        _qt_web_import_err,
+		        RuntimeWarning,
 		)
 
 from yade.qt.ui_controller import Ui_Controller
@@ -82,10 +83,7 @@ def openUrl(url):
 
 	reuseLast = False
 	try:
-		reuseLast = (
-			len(webWindows) > 0
-			and str(webWindows[-1].url()).split('#')[-1].split('.')[2] == url.split('#')[-1].split('.')[2]
-		)
+		reuseLast = (len(webWindows) > 0 and str(webWindows[-1].url()).split('#')[-1].split('.')[2] == url.split('#')[-1].split('.')[2])
 	except Exception:
 		pass
 	if not reuseLast:

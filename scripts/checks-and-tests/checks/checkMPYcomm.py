@@ -2,8 +2,10 @@ import yade
 try:
 	from checkList import YadeCheckError  # same directory
 except Exception:
+
 	class YadeCheckError(Exception):
 		pass
+
 
 if 'MPI' in yade.config.features:
 	from yade import mpy as mp
