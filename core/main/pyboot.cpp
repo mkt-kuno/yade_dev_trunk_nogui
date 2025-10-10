@@ -56,7 +56,7 @@ void yadeInitialize(boost::python::list& pp, const std::string& confDir)
 	for (int i = 0; i < boost::python::len(pp); i++) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"	// pp[i] is the argument, not sure why compiler thinks it's uninitialized ...
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized" // pp[i] is the argument, not sure why compiler thinks it's uninitialized ...
 		ppp.push_back(boost::python::extract<std::string>(pp[i]));
 #pragma GCC diagnostic pop
 	}

@@ -279,11 +279,11 @@ ShopLS::lsSimpleShape(int shape, const AlignedBox3r& aabb, const Real& step, con
 	} else if (shape == 3) // FMM for se, with the whole distance field at once
 	{
 		FastMarchingMethod distFMM;
-		distFMM.heapSort = true;
-		distFMM.grid     = lsShape->lsGrid;
-		distFMM.phiIni   = distIniSE((maxBod - minBod) / 2., epsilons, lsShape->lsGrid);
-		distanceVal      = distFMM.phi();
-		lsShape->starLike= true; // we have a single valued function x(u,v) for se, whatever the epsilons
+		distFMM.heapSort  = true;
+		distFMM.grid      = lsShape->lsGrid;
+		distFMM.phiIni    = distIniSE((maxBod - minBod) / 2., epsilons, lsShape->lsGrid);
+		distanceVal       = distFMM.phi();
+		lsShape->starLike = true; // we have a single valued function x(u,v) for se, whatever the epsilons
 	} else if (shape == 4) {
 		FastMarchingMethod distFMM;
 		distFMM.grid   = lsShape->lsGrid;

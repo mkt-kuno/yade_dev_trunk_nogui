@@ -132,7 +132,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::NRAdimExp_integrate_u(
 	Real d = prev_d;
 
 	int  i;
-	Real a(0), F{math::NaN};
+	Real a(0), F { math::NaN };
 
 	for (i = 0; i < MaxIter; i++) {
 		a = (math::exp(d) < eps) ? alpha : 0.; // Alpha = 0 for non-contact

@@ -88,28 +88,31 @@ void Ip2_FrictMat_FrictMat_MultiFrictPhys::go(const shared_ptr<Material>& mat1, 
 {
 	//NB: we will execute that Ip2::go at every iteration, because new items in interaction->phys->contacts have to be touched here (e.g., assigned kn)
 	shared_ptr<MultiFrictPhys> multiFrictPhysPtr(new MultiFrictPhys);
-	if (interaction->phys->getClassName() == "MultiPhys"){ // this interaction has just been created (and already populated with a phys, of MultiPhys type), by the Ig2*MultiScGeom::go
+	if (interaction->phys->getClassName()
+	    == "MultiPhys") { // this interaction has just been created (and already populated with a phys, of MultiPhys type), by the Ig2*MultiScGeom::go
 		LOG_DEBUG("Interaction " << interaction->id1 << " - " << interaction->id2 << " seen for the first time in the Ip2" << std::endl);
 		// we will backport interaction->phys->contacts and ->nodesIds;
 		shared_ptr<MultiPhys> iPhysPtrAsMultiPhys(YADE_PTR_CAST<MultiPhys>(interaction->phys));
 		multiFrictPhysPtr->contacts = iPhysPtrAsMultiPhys->contacts;
 		multiFrictPhysPtr->nodesIds = iPhysPtrAsMultiPhys->nodesIds;
-	}
-	else if(interaction->phys->getClassName() == "MultiFrictPhys") { // it has existed for a while: i->phys is already of MultiFrictPhys type
-		LOG_DEBUG("Interaction " << interaction->id1 << " - " << interaction->id2 << " had already been Ip2-handled in the past, its phys is of " << interaction->phys->getClassName() << " at least" << std::endl);
+	} else if (interaction->phys->getClassName() == "MultiFrictPhys") { // it has existed for a while: i->phys is already of MultiFrictPhys type
+		LOG_DEBUG(
+		        "Interaction " << interaction->id1 << " - " << interaction->id2 << " had already been Ip2-handled in the past, its phys is of "
+		                       << interaction->phys->getClassName() << " at least" << std::endl);
 		multiFrictPhysPtr = YADE_PTR_CAST<MultiFrictPhys>(interaction->phys);
-	}
-	else{
-		LOG_ERROR("Interaction " << interaction->id1 << " - " << interaction->id2 << " has a phys of " << interaction->phys->getClassName() << ", that is clearly not expected ! (only MultiPhys or MultiFrictPhys are)" << std::endl);
+	} else {
+		LOG_ERROR(
+		        "Interaction " << interaction->id1 << " - " << interaction->id2 << " has a phys of " << interaction->phys->getClassName()
+		                       << ", that is clearly not expected ! (only MultiPhys or MultiFrictPhys are)" << std::endl);
 	}
 	LOG_DEBUG(
-		"YADE_PTR_DYN_CAST<MultiFrictPhys>(interaction->phys) = "
-		<< YADE_PTR_DYN_CAST<MultiFrictPhys>(interaction->phys)
-		<< " (0 would be a problem)"); // the dynamic cast will never be executed here unless LOG_DEBUG level is actually effective
+	        "YADE_PTR_DYN_CAST<MultiFrictPhys>(interaction->phys) = "
+	        << YADE_PTR_DYN_CAST<MultiFrictPhys>(interaction->phys)
+	        << " (0 would be a problem)"); // the dynamic cast will never be executed here unless LOG_DEBUG level is actually effective
 	// Computing once for all (outside of below loop) the to-be-assigned contact friction from the Materials frictionAngle(s):
 	const shared_ptr<FrictMat>& fmat1 = YADE_PTR_CAST<FrictMat>(mat1);
 	const shared_ptr<FrictMat>& fmat2 = YADE_PTR_CAST<FrictMat>(mat2);
-	Real frictAngle( std::min(fmat1->frictionAngle, fmat2->frictionAngle) );
+	Real                        frictAngle(std::min(fmat1->frictionAngle, fmat2->frictionAngle));
 	// Looping over contacting nodes to assign mechanical properties into individual contacts items:
 	LOG_DEBUG("About to looping over contacting nodes");
 	for (unsigned int idx = 0; idx < multiFrictPhysPtr->contacts.size(); idx++) {
@@ -117,13 +120,12 @@ void Ip2_FrictMat_FrictMat_MultiFrictPhys::go(const shared_ptr<Material>& mat1, 
 			LOG_DEBUG("Contact at node " << multiFrictPhysPtr->nodesIds[idx] << " is detected by the Ip2 as being just created" << std::endl);
 			shared_ptr<FrictPhys> frictPhysPtr(new FrictPhys);
 			// Direct assignment of values of stiffnesses:
-			frictPhysPtr->kn                     = kn;
-			frictPhysPtr->ks                     = ks;
+			frictPhysPtr->kn = kn;
+			frictPhysPtr->ks = ks;
 			// Assignment of (tangent of) friction angle:
 			frictPhysPtr->tangensOfFrictionAngle = std::tan(frictAngle);
-			multiFrictPhysPtr->contacts[idx] = frictPhysPtr;
-		}
-		else { // this contacts[idx] item shall have existed for a while, there is nothing to do
+			multiFrictPhysPtr->contacts[idx]     = frictPhysPtr;
+		} else { // this contacts[idx] item shall have existed for a while, there is nothing to do
 			LOG_DEBUG("Contact at node " << multiFrictPhysPtr->nodesIds[idx] << " is detected by the Ip2 as existing for a while" << std::endl);
 		}
 	}
@@ -136,43 +138,46 @@ void Ip2_ViscElMat_ViscElMat_MultiViscElPhys::go(const shared_ptr<Material>& mat
 {
 	//NB: we will execute that Ip2::go at every iteration, because new items in interaction->phys->contacts have to be touched here (e.g., assigned kn)
 	shared_ptr<MultiViscElPhys> multiViscElPhysPtr(new MultiViscElPhys);
-	if (interaction->phys->getClassName() == "MultiPhys"){ // this interaction has just been created (and already populated with a phys, of MultiPhys type), by the Ig2*MultiScGeom::go
+	if (interaction->phys->getClassName()
+	    == "MultiPhys") { // this interaction has just been created (and already populated with a phys, of MultiPhys type), by the Ig2*MultiScGeom::go
 		LOG_DEBUG("Interaction " << interaction->id1 << " - " << interaction->id2 << " seen for the first time in the Ip2" << std::endl);
 		// we will backport interaction->phys->contacts and ->nodesIds;
 		shared_ptr<MultiPhys> iPhysPtrAsMultiPhys(YADE_PTR_CAST<MultiPhys>(interaction->phys));
 		multiViscElPhysPtr->contacts = iPhysPtrAsMultiPhys->contacts;
 		multiViscElPhysPtr->nodesIds = iPhysPtrAsMultiPhys->nodesIds;
-	}
-	else if(interaction->phys->getClassName() == "MultiViscElPhys") { // it has existed for a while: i->phys is already of MultiViscElPhys type
-		LOG_DEBUG("Interaction " << interaction->id1 << " - " << interaction->id2 << " had already been Ip2-handled in the past, its phys is of " << interaction->phys->getClassName() << " at least" << std::endl);
+	} else if (interaction->phys->getClassName() == "MultiViscElPhys") { // it has existed for a while: i->phys is already of MultiViscElPhys type
+		LOG_DEBUG(
+		        "Interaction " << interaction->id1 << " - " << interaction->id2 << " had already been Ip2-handled in the past, its phys is of "
+		                       << interaction->phys->getClassName() << " at least" << std::endl);
 		multiViscElPhysPtr = YADE_PTR_CAST<MultiViscElPhys>(interaction->phys);
-	}
-	else{
-		LOG_ERROR("Interaction " << interaction->id1 << " - " << interaction->id2 << " has a phys of " << interaction->phys->getClassName() << ", that is clearly not expected ! (only MultiPhys or MultiViscElPhys are)" << std::endl);
+	} else {
+		LOG_ERROR(
+		        "Interaction " << interaction->id1 << " - " << interaction->id2 << " has a phys of " << interaction->phys->getClassName()
+		                       << ", that is clearly not expected ! (only MultiPhys or MultiViscElPhys are)" << std::endl);
 	}
 	LOG_DEBUG(
-		"YADE_PTR_DYN_CAST<MultiViscElPhys>(interaction->phys) = "
-		<< YADE_PTR_DYN_CAST<MultiViscElPhys>(interaction->phys)
-		<< " (0 would be a problem)"); // the dynamic cast will never be executed here unless LOG_DEBUG level is actually effective
+	        "YADE_PTR_DYN_CAST<MultiViscElPhys>(interaction->phys) = "
+	        << YADE_PTR_DYN_CAST<MultiViscElPhys>(interaction->phys)
+	        << " (0 would be a problem)"); // the dynamic cast will never be executed here unless LOG_DEBUG level is actually effective
 	// Computing once for all (outside of below loop) the to-be-assigned contact friction from the Materials frictionAngle(s):
-	
+
 	const shared_ptr<ViscElMat>& fmat1 = YADE_PTR_CAST<ViscElMat>(mat1);
 	const shared_ptr<ViscElMat>& fmat2 = YADE_PTR_CAST<ViscElMat>(mat2);
-	
-	Real frictAngle( std::min(fmat1->frictionAngle, fmat2->frictionAngle) );
 
-	Real                              kna             = fmat1->kn;
-	Real                              knb             = fmat2->kn;
+	Real frictAngle(std::min(fmat1->frictionAngle, fmat2->frictionAngle));
 
-	Real                              ksa             = fmat1->ks;
-	Real                              ksb             = fmat2->ks;
-	
-	Real                              ena             = fmat1->en;
-	Real                              enb             = fmat2->en;
-	
-	Real                              esa             = fmat1->et; // ViscElMat notes the tangential coefficient of restitution as "et" - here we use "es" where "s" stands for "shear"
-	Real                              esb             = fmat2->et; 
-	
+	Real kna = fmat1->kn;
+	Real knb = fmat2->kn;
+
+	Real ksa = fmat1->ks;
+	Real ksb = fmat2->ks;
+
+	Real ena = fmat1->en;
+	Real enb = fmat2->en;
+
+	Real esa = fmat1->et; // ViscElMat notes the tangential coefficient of restitution as "et" - here we use "es" where "s" stands for "shear"
+	Real esb = fmat2->et;
+
 	Real mass1 = Body::byId(interaction->getId1())->state->mass;
 	Real mass2 = Body::byId(interaction->getId2())->state->mass;
 	if (mass1 == 0.0 and mass2 > 0.0) {
@@ -180,19 +185,19 @@ void Ip2_ViscElMat_ViscElMat_MultiViscElPhys::go(const shared_ptr<Material>& mat
 	} else if (mass2 == 0.0 and mass1 > 0.0) {
 		mass2 = mass1;
 	}
-	
+
 	// See [Pournin2001, just below equation (19)]
 	const Real massR = mass1 * mass2 / (mass1 + mass2);
 
 	Real Kn = (kn) ? (*kn)(mat1->id, mat2->id) : 2. * kna * knb / (kna + knb);
 	Real Ks = (ks) ? (*ks)(mat1->id, mat2->id) : 2. * ksa * ksb / (ksa + ksb);
-	
+
 	Real En = (en) ? (*en)(mat1->id, mat2->id) : 2. * ena * enb / (ena + enb);
 	Real Es = (et) ? (*et)(mat1->id, mat2->id) : 2. * esa * esb / (esa + esb);
-	
+
 	Real cn = 2.0 * find_cn_from_en(En, massR, contactParameterCalculation(Kn, Kn), interaction);
 	Real cs = 2.0 * find_cn_from_en(Es, massR, contactParameterCalculation(Ks, Ks), interaction);
-	
+
 	// Looping over contacting nodes to assign mechanical properties into individual contacts items:
 	LOG_DEBUG("About to looping over contacting nodes");
 	for (unsigned int idx = 0; idx < multiViscElPhysPtr->contacts.size(); idx++) {
@@ -200,16 +205,15 @@ void Ip2_ViscElMat_ViscElMat_MultiViscElPhys::go(const shared_ptr<Material>& mat
 			LOG_DEBUG("Contact at node " << multiViscElPhysPtr->nodesIds[idx] << " is detected by the Ip2 as being just created" << std::endl);
 			shared_ptr<ViscElPhys> viscElPhysPtr(new ViscElPhys);
 			// Direct assignment of values of stiffnesses:
-			viscElPhysPtr->kn                     = Kn;
-			viscElPhysPtr->ks                     = Ks;
+			viscElPhysPtr->kn = Kn;
+			viscElPhysPtr->ks = Ks;
 			// Direct assignment of values of viscous damping coefficients:
-			viscElPhysPtr->cn                     = cn;
-			viscElPhysPtr->cs                     = cs;
+			viscElPhysPtr->cn = cn;
+			viscElPhysPtr->cs = cs;
 			// Assignment of (tangent of) friction angle:
 			viscElPhysPtr->tangensOfFrictionAngle = std::tan(frictAngle);
-			multiViscElPhysPtr->contacts[idx] = viscElPhysPtr;
-		}
-		else { // this contacts[idx] item shall have existed for a while, there is nothing to do
+			multiViscElPhysPtr->contacts[idx]     = viscElPhysPtr;
+		} else { // this contacts[idx] item shall have existed for a while, there is nothing to do
 			LOG_DEBUG("Contact at node " << multiViscElPhysPtr->nodesIds[idx] << " is detected by the Ip2 as existing for a while" << std::endl);
 		}
 	}

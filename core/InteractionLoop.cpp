@@ -150,7 +150,7 @@ void InteractionLoop::action()
 #ifndef YADE_LS_DEM
 			if (wasReal)
 #else
-			if(wasReal and warnRoleIg2)
+			if (wasReal and warnRoleIg2)
 #endif
 				LOG_WARN("IGeomFunctor returned false on existing interaction!");
 			if (wasReal)

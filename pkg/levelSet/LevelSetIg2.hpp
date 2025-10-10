@@ -152,7 +152,9 @@ public:
 	        "contact). On the contrary, in order to avoid a continuous increase in the interaction list, it will take the responsibility to ask for "
 	        "interaction removal as soon as node treatment is impossible (due to an excessive gap), even when the interaction was previously real (at "
 	        "variance with general YADE design), prompting the need for setting :yref:`InteractionLoop.warnRoleIg2` = False to avoid unnecessary warning "
-	        "messages in such cases, see :ysrc:`examples/levelSet/lsNodeGeom.py` for an example. Please also note that using this Functor is expected to bias (increase) unbalancedForce measurements as it artificially increases the number of real interactions, with a number of those carrying no force, making for a smaller mean average interaction force, hence a higher unbalanced force")
+	        "messages in such cases, see :ysrc:`examples/levelSet/lsNodeGeom.py` for an example. Please also note that using this Functor is expected to "
+	        "bias (increase) unbalancedForce measurements as it artificially increases the number of real interactions, with a number of those carrying no "
+	        "force, making for a smaller mean average interaction force, hence a higher unbalanced force")
 	// clang-format on
 	DECLARE_LOGGER;
 	FUNCTOR2D(LevelSet, LevelSet);

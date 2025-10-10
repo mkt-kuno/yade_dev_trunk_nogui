@@ -183,7 +183,8 @@ private:
 	{
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"	// Not sure why compiler thinks it's uninitialized, but we can allow it here, because we want faithful representation.
+#pragma GCC diagnostic ignored                                                                                                                                 \
+        "-Wmaybe-uninitialized" // Not sure why compiler thinks it's uninitialized, but we can allow it here, because we want faithful representation.
 		const ComplexT self = py::extract<ComplexT>(obj)();
 		return std::string(object_class_name(obj) + "(") + ::yade::minieigenHP::numToStringHP(self.real()) + ","
 		        + ::yade::minieigenHP::numToStringHP(self.imag()) + ")";

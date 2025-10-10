@@ -146,10 +146,10 @@ template <typename Scalar> Vector6<Scalar> tensor_toVoigt(const Matrix3<Scalar>&
 }
 
 namespace math {
-const Real
-        NaN(std::numeric_limits<Real>::has_signaling_NaN
-                    ? std::numeric_limits<Real>::signaling_NaN()
-                    : (std::numeric_limits<Real>::has_quiet_NaN ? std::numeric_limits<Real>::quiet_NaN() : math::abs(Real(0) / Real(0))));
+	const Real
+	        NaN(std::numeric_limits<Real>::has_signaling_NaN
+	                    ? std::numeric_limits<Real>::signaling_NaN()
+	                    : (std::numeric_limits<Real>::has_quiet_NaN ? std::numeric_limits<Real>::quiet_NaN() : math::abs(Real(0) / Real(0))));
 
 }
 

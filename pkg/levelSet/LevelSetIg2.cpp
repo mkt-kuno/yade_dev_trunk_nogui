@@ -12,8 +12,8 @@
 #include <preprocessing/dem/Shop.hpp>
 
 namespace yade {
-YADE_PLUGIN((Ig2_Sphere_LevelSet_ScGeom)(Ig2_Box_LevelSet_ScGeom)(Ig2_Wall_LevelSet_ScGeom)(Ig2_Wall_LevelSet_MultiScGeom)(Ig2_LevelSet_LevelSet_ScGeom)(Ig2_LevelSet_LevelSet_LSnodeGeom)(
-        Ig2_LevelSet_LevelSet_MultiScGeom));
+YADE_PLUGIN((Ig2_Sphere_LevelSet_ScGeom)(Ig2_Box_LevelSet_ScGeom)(Ig2_Wall_LevelSet_ScGeom)(Ig2_Wall_LevelSet_MultiScGeom)(Ig2_LevelSet_LevelSet_ScGeom)(
+        Ig2_LevelSet_LevelSet_LSnodeGeom)(Ig2_LevelSet_LevelSet_MultiScGeom));
 CREATE_LOGGER(Ig2_Sphere_LevelSet_ScGeom);
 CREATE_LOGGER(Ig2_Box_LevelSet_ScGeom);
 CREATE_LOGGER(Ig2_LevelSet_LevelSet_LSnodeGeom);
@@ -207,8 +207,8 @@ bool Ig2_Wall_LevelSet_ScGeom::go(
 	Real distToNode, // one wall-level set distance value (< 0 when contact), for one node
 	        nodePos, // current position along the Wall->axis of one given boundary node
 	        maxOverlap(-std::numeric_limits<Real>::infinity());
-	Vector3r currNode,   // current position of one given boundary node
-	        contactNode(math::NaN,math::NaN,math::NaN); // the boundary node which is the most inside the wall
+	Vector3r currNode,                                    // current position of one given boundary node
+	        contactNode(math::NaN, math::NaN, math::NaN); // the boundary node which is the most inside the wall
 #ifdef USE_TIMING_DELTAS
 	timingDeltas->checkpoint("Until nodes loop");
 #endif
@@ -278,9 +278,9 @@ bool Ig2_Wall_LevelSet_MultiScGeom::go(
         const bool&                    force,
         const shared_ptr<Interaction>& c)
 {
-	bool                       newIgeom(!bool(c->geom));
-	shared_ptr<MultiScGeom>    geomMulti(new MultiScGeom);
-	shared_ptr<MultiPhys> physMulti(new MultiPhys); // As a reminder, Ig2_*MultiScGeom have to touch the physics
+	bool                    newIgeom(!bool(c->geom));
+	shared_ptr<MultiScGeom> geomMulti(new MultiScGeom);
+	shared_ptr<MultiPhys>   physMulti(new MultiPhys); // As a reminder, Ig2_*MultiScGeom have to touch the physics
 	if (!newIgeom) {
 		geomMulti = YADE_PTR_CAST<MultiScGeom>(c->geom);
 		physMulti = YADE_PTR_CAST<MultiPhys>(c->phys);
@@ -298,9 +298,9 @@ bool Ig2_Wall_LevelSet_MultiScGeom::go(
 	wallNormal[wallSh->axis] = 1;
 	normal                   = (wallPos - lsPos > 0 ? -1 : 1) * wallNormal; // points from wall to particle center
 	// We will now look at nodes:
-	Real distToNode{math::NaN},   // one wall-level set distance value (< 0 when contact), for one node
-	        nodePos{math::NaN};   // current position along the Wall->axis of one given boundary node
-	Vector3r currNode(math::NaN,math::NaN,math::NaN); // current position of one given boundary node
+	Real distToNode { math::NaN },                      // one wall-level set distance value (< 0 when contact), for one node
+	        nodePos { math::NaN };                      // current position along the Wall->axis of one given boundary node
+	Vector3r currNode(math::NaN, math::NaN, math::NaN); // current position of one given boundary node
 	for (int node = 0; node < nNodes; node++) {
 		currNode = ShopLS::rigidMapping(lsSh->surfNodes[node], Vector3r::Zero(), state2.pos + shift2, state2.ori);
 		nodePos  = currNode[wallSh->axis];
@@ -780,11 +780,11 @@ bool Ig2_LevelSet_LevelSet_ScGeom::goSingleOrMulti(
 
 	// 2. We go now for the master-slave contact algorithm with surface ie boundary nodes:
 	// 2.1 Preliminary declarations:
-	bool                       newIgeom(!bool(c->geom));
-	shared_ptr<ScGeom>         geomSingle(new ScGeom);     // useful only if single but let s also make it here in full scope
-	shared_ptr<MultiScGeom>    geomMulti(new MultiScGeom); // useful only if !single but has to be in full scope
-	shared_ptr<MultiPhys> physMulti(
-	        new MultiPhys); // useful only if !single but has to be in full scope. As a reminder, Ig2_*MultiScGeom have to touch the physics
+	bool                    newIgeom(!bool(c->geom));
+	shared_ptr<ScGeom>      geomSingle(new ScGeom);     // useful only if single but let s also make it here in full scope
+	shared_ptr<MultiScGeom> geomMulti(new MultiScGeom); // useful only if !single but has to be in full scope
+	shared_ptr<MultiPhys>   physMulti(
+                new MultiPhys); // useful only if !single but has to be in full scope. As a reminder, Ig2_*MultiScGeom have to touch the physics
 	if (!newIgeom) {
 		if (single) geomSingle = YADE_PTR_CAST<ScGeom>(c->geom);
 		else {

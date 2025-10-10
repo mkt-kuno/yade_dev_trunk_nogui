@@ -6,10 +6,10 @@
 #ifdef YADE_LS_DEM
 #pragma once
 #include <core/Dispatching.hpp>
+#include <pkg/common/MatchMaker.hpp>
 #include <pkg/dem/FrictPhys.hpp>
 #include <pkg/dem/ViscoelasticPM.hpp>
 #include <pkg/levelSet/LevelSet.hpp>
-#include <pkg/common/MatchMaker.hpp>
 
 namespace yade {
 class Bo1_LevelSet_Aabb : public BoundFunctor {
@@ -24,8 +24,8 @@ REGISTER_SERIALIZABLE(Bo1_LevelSet_Aabb);
 
 /* ------------------------------------------------------------------------ */
 /* MultiPhys */
-class MultiPhys: public IPhys {
-	public:
+class MultiPhys : public IPhys {
+public:
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MultiPhys,IPhys,"Describes the physical part of an interaction with multiple contact points, e.g., between two :yref:`LevelSet` bodies, as a set of :yref:`IPhys` items. This class is actually not intended to be used directly but to serve as a common ancestor for children classes such as :yref:`MultiFrictPhys`.",
 	((vector< shared_ptr<IPhys> >,contacts,,,"The actual list of :yref:`IPhys` (for the mother class, actually obtained types can be different for derived classes such as :yref:`MultiFrictPhys` which will include :yref:`FrictPhys` instances) items corresponding to the different contact points."))

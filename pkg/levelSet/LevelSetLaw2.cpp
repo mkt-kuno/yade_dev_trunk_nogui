@@ -19,7 +19,9 @@ bool Law2_MultiScGeom_MultiFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, sh
                 new IGeom); // keep it as IGeom ! Otherwise (if directly defined as ScGeom) a temporary will have to be created when calling CS::go below, and it will not work with the expected reference type
 	shared_ptr<IPhys> ipOne(new IPhys);
 	bool              retVal(false);
-	LOG_DEBUG("Will loop over " << igMulti->contacts.size() << " contact items when looking at i->geom->contacts (in MultiScGeom), vs " << ipMulti->contacts.size() << " in i->phys->contacts (in MultiFrictPhys)");
+	LOG_DEBUG(
+	        "Will loop over " << igMulti->contacts.size() << " contact items when looking at i->geom->contacts (in MultiScGeom), vs "
+	                          << ipMulti->contacts.size() << " in i->phys->contacts (in MultiFrictPhys)");
 	for (unsigned int idx = 0; idx < igMulti->contacts.size(); idx++) {
 		LOG_TRACE("Looping over contact " << idx << " out of " << igMulti->contacts.size());
 		igOne  = igMulti->contacts[idx];
@@ -35,13 +37,15 @@ CREATE_LOGGER(Law2_MultiScGeom_MultiViscElPhys_Basic);
 
 bool Law2_MultiScGeom_MultiViscElPhys_Basic::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
 {
-	shared_ptr<MultiScGeom>    igMulti = YADE_PTR_CAST<MultiScGeom>(ig);
+	shared_ptr<MultiScGeom>     igMulti = YADE_PTR_CAST<MultiScGeom>(ig);
 	shared_ptr<MultiViscElPhys> ipMulti = YADE_PTR_CAST<MultiViscElPhys>(ip);
-	shared_ptr<IGeom>          igOne(
+	shared_ptr<IGeom>           igOne(
                 new IGeom); // keep it as IGeom ! Otherwise (if directly defined as ScGeom) a temporary will have to be created when calling CS::go below, and it will not work with the expected reference type
 	shared_ptr<IPhys> ipOne(new IPhys);
 	bool              retVal(false);
-	LOG_DEBUG("Will loop over " << igMulti->contacts.size() << " contact items when looking at i->geom->contacts (in MultiScGeom), vs " << ipMulti->contacts.size() << " in i->phys->contacts (in MultiViscElPhys)");
+	LOG_DEBUG(
+	        "Will loop over " << igMulti->contacts.size() << " contact items when looking at i->geom->contacts (in MultiScGeom), vs "
+	                          << ipMulti->contacts.size() << " in i->phys->contacts (in MultiViscElPhys)");
 	for (unsigned int idx = 0; idx < igMulti->contacts.size(); idx++) {
 		LOG_TRACE("Looping over contact " << idx << " out of " << igMulti->contacts.size());
 		igOne  = igMulti->contacts[idx];

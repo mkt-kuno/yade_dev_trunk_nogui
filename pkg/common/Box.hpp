@@ -18,7 +18,7 @@ public:
 	        : extents(_extents)
 	{
 	}
-	Real getVolume() override { return 8.*extents.prod(); };
+	Real getVolume() override { return 8. * extents.prod(); };
 	virtual ~Box() {};
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Box,Shape,"Box (cuboid) particle geometry. (Avoid using in new code, prefer :yref:`Facet` instead.)",

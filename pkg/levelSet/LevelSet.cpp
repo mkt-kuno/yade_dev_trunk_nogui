@@ -424,8 +424,8 @@ void LevelSet::init() // computes stuff (center, volume, inertia, nVoxInside) on
 		}
 	}
 	if (nVoxInside == 0)
-		LOG_ERROR(
-		        "We have a level set body with 0 voxels being considered inside (0 positive values in distField ?), this is not expected neither supported.");
+		LOG_ERROR("We have a level set body with 0 voxels being considered inside (0 positive values in distField ?), this is not expected neither "
+		          "supported.");
 
 	xMean /= volume;
 	yMean /= volume;

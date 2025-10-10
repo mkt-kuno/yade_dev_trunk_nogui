@@ -1,6 +1,6 @@
 #pragma once
-#include <core/Shape.hpp>
 #include <lib/high-precision/Constants.hpp>
+#include <core/Shape.hpp>
 
 // FIXED: add namespace yade, see https://gitlab.com/yade-dev/trunk/issues/57 and (old site, fixed bug) https://bugs.launchpad.net/yade/+bug/528509
 
@@ -14,7 +14,7 @@ public:
 		createIndex();
 	}
 	virtual ~Sphere() {};
-	Real getVolume() override {return (4 / 3.) * Mathr::PI * pow(radius, 3);}
+	Real getVolume() override { return (4 / 3.) * Mathr::PI * pow(radius, 3); }
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Sphere,Shape,"Geometry of spherical particle.",
 		((Real,radius,NaN,,"Radius [m]")),

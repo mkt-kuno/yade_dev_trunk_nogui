@@ -30,18 +30,19 @@ void Gl1_LevelSet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& /*st
 
 	// Render the surface nodes
 	glPointSize(15.f);
-	Vector3r pointColor = Vector3r(cm->color[0] > 0.5 ? 0 : 1, cm->color[1] > 0.5 ? 0 : 1,  cm->color[2] > 0.5 ? 0 : 1);
+	Vector3r pointColor = Vector3r(cm->color[0] > 0.5 ? 0 : 1, cm->color[1] > 0.5 ? 0 : 1, cm->color[2] > 0.5 ? 0 : 1);
 	glColor3v(pointColor);
-	
+
 	if (surfNodes) {
-		glBegin(GL_POINTS);
+		glBegin(GL_POINTS)
+			;
 			for (unsigned int i1 = 0; i1 < LS->surfNodes.size(); i1++) {
 				glVertex3v(LS->surfNodes[i1]);
 			}
 		glEnd();
 	}
 
-	if (surface){
+	if (surface) {
 		if (recompute) { // Update the triangulation if we want that (necessary for fracturing or deforming particles)
 			LS->computeMarchingCubes();
 		}
@@ -58,11 +59,11 @@ void Gl1_LevelSet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& /*st
 			glDisable(GL_LIGHTING);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // Turn on wireframe mode. Render front and back faces of the wireframe
 		} else {
-		//			glEnable(GL_NORMALIZE); //Not needed for vertex-based shading. The normals have been normalised inside the Marching Cubes script
+			//			glEnable(GL_NORMALIZE); //Not needed for vertex-based shading. The normals have been normalised inside the Marching Cubes script
 			glMaterialv(
-				    GL_FRONT_AND_BACK,
-				    GL_AMBIENT_AND_DIFFUSE,
-				    Vector3r(cm->color[0], cm->color[1], cm->color[2])); //glMaterialv is used when lighting is enabled
+			        GL_FRONT_AND_BACK,
+			        GL_AMBIENT_AND_DIFFUSE,
+			        Vector3r(cm->color[0], cm->color[1], cm->color[2])); //glMaterialv is used when lighting is enabled
 			glDisable(GL_CULL_FACE);
 			//			glCullFace(GL_BACK); glEnable(GL_CULL_FACE);
 			glEnable(GL_LIGHTING);            // 2D
@@ -74,7 +75,8 @@ void Gl1_LevelSet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& /*st
 			;
 			for (int i = 0; i < 3 * nbTriangles; i += 3) {
 				glNormal3v(normals[i + 2]);
-				glVertex3v(triangles[i + 2]); //vertex #2 The sequence of the vertices specifies which side of the faces is front and which is back
+				glVertex3v(
+				        triangles[i + 2]); //vertex #2 The sequence of the vertices specifies which side of the faces is front and which is back
 				glNormal3v(normals[i + 1]);
 				glVertex3v(triangles[i + 1]); //vertex #1
 				glNormal3v(normals[i + 0]);

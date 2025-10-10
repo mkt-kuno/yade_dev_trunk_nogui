@@ -487,9 +487,9 @@ public:
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-		const auto         self = py::extract<VectorT>(obj)();
+		const auto self = py::extract<VectorT>(obj)();
 #pragma GCC diagnostic pop
-		bool               list = (Dim == Eigen::Dynamic && self.size() > 0);
+		bool list = (Dim == Eigen::Dynamic && self.size() > 0);
 		oss << object_class_name(obj) << (list ? "([" : "(");
 		Vector_data_stream(self, oss);
 		oss << (list ? "])" : ")");

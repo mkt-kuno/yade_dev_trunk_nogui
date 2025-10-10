@@ -21,9 +21,9 @@ private:
 	// - farState: just the initial state for all gridpoints
 	vector<vector<vector<gpState>>> gpStates;
 	vector<Vector3i>                knownTmp, // a temporary version of known (below), which we will empty at some point for the purpose of the algorithm
-	        trials;                           // the narrow band = all gps (their indices) with a trialState, conforming a heap state where trials.front() is the closest-to-surface gp
-	vector<vector<vector<Real>>> phiField;
-	void                         printNeighbValues(int, int, int) const;
+	        trials; // the narrow band = all gps (their indices) with a trialState, conforming a heap state where trials.front() is the closest-to-surface gp
+	vector<vector<vector<Real>>>  phiField;
+	void                          printNeighbValues(int, int, int) const;
 	Real                          eikDiscr(Real, Real, Real) const;
 	Real                          eikDiscr(Real, Real, Real, Real) const;
 	Real                          phiAtNgbr(int idx, int i, int j, int k) const;

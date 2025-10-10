@@ -50,11 +50,11 @@ namespace CGT {
 
 			Grain(void)
 			{
-				id          = -1;
-				isSphere    = false;
-				sphere      = Sphere(CGAL::ORIGIN, 0);
+				id = -1;
+				isSphere = false;
+				sphere = Sphere(CGAL::ORIGIN, 0);
 				translation = CGAL::NULL_VECTOR;
-				rotation    = CGAL::NULL_VECTOR;
+				rotation = CGAL::NULL_VECTOR;
 			}
 		};
 		class Contact {
@@ -75,7 +75,7 @@ namespace CGT {
 			Contact(void)
 			{
 				visited = false;
-				status  = PERSISTENT;
+				status = PERSISTENT;
 			}
 		};
 
