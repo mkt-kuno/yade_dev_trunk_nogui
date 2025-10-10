@@ -68,6 +68,7 @@ LevelSet & Volume-interacting LevelSet
 Polyhedra / Facets
 ------------------
   New polyhedra check (checking if shearForce in one interaction affects another) (!1131)
+  New polyhedra check (checking for 'jumpy' poluhedra in a simplified drum simulation) (!1134)
 
 PotentialParticles / Blocks
 ---------------------------
