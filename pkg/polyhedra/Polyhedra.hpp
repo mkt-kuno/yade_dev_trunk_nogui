@@ -330,7 +330,8 @@ CGALvector ToCGALVector(Vector3r A);
 bool do_intersect(Polyhedron A, Polyhedron B);
 bool do_intersect(Polyhedron A, Polyhedron B, std::vector<int>& sep_plane);
 //connect triagular facets if possible
-Polyhedron Simplify(Polyhedron P, Real lim);
+Polyhedron Simplify(Polyhedron P);
+Polyhedron Simplify(Polyhedron P, Real lim); // this version still required for initialization otherwise polyhedra splitter doesn't work properly
 //list of facets and edges
 void PrintPolyhedron(Polyhedron P);
 void PrintPolyhedron2File(Polyhedron P, std::ofstream& X);

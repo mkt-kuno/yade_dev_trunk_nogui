@@ -22,8 +22,6 @@ CREATE_CPP_LOCAL_LOGGER("Polyhedra_support.cpp");
 const Real DISTANCE_LIMIT = 2E-11;
 //MERGE_PLANES_LIMIT - if two facets of two intersecting polyhedron differ less, then they are treated ose one only
 const Real MERGE_PLANES_LIMIT = 1E-18; //18
-//SIMPLIFY_LIMIT - if two facets of one polyhedron differ less, then they are joint into one facet
-const Real SIMPLIFY_LIMIT = 1E-19; //19
 //FIND_NORMAL_LIMIT - to determine which facet of intersection belongs to which polyhedron
 const Real FIND_NORMAL_LIMIT = 1E-40;
 //SPLITTER_GAP - creates gap between splitted polyhedrons
@@ -323,7 +321,32 @@ Real PlaneDifference(const Plane& a, const Plane& b)
 
 //**********************************************************************************
 //connect triagular facets if possible
-Polyhedron Simplify(Polyhedron P, Real limit)
+Polyhedron Simplify(Polyhedron P) // this version does not use 'limit' but check 'exact' coplanarity
+{
+	bool elimination = true;
+	while (elimination) {
+		elimination = false;
+		for (Polyhedron::Edge_iterator hei = P.edges_begin(); hei != P.edges_end(); ++hei) {
+		    CGALpoint& a = hei->vertex()->point();
+		    CGALpoint& b = hei->next()->vertex()->point();
+		    CGALpoint& c = hei->next()->next()->vertex()->point();
+		    CGALpoint& d = hei->opposite()->next()->vertex()->point();
+			if (CGAL::coplanar(a, b, c, d)) {
+				if (hei->vertex()->vertex_degree() < 3) hei = P.erase_center_vertex(hei);
+				else if (hei->opposite()->vertex()->vertex_degree() < 3)
+					hei = P.erase_center_vertex(hei->opposite());
+				else
+					hei = P.join_facet(hei);
+				elimination = true;
+				break;
+			}
+		}
+	}
+	if (P.size_of_facets() < 4) P.clear();
+	return P;
+}
+
+Polyhedron Simplify(Polyhedron P, Real limit) // this version is used during Polyhedron initialization
 {
 	bool elimination = true;
 	while (elimination) {
@@ -343,6 +366,7 @@ Polyhedron Simplify(Polyhedron P, Real limit)
 	if (P.size_of_facets() < 4) P.clear();
 	return P;
 }
+
 
 //**********************************************************************************
 //list of facets + edges
@@ -607,8 +631,8 @@ Polyhedron Polyhedron_Plane_intersection(Polyhedron A, Plane B, CGALpoint centro
 	if (Intersection.empty()) return Intersection;
 
 	//simplify - turn off simplification in the interaction computations
-	//std::transform(Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(), Plane_equation());
-	//Intersection = Simplify(Intersection, SIMPLIFY_LIMIT);
+	std::transform(Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(), Plane_equation());
+	Intersection = Simplify(Intersection);
 	std::transform(Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(), Plane_equation());
 
 	//dualize again
@@ -729,8 +753,8 @@ Polyhedron Polyhedron_Polyhedron_intersection(Polyhedron A, Polyhedron B, CGALpo
 	if (Intersection.empty()) return Intersection;
 
 	//simplify - turn off simplification in the interaction computations
-	//std::transform(Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(), Plane_equation());
-	//Intersection = Simplify(Intersection, SIMPLIFY_LIMIT);
+	std::transform(Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(), Plane_equation());
+	Intersection = Simplify(Intersection);
 	std::transform(Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(), Plane_equation());
 
 	//dualize again

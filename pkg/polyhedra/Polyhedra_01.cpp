@@ -70,7 +70,7 @@ void Polyhedra::Initialize()
 
 	//connect triagular facets if possible
 	std::transform(P.facets_begin(), P.facets_end(), P.planes_begin(), Plane_equation());
-	P = Simplify(P, 1E-9);
+	P = Simplify(P,1E-9);
 
 	//modify order of v according to CGAl polyhedron
 	//int i = 0;
