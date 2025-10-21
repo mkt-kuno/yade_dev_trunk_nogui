@@ -89,6 +89,7 @@ Packaging & Build Improvements
   Allow OpenMPI to run inside CI root containers by auto-setting OMPI/PRTE *_ALLOW_RUN_AS_ROOT vars (minimal change in initialize()).
   Fix detection of eigen 5.0.0, fix #384 (!1130)
   Enable -Wmaybe-uninitialized useful compiler error. This should be really helpful (!1132)
+  Remove support for ubuntu 18.04 Bionic Beaver (!1138)
 
 Small Enhancements
 ******************

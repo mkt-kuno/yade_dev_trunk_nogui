@@ -39,12 +39,12 @@ After that you can normally start Yade using the command ``yade`` or ``yade-batc
 **Daily packages**
 
 Pre-built packages updated more frequently than the stable versions are provided for all currently supported Debian and Ubuntu
-versions and available on `yade-dem.org/packages <http://yade-dem.org/packages/>`_ .
+versions.
 
 These are "daily" versions of the packages which are being updated regularly and, hence, include
 all the newly added features.
 
-To install the daily-version you need to add the repository to your
+For their installation, you need to add the yade-dem.org/packages repository to your
 /etc/apt/sources.list.
 
 
@@ -66,11 +66,6 @@ To install the daily-version you need to add the repository to your
 - Debian 14 **forky** also with :ref:`high precision<highPrecisionReal>` ``long double``, ``float128`` and ``mpfr150`` packages::
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ forky main" >> /etc/apt/sources.list.d/yadedaily.list'
-
-
-- Ubuntu 18.04 **bionic**::
-
-	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ bionic main" >> /etc/apt/sources.list.d/yadedaily.list'
 
 
 - Ubuntu 20.04 **focal**::
@@ -135,10 +130,6 @@ Docker images are based on supported distributions:
 
 	docker run -it registry.gitlab.com/yade-dev/docker-prod:debian-trixie
 
-- Ubuntu 18.04 **bionic**::
-
-	docker run -it registry.gitlab.com/yade-dev/docker-prod:ubuntu18.04
-
 
 - Ubuntu 20.04 **focal**::
 
@@ -148,7 +139,7 @@ Docker images are based on supported distributions:
 
 	docker run -it registry.gitlab.com/yade-dev/docker-prod:ubuntu22.04
 
-- Ubuntu 24.04 **noble**:: (with only the `yadedaily` version)
+- Ubuntu 24.04 **noble** (with only the `yadedaily` version)::
 
 	docker run -it registry.gitlab.com/yade-dev/docker-prod:ubuntu24.04
 
@@ -178,6 +169,8 @@ and where the source code will be compiled. Here is an example for a folder stru
 		install/	## install folder; contains the executables
 
 
+.. _download:
+
 Download
 ^^^^^^^^^^
 
@@ -190,7 +183,7 @@ versions will not be updated (except for updates due to critical and
 easy-to-fix bugs), but generally they are more stable than the trunk.
 
 #. Releases can be downloaded from the `download page <https://gitlab.com/yade-dev/trunk/-/releases>`_, as compressed archive. Uncompressing the archive gives you a directory with the sources.
-#. The development version (``trunk``) can be obtained from the `code repository <https://gitlab.com/yade-dev/>`_ at GitLab.
+#. The development version (``trunk``) can be obtained from the `code repository <https://gitlab.com/yade-dev/trunk>`_ at GitLab.
 
 We use `GIT <http://git-scm.com/>`_ (the ``git`` command) for code
 management (install the ``git`` package on your system and create a `GitLab account <https://gitlab.com/users/sign_in>`__). From the top of of the above folder structure::
@@ -230,12 +223,12 @@ Following dependencies are for instance mandatory:
 
 They can be installed from the command line of your Linux distribution, assuming you have root privileges.
 
-**For Ubuntu 20.04, 18.04**, **Debian 9, 10, 11** and their derivatives, just copy&paste to the terminal the following code block for installing all mandatory and optional dependencies::
+**For Ubuntu 20.04, 22.04, 24.04**, **Debian 11, 12, 13** and their derivatives, just copy&paste to the terminal the following code block for installing all mandatory and optional dependencies::
 
 		sudo apt install cmake git freeglut3-dev libboost-all-dev fakeroot \
 		dpkg-dev build-essential g++ python3-dev python3-ipython python3-matplotlib \
 		libsqlite3-dev python3-numpy python3-tk gnuplot libgts-dev python3-pygraphviz \
-		libvtk6-dev libeigen3-dev python3-xlib python3-pyqt5 pyqt5-dev-tools python3-mpi4py \
+		libvtk9-dev libeigen3-dev python3-xlib python3-pyqt5 pyqt5-dev-tools python3-mpi4py \
 		python3-pyqt5.qtwebkit gtk2-engines-pixbuf python3-pyqt5.qtsvg libqglviewer-dev-qt5 \
 		python3-pil libjs-jquery python3-sphinx python3-git libxmu-dev libxi-dev libcgal-dev \
 		help2man libbz2-dev zlib1g-dev libopenblas-dev libsuitesparse-dev \
@@ -254,7 +247,7 @@ If you maintain your own dependency list for trixie/forky replace ``python3-pyqt
 	python3-pyqt5.qtwebengine
 
 
-Note: on Ubuntu 22.04 and newer, the VTK library should be ``libvtk9-dev`` instead of ``libvtk6-dev``.
+Note: on Ubuntu 20.04, the VTK library should be ``libvtk6-dev`` instead of ``libvtk9-dev``.
 
 Most of the list above is very likely already packaged for your distribution. In case you are still confronted
 with some errors concerning not available packages (e.g., package ``libmetis-dev`` is not available) it may be necessary
@@ -268,6 +261,8 @@ install by yourself the software packages listed above. Their names in other dis
 names of the Debian-packages.
 
 Some of the above packages are only required for some choice of Yade compilation options, for desired Yade features, in the subsequent ``cmake`` configuration of compilation. If a required package is eventually not installed the related features will be disabled automatically with a message appearing during ``cmake`` output (at the end, in particular). Generally speaking, it is advised to watch for notes and warnings/errors, which are shown by ``cmake`` in the following.
+
+.. _cmake_configuration:
 
 Compilation configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -334,20 +329,6 @@ Maintaining a consistent choice for options values, in addition to using the sam
 For using more extended parameters of cmake, please follow the corresponding
 documentation on `https://cmake.org/documentation <https://cmake.org/documentation/>`_.
 
-.. warning:: If you have Ubuntu 14.04 Trusty, you need to add -DCMAKE_CXX_FLAGS=-frounding-math
- during the configuration step of compilation (see below) or to install libcgal-dev
- from our `external PPA <https://launchpad.net/~yade-users/+archive/external/>`_.
- Otherwise the following error occurs on AMD64 architectures::
-
-    terminate called after throwing an instance of 'CGAL::Assertion_exception'
-    what():  CGAL ERROR: assertion violation!
-    Expr: -CGAL_IA_MUL(-1.1, 10.1) != CGAL_IA_MUL(1.1, 10.1)
-    File: /usr/include/CGAL/Interval_nt.h
-    Line: 209
-    Explanation: Wrong rounding: did you forget the  -frounding-math  option if you use GCC (or  -fp-model strict  for Intel)?
-    Aborted
-
-
 .. _yadeCompilation:
 
 Compilation and usage
@@ -404,27 +385,29 @@ feature will be disabled.
 Supported linux releases
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-`Currently supported <https://gitlab.com/yade-dev/trunk/pipelines?scope=branches>`_ [#buildLog]_ linux releases and their respective `docker <https://docs.docker.com/>`_ `files <https://docs.docker.com/engine/reference/builder/>`_ are:
+`Currently supported <https://gitlab.com/yade-dev/trunk/pipelines?scope=branches>`_ [#buildLog]_ linux releases for source code installation and their respective `docker <https://docs.docker.com/>`_ `files <https://docs.docker.com/engine/reference/builder/>`_ are:
 
-* `Ubuntu 18.04 bionic <https://gitlab.com/yade-dev/docker-yade/blob/ubuntu18.04/Dockerfile>`_
+* `Ubuntu 20.04 <https://gitlab.com/yade-dev/docker-yade/blob/ubuntu20.04/Dockerfile>`_
+* `Ubuntu 22.04 <https://gitlab.com/yade-dev/docker-yade/blob/ubuntu22.04/Dockerfile>`_
+* `Ubuntu 24.04 <https://gitlab.com/yade-dev/docker-yade/blob/ubuntu24.04/Dockerfile>`_
 * `openSUSE 15 <https://gitlab.com/yade-dev/docker-yade/blob/suse15/Dockerfile>`_
 
-These are the bash commands used to prepare the linux distribution and environment for installing and testing yade.
-These instructions are automatically performed using the `gitlab continuous integration <https://docs.gitlab.com/ee/ci/quick_start/>`_ service after
-each merge to master. This makes sure that yade always works correctly on these linux distributions.
-In fact yade can be installed manually by following step by step these instructions in following order:
+The above links include the bash commands used to prepare the linux distribution and environment for installing and testing Yade.
+During Yade development workflow, these instructions are automatically performed using the `gitlab continuous integration <https://docs.gitlab.com/ee/ci/quick_start/>`_ service after
+each merge to the master branch, which makes sure that Yade always works correctly on these linux distributions.
+In fact the above installation procedure closely corresponds to following step by step these instructions in following order:
 
 1. Bash commands in the respective Dockerfile to install necessary packages,
 
-2. do ``git clone https://gitlab.com/yade-dev/trunk.git``,
+2. do ``git clone https://gitlab.com/yade-dev/trunk.git``, just like in the previous :ref:`download` paragraph
 
-3. then the ``cmake_*`` commands in the `.gitlab-ci.yml file <https://gitlab.com/yade-dev/trunk/blob/master/.gitlab-ci.yml>`_ for respective distribution,
+3. then the ``cmake_*`` commands in the `.gitlab-ci.yml file <https://gitlab.com/yade-dev/trunk/blob/master/.gitlab-ci.yml>`_ for respective distribution, corresponding to previous :ref:`cmake_configuration` paragraph
 
-4. then the ``make_*`` commands to compile yade,
+4. then the ``make_*`` commands to compile yade, as per :ref:`yadeCompilation`
 
 5. and finally the ``--check`` and ``--test`` commands.
 
-6. Optionally documentation can be built with ``make doc`` command, however currently it is not guaranteed to work on all linux distributions due to frequent interface changes in `sphinx <http://www.sphinx-doc.org/en/master/>`_.
+6. Optionally documentation can be built with ``make doc`` command, as also explained in  :ref:`yadeCompilation`. However currently it is not guaranteed to work on all linux distributions due to frequent interface changes in `sphinx <http://www.sphinx-doc.org/en/master/>`_.
 
 These instructions use ``ccache`` and ``ld.gold`` to :ref:`speed-up compilation <speed-up>` as described below.
 

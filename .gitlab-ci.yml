@@ -232,16 +232,6 @@ variables:
 
 # 2.1 build stage
 
-make_18_04:
-  <<: *make_definition
-  <<: *skip_WIP
-  artifacts:
-    paths:
-      - install
-      - build
-    expire_in: 2 weeks
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-
 make_20_04:
   <<: *make_definition
   <<: *artifacts_definition
@@ -465,12 +455,13 @@ make_suse15:
     - echo $CXXFLAGS
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
 
+# TODO: prepare linux image for some newer distribution to do the *_nogui tests. And then remove the -DENABLE_CGAL=OFF flag.
 make_18_04_nogui:
   <<: *make_definition
   <<: *artifacts_definition
   <<: *skip_WIP_and_Draft
   before_script:
-    - export EXTRA_CMAKE_ARGS="-DENABLE_GUI=OFF $EXTRA_CMAKE_ARGS"
+    - export EXTRA_CMAKE_ARGS="-DENABLE_GUI=OFF -DENABLE_CGAL=OFF $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_nogui
 
@@ -562,14 +553,6 @@ make_SSE:
     when: always
     paths:
       - screenshots
-
-test_18_04:
-  <<: *test_definition
-  <<: *skip_WIP
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  dependencies:
-    - make_18_04
-  needs: ["make_18_04"]
 
 test_20_04:
   <<: *test_definition
@@ -944,14 +927,6 @@ test_22_foam10:
     - cat /etc/os-release
     - if grep -q "Arch Linux" /etc/lsb-release; then /usr/sbin/uname -m; else  /usr/bin/dpkg --print-architecture ; fi
   timeout: 35 minutes
-
-check_18_04:
-  <<: *check_definition
-  <<: *skip_WIP
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  dependencies:
-    - make_18_04
-  needs: ["make_18_04"]
 
 check_20_04:
   <<: *check_definition
@@ -1334,13 +1309,6 @@ deb_forky_mpfr150:
     - export PREC_NAME="-mpfr150"
     - ./scripts/ppa_ci/builddeb.py -d "forky" -p "mpfr150"
   timeout: 9 hours
-
-deb_bionic:
-  <<: *deb_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  before_script:
-    - rm -rf ./deb
-    - ./scripts/ppa_ci/builddeb.py -d "bionic"
 
 deb_focal:
   <<: *deb_definition
