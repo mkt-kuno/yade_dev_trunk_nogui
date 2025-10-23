@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-for i in bionic bullseye focal jammy bookworm trixie noble forky
+for i in bullseye focal jammy bookworm trixie noble forky
 do
     aptly repo create -distribution=$i -component=main yadedaily-$i
 done

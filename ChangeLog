@@ -90,6 +90,7 @@ Packaging & Build Improvements
   Fix detection of eigen 5.0.0, fix #384 (!1130)
   Enable -Wmaybe-uninitialized useful compiler error. This should be really helpful (!1132)
   Remove support for ubuntu 18.04 Bionic Beaver (!1138)
+  Remove packaging support for ubuntu 18.04 Bionic Beaver (!1140)
 
 Small Enhancements
 ******************
