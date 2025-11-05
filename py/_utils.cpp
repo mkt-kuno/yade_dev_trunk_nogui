@@ -938,8 +938,8 @@ try {
 	        Shop__getStressAndTangent,
 	        (py::args("volume") = 0, py::args("symmetry") = true),
 	        "Compute overall stress of periodic cell using the same equation as function getStress. In addition, the tangent operator is calculated using "
-	        "the equation published in [Kruyt and Rothenburg1998]_:\n\n.. math:: S_{ijkl}=\\frac{1}{V}\\sum_{c}(k_n n_i l_j n_k l_l + k_t t_i l_j t_k "
-	        "l_l)\n\n Although the above formula gives the elements of the fourth-order stiffness tensor, this tangent operator will be returned in Voigt "
+	        "the equation published in [Kruyt and Rothenburg1998]_:\n\n $S_{ijkl}=\\frac{1}{V}\\sum_{c}(k_n n_i l_j n_k l_l + k_t t_i l_j t_k l_l)$"
+	        "\n\n Although the above formula gives the elements of the fourth-order stiffness tensor, this tangent operator will be returned in Voigt "
 	        "notation, giving a 6 by 6 tensor, where elements of $S_{ijkl}$ mapping to the same Voigt element will be averaged.\n\n:param float volume:"
 	        " same as in function getStress\n:param bool symmetry: make the tensors symmetric.\n\n:return: macroscopic stress tensor and tangent operator"
 	        " as py::tuple");

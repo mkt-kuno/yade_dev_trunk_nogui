@@ -1098,7 +1098,7 @@ Real Shop::getVoidRatio2D(const shared_ptr<Scene>& _scene, Real _zlen)
 }
 
 /*! Added function to get stress tensor and tangent operator tensor. By Ning Guo */
-py::tuple Shop::getStressAndTangent(Real volume, bool /*symmetry*/)
+py::tuple Shop::getStressAndTangent(Real volume, bool symmetry)
 {
 	Scene* scene = Omega::instance().getScene().get();
 	if (volume == 0) volume = scene->isPeriodic ? scene->cell->hSize.determinant() : 1;
@@ -1193,6 +1193,13 @@ py::tuple Shop::getStressAndTangent(Real volume, bool /*symmetry*/)
 		tangent(5, 5)
 		        += kN * (n[0] * branch[1] * n[0] * branch[1] + n[0] * branch[1] * n[1] * branch[0] * 2 + n[1] * branch[0] * n[1] * branch[0]) * 0.25
 		        + kT * (t[0] * branch[1] * t[0] * branch[1] + t[0] * branch[1] * t[1] * branch[0] * 2 + t[1] * branch[0] * t[1] * branch[0]) * 0.25;
+	}
+	if (symmetry){ // Populate the lower half of the stiffness tensor as well
+		for (int i = 0; i < 6; ++i) {
+   		 	for (int j = i + 1; j < 6; ++j) {
+        		tangent(j, i) = tangent(i, j);
+    		}
+		}
 	}
 	stress /= volume;
 	tangent /= volume;

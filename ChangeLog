@@ -10,6 +10,7 @@ Bug Fixes
   Fix Archlinux compilation (!1109)
   Fix a bug that would make PFV solver crash with too many spheres(!1113)
   Fix information leakage between polyhedra interactions that was caused by 'shearForce' declaration in the 'Law2_PolyhedraGeom_PolyhedraPhys_Volumetric' class (!1131)
+  Provide lower half of stiffness tensor as well in getStressAndTangent() (!1139)
 
 Code Formatting & Organization
 ******************************
@@ -30,6 +31,7 @@ Documentation & Comments
   Improve README wording: grammar, capitalization (C++/Python), hyphenation, clearer link labels
   Removing a typo in spherical orientation time integration (!1133)
   Add comment to the documentation (and README of checks) recommending against using O.pause() in check scripts (!1131)
+  Clarify documentation of shear deformation, typo and layout fixes (!1139)
 
 Examples
 ********

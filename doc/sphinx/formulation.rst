@@ -321,7 +321,7 @@ Such definition, however, has the disadvantage of effectively increasing rigidit
 
 Shear deformation
 -----------------
-In order to keep $\vec{u}_T$ consistent (e.g. that $\vec{u}_T$ must be constant if two spheres retain mutually constant configuration but move arbitrarily in space), then either $\vec{u}_T$ must track spheres' spatial motion or must (somehow) rely on sphere-local data exclusively.
+The shear deformation (or displacement) between two particles must be computed incrementally to facilitate plasticity such as sliding in the Mohr-Coulomb friction model. Moreover, if two particles in contact are subject to a pure rigid-body motion, thereby maintaining the same relative orientation (e.g. overlap distance and shear), then $\vec{u}_T$ must still either track the spheres' spatial motion or must rely exclusively on sphere-local data.
 
 Geometrical meaning of shear strain is shown in `fig-shear-2d`_.
 
@@ -330,9 +330,9 @@ Geometrical meaning of shear strain is shown in `fig-shear-2d`_.
 	
 	Evolution of shear displacement $\vec{u}_T$ due to mutual motion of spheres, both linear and rotational. Left configuration is the initial contact, right configuration is after displacement and rotation of one particle.
 
-The classical incremental algorithm is widely used in DEM codes and is described frequently ([Luding2008]_, [Alonso2004]_). Yade implements this algorithm in the :yref:`ScGeom` class. At each step, shear displacement $\uT$ is updated; the update increment can be decomposed in 2 parts: motion of the interaction (i.e. $\vec{C}$ and $\vec{n}$) in global space and mutual motion of spheres.
+The classical incremental algorithm is widely used in DEM codes and is described frequently ([Luding2008]_, [Alonso2004]_). Yade implements this algorithm in the :yref:`ScGeom` class. At each step, the shear displacement $\uT$ is updated; the update increment can be decomposed in 2 parts: motion of the interaction (i.e. $\vec{C}$ and $\vec{n}$) in global space and mutual motion of spheres.
 
-#. Contact moves dues to changes of the spheres' positions $\vec{C}_1$ and $\vec{C}_2$, which updates current $\currC$ and $\currn$ as per :eq:`eq-contact-point` and :eq:`eq-contact-normal`. $\prevuT$ is perpendicular to the contact plane at the previous step $\prevn$ and must be updated so that $\prevuT+(\Delta\uT)=\curruT\perp\currn$; this is done by perpendicular projection to the plane first (which might decrease $|\uT|$) and adding what corresponds to spatial rotation of the interaction instead:
+#. Correcting for rigid-body motion. The orientation of the contact changes dues to changes in the spheres' positions $\vec{C}_1$ and $\vec{C}_2$, thereby updating the current $\currC$ and $\currn$ as per :eq:`eq-contact-normal` and :eq:`eq-contact-point`, as well as their orientations. The vector $\prevuT$ is parallel to the contact plane at the previous step $\prevn$ and must be updated so that $\prevuT+(\Delta\uT)=\curruT\perp\currn$ to correct for the tilt of the contact plane. Additionally, there can be a spin around the contact normal, which also needs to be accounted for. The update is done by projecting $\uT$ onto the new contact plane first and then adding the rotation of the interaction around the new normal. Both of these are approximations, particularly the projection as it might decrease $|\uT|$.
   
    .. math::
       :nowrap:
@@ -342,7 +342,7 @@ The classical incremental algorithm is widely used in DEM codes and is described
          (\Delta \uT)_2&=-\prevuT\times\left(\frac{\Delta t}{2} \currn \cdot (\pprev{\vec{\omega}}_1+\pprev{\vec{\omega}}_2)\right) \currn
       \end{align*}
 
-#. Mutual movement of spheres, using only its part perpendicular to $\currn$; $\vec{v}_{12}$ denotes mutual velocity of spheres at the contact point:
+#. Accounting for the relative movement between the spheres, using only its part perpendicular to $\currn$; $\vec{v}_{12}$ denotes relative velocity of spheres at the contact point:
 
    .. math::
       :nowrap:
