@@ -32,6 +32,7 @@ Documentation & Comments
   Removing a typo in spherical orientation time integration (!1133)
   Add comment to the documentation (and README of checks) recommending against using O.pause() in check scripts (!1131)
   Clarify documentation of shear deformation, typo and layout fixes (!1139)
+  TriaxialStressController doc updates regarding axes numbering and max_vel (!1141)
 
 Examples
 ********
