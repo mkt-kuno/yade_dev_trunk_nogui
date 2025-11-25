@@ -42,7 +42,7 @@ par=argparse.ArgumentParser(usage='%s [options] [ simulation.xml[.bz2] | script.
   and interfaces. Python is used for rapid and concise scene construction, \
   simulation control, postprocessing and debugging.\
   Available features: %s.\
-  Homepage http://www.yade-dem.org, code hosted at http://www.launchpad.net/yade."%features
+  Homepage http://www.yade-dem.org, code hosted at https://gitlab.com/yade-dev/trunk."%features
   )
 par.add_argument('-v','--version',help='Print version and exit.',dest='version',action='store_true')
 par.add_argument('-j','--threads',help='Number of OpenMP threads to run; defaults to 1. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type=int)
