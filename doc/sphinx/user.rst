@@ -802,6 +802,13 @@ Conversely, modifying the position directly is likely to break Yade's algorithms
 	O.bodies[0].state.blockedDOFs='x'
 	O.bodies[0].state.pos=10*O.dt #REALLY BAD! Don't assign position
 
+.. _InitialAngularVelocity:
+
+Initial (angular) velocity
+^^^^^^^^^^^^^^^^
+
+The above assignment of linear or angular velocities may also serve as initial conditions for :yref:`dynamic<Body.dynamic>` ones, where extra care has to be taken for :yref:`aspherical<Body.aspherical>` bodies, depending on the choice of the corresponding :yref:`integration algorithm<NewtonIntegrator.rotAlgorithm>`. Because of the algorithm internals described at :ref:`orientation_aspherical`, an initial :yref:`angular momentum<State.angMom>` (function of the desired initial angular velocity and of the :yref:`inertia tensor<State.inertia>̀`) has to be assigned instead of an initial angular velocity (that would have no effect) when using the 'Fincham1992' integration algorithm. On the other hand, angular velocities are to be directly initialized with the other two algorithms: 'delValle2023' and 'Omelyan1999'.
+
 Imposed force
 ^^^^^^^^^^^^^
 

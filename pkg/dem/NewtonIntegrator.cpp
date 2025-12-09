@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include <lib/base/Math.hpp>
+#include <lib/base/LoggingUtils.hpp> // LOG_WARN_ONCE
 #include <lib/high-precision/Constants.hpp>
 #include <lib/serialization/EnumSupport.hpp>
 #include <core/Clump.hpp>
@@ -375,7 +376,10 @@ void NewtonIntegrator::leapfrogAsphericalRotateOmelyan_1998(State* state, const 
 	//if(scene->isPeriodic && homoDeform) {state->angVel+=dSpin;}
 	Matrix3r A = state->ori.conjugate().toRotationMatrix(); // rotation matrix from global to local r.f.
 	Vector3r w = A * state->angVel;                         // local angular velocity at time n
-	if (densityScaling) w *= state->densityScaling;
+	if (densityScaling) {
+		w *= state->densityScaling;
+		LOG_WARN_ONCE("Using NewtonIntegrator density scaling together with Omelyan1998 time integration algorithm shall currently be considered as highly experimental");
+	}
 	Vector3r       ww  = w;              // auxiliar vector
 	const Vector3r II  = state->inertia; // auxiliar Inertia tensor vector
 	const Vector3r tau = A * M;          // Torque in the local reference frame
@@ -418,14 +422,15 @@ void NewtonIntegrator::leapfrogAsphericalRotateCarlos_2023(State* state, const R
 	//if(scene->isPeriodic && homoDeform) {state->angVel+=dSpin;}
 	Matrix3r A = state->ori.conjugate().toRotationMatrix(); // rotation matrix from global to local r.f.
 	Vector3r w = A * state->angVel;                         // local angular velocity at time n
-	if (densityScaling) w *= state->densityScaling;
 	const Vector3r tau = A * M; // Torque in the local reference frame
 
 	// Calculate angular velocity at time n + 1/2, solve nonlinear system of equations.
 	const Vector3r K1 = dt * w_dot(w, tau, state->inertia);
 	const Vector3r K2 = dt * w_dot(w + K1, tau, state->inertia);
 	const Vector3r K3 = dt * w_dot(w + 0.25 * (K1 + K2), tau, state->inertia);
-	w += (K1 + K2 + 4.0 * K3) / 6.0;
+	Vector3r w_increment( (K1 + K2 + 4.0 * K3) / 6.0); // increment in angular velocity as per Eq. (9) of delValle2023
+	if(densityScaling) w_increment *= state->densityScaling;
+	w += w_increment;
 
 	// Update orientation q(t + dt)
 	Real w_Norm = w.squaredNorm();
@@ -436,12 +441,12 @@ void NewtonIntegrator::leapfrogAsphericalRotateCarlos_2023(State* state, const R
 	}
 
 	if (iter % normalizeEvery
-	    == 0) // Just as a safety messure. In theory this is not needed. The formulation preserves the norm. In my tests 10 k was fine, but just in case use 5k
+	    == 0) // Just as a safety measure. In theory this is not needed. The formulation preserves the norm
 		state->ori.normalize(); // This operation is expensive, we dont want to do it every time step.
 
 	// Update angular velocity
-	if (densityScaling) w *= state->densityScaling;
 	state->angMom = A.transpose() * w.cwiseProduct(state->inertia); // global angular momentum at time n + 1/2
+	if (densityScaling) state->angMom /= state->densityScaling;     // leapfrogAsphericalRotate keeps state->angMom unaffected by density scaling, let us do the same here (by reverting the artificial increase in w)
 	state->angVel = A.transpose() * w;                              // global angular velocity at time n + 1/2
 }
 
@@ -482,8 +487,10 @@ void NewtonIntegrator::set_densityScaling(bool dsc)
 }
 
 
-// http://www.euclideanspace.com/physics/kinematics/angularvelocity/QuaternionDifferentiation2.pdf
+// http://www.euclideanspace.com/physics/kinematics/angularvelocity/QuaternionDifferentiation2.pdf, Eq. (17)
 Quaternionr NewtonIntegrator::DotQ(const Vector3r& angVel, const Quaternionr& Q)
+// Returns time derivative of our orientation quaternion, with angVel including the coefficients of angular velocity in body frame
+// See also Eq. (6b-c) of Fincham1992
 {
 	Quaternionr dotQ;
 	dotQ.w() = (-Q.x() * angVel[0] - Q.y() * angVel[1] - Q.z() * angVel[2]) / 2;

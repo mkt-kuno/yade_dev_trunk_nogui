@@ -76,9 +76,9 @@ public:
 		((Vector3r,gravity,Vector3r::Zero(),,"Gravitational acceleration (effectively replaces GravityEngine)."))
 		((Real,maxVelocitySq,0,,"stores max. displacement, based on which we trigger collision detection. |yupdate|"))
 		((bool,exactAsphericalRot,true,,"Enable more exact body rotation integrator for :yref:`aspherical bodies<Body.aspherical>` *only*, using formulations from [delValle2023]_, [Omelyan1998]_, or [Fincham1992]_ depending on :yref:`rotAlgorithm<NewtonIntegrator.rotAlgorithm>`"))
-		((RotAlgorithm,rotAlgorithm,RotAlgorithm::delValle2023,,"Which rotation algorithm to use. Options are: delValle2023, Omelyan1998, Fincham1992."))
-		((int,normalizeEvery,5000,,"Normalize the quaternion every normalizeEvery step. Only used in the aspherical formulations from [delValle2023]_, [Omelyan1998]_."))
-		((int,niterOmelyan1998,3,,"The number of iterations used to solve the nonlinear system of [Omelyan1998]_ formulation. Provided a small enough timestep, three iterations are enough to make the system converge."))
+		((RotAlgorithm,rotAlgorithm,RotAlgorithm::delValle2023,,"Which rotation algorithm to use. Options are: 'delValle2023', 'Omelyan1998', 'Fincham1992'. The choice also impacts the expected ways for defining initial angular velocities, if any, see :ref:`InitialAngularVelocity`."))
+		((int,normalizeEvery,5000,,"Normalize the quaternion every normalizeEvery step. Only used in the aspherical formulations from [delValle2023]_, [Omelyan1998]_.")) // In my (= C.A. del Valle) tests 10 k was fine, but just in case use 5k
+		((int,niterOmelyan1998,3,,"The number of iterations used to solve the nonlinear system of [Omelyan1998]_ formulation in case the latter is chosen as a :yref:`rotational integration algorithm<NewtonIntegrator.rotAlgorithm>`. Provided a small enough timestep, three iterations are enough to make the system converge."))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),,"Store previous velocity gradient (:yref:`Cell::velGrad`) to track average acceleration in periodic simulations. |yupdate|"))
 		#ifdef YADE_BODY_CALLBACK
 			((vector<shared_ptr<BodyCallback> >,callbacks,,,"List (std::vector in c++) of :yref:`BodyCallbacks<BodyCallback>` which will be called for each body as it is being processed."))

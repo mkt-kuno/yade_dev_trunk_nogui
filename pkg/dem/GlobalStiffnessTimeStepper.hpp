@@ -49,7 +49,7 @@ public:
 #ifdef YADE_MPI 
 			((bool,parallelMode,false,,"if parallelMode, dt is set to min of all subdomain dt. "))
 #endif			
-			((Real,targetDt,1,,"if :yref:`NewtonIntegrator::densityScaling` is active, this value will be used as the simulation  timestep and the scaling will use this value of dt as the target value. The value of targetDt is arbitrary and should have no effect in the result in general. However if some bodies have imposed velocities, for instance, they will move more or less per each step depending on this value."))
+			((Real,targetDt,1,,"if :yref:`NewtonIntegrator::densityScaling` is active, this value will be used as the simulation  timestep and a mass density scaling will use this value of dt as the target value. The value of targetDt is arbitrary and should have no effect in the result in general. However if some bodies have imposed velocities, for instance, they will move more or less per each step depending on this value."))
 			((bool,viscEl,false,,"To use with :yref:`ViscElPhys`. if True, evaluate separetly the minimum eigen-period in the problem considering only the elastic contribution on one hand (spring only), and only the viscous contribution on the other hand (dashpot only). Take then the minimum of the two and use the safety coefficient :yref:`GlobalStiffnessTimestepper::timestepSafetyCoefficient` to take into account the possible coupling between the two contribution.")),
 			computedOnce=false;)
 	// clang-format on

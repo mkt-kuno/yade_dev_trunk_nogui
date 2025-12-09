@@ -462,7 +462,7 @@ Orientation
 YADE has three different algorithms for integrating the rotational motion of non-spherical particles and one for spherical particles. 
 
 Orientation (spherical)
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Updating particle orientation $\curr{q}$ proceeds in an analogous way to position update. First, we compute current angular acceleration $\curraaccel$ from known current torque $\vec{T}$. For spherical particles where the inertia tensor is diagonal in any orientation (therefore also in current global orientation), satisfying $\vec{I}_{11}=\vec{I}_{22}=\vec{I}_{33}$, we can write
 
 .. math:: \curraaccel_i=\vec{T}_i/\vec{I}_{11},
@@ -485,15 +485,17 @@ Finally, we compute the next orientation $\next{q}$ by rotation composition
 
 .. math:: \next{q}=\Delta q\curr{q}.
 
+.. _orientation_aspherical:
+
 Orientation (aspherical)
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Integrating the rotation of aspherical particles is considerably more complicated than their position, as their local reference frame is not inertial. Rotation of rigid body in the local frame, where inertia matrix $\mat{I}$ is diagonal, is described in the continuous form by Euler's equations ($i\in\{1,2,3\}$ and $i$, $j$, $k$ are subsequent indices):
 
 .. math:: \vec{T}_i=\mat{I}_{ii}\dot{\vec{\omega}}_i+(\mat{I}_{kk}-\mat{I}_{jj})\vec{\omega}_j\vec{\omega}_k.
 
 Due to the presence of both $\vec{\omega}$ and $\dot{\vec{\omega}}$, the equation cannot be solved using the standard leapfrog algorithm (that was the case for translational motion and also for the spherical bodies' rotation where this equation reduced to $\vec{T}=\mat{I}\dot{\vec{\omega}}$). The different integration algorithms for non-spherical particles can be selected using the :yref:`NewtonIntegrator.rotAlgorithm` argument of the :yref:`NewtonIntegrator`. 
 
-The default algorithm and the most accurate one was proposed by [delValle2023]_. The algorithm uses a leapfrog formulation that conserves the norm of the quaternion. [Omelyan1998]_, a more general version of [Omelyan1999]_ algorithm, is also implemented. Previously, YADE used the algorithm described by [Allen1989]_ (pg. 84--89) and designed by [Fincham1992]_ for molecular dynamics problems; it consists of extending the leapfrog algorithm by mid-step/on-step estimators of quantities known at on-step/mid-step points in the basic formulation. Although it has received criticism and more precise algorithms were known ([Omelyan1999]_, [Neto2006]_, [Johnson2008]_), this algorithm is implemented in Yade for its relative simplicity.
+The default algorithm and the most accurate one was proposed by [delValle2023]_. The algorithm uses a leapfrog formulation that conserves the norm of the quaternion. [Omelyan1998]_, a more general version of [Omelyan1999]_ algorithm, is also implemented. Previously, YADE used the algorithm described by [Allen1989]_ (pg. 84--89) and designed by [Fincham1992]_ for molecular dynamics problems; it consists of extending the leapfrog algorithm by mid-step/on-step estimators of quantities known at on-step/mid-step points in the basic formulation. Although it has received criticism and more precise algorithms were known (such as the previous [Omelyan1999]_ or also [Neto2006]_, [Johnson2008]_), this algorithm had been implemented in Yade for its relative simplicity.
 
 .. Finchman: Leapfrog Rotational Algorithms: http://www.informaworld.com/smpp/content~content=a756872469&db=all
     Schvanberg: Leapfrog Rotational Algorithms: http://www.informaworld.com/smpp/content~content=a914299295&db=all
@@ -511,7 +513,7 @@ For a given particle, we know
 
 
 SPIRAL Algorithm ([delValle2023]_)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""""
 
 Our goal is to compute new values of the latter three, that is, $\nnext{\vec{L}}$, $\next{q}$, $\nnext{\vec{\omega}}$. We first estimate the current angular velocity:
 
@@ -548,7 +550,7 @@ where the quantity inside the parenthesis is a quaternion represented by its sca
 
 
 Omelyan Algorithm
-^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""""
 [Omelyan1999]_ algorithm is also a leapfrog formulation. However, note that in a leapfrog formulation, we require the mid-step velocity and the current derivative of the velocity. But, in the case of Euler's equation, the current angular acceleration depends on the current angular velocity, which is unknown. Then, Omelyan proposes to interpolate the current angular velocity product as $\curr{\locframe{\vec{\omega}}}_j\curr{\locframe{\vec{\omega}}}_k \approx \frac{1}{2}(\pprev{\locframe{\vec{\omega}}}_j\pprev{\locframe{\vec{\omega}}}_k + \nnext{\locframe{\vec{\omega}}}_j\nnext{\locframe{\vec{\omega}}}_k)$. This leads to a non-linear system of equations that can efficiently be solved by iteration:
 
 .. math::
@@ -601,9 +603,9 @@ where $\nnext{\locframe{\omega}}$ is a quaternion with a real part equal to zero
 In the same way as the last algorithm, it is a third-order approximation, and the formulation is orthonormal, meaning that the norm of the quaternion is conserved. However, this formulation is numerically not as stable as the previous one.
 
 Fincham Algorithm
-^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""""
 
-Unlike the other two algorithms, [Fincham1992]_ does not conserve the norm of the quaternion. Then, :yref:`NewtonIntegrator.normalizeEvery` has no effect over this algorithm. This algorithm is second-order. The algorithm goes as follows: first, we estimate the current angular momentum and compute the current local angular velocity:
+Unlike the other two algorithms, [Fincham1992]_ does not conserve the norm of the quaternion, which is thus automatically re-normalized at every time step, regardless of :yref:`NewtonIntegrator.normalizeEvery`. This algorithm is second-order and, unlike the two other, makes a direct use of angular momentum to deduce angular velocity in a second step. Because of this, its usage requires to assign :yref:`angular momentum<State.angMom>` instead of angular velocity if an initial rotational movement is to be defined for a :yref:`dynamic<Body.dynamic>` body (see also :ref:`InitialAngularVelocity`). It namely goes as follows: first, we estimate the current angular momentum and compute the current local angular velocity:
 
 .. math::
     :nowrap:

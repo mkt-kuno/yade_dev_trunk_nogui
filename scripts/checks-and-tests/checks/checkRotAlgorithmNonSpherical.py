@@ -1,7 +1,8 @@
+## Check test for aspherical rotation integration algorithms of NewtonIntegrator, as per § 3. of delValle2024
 import yade.math as mth
 import yade.minieigenHP as mne
 
-# We have a spinning cylinder
+# We have a spinning cylinder (of axis of symmetry = x)
 rho = mth.Real("7750.0")
 Rad = mth.Real("0.05")  # 5 cm
 Height = mth.Real("0.15")  # 15 cm
@@ -12,7 +13,7 @@ Ix = mth.Real("0.5") * Mass * Rad * Rad
 Iy = Mass * Height * Height / 12 + mth.Real("0.25") * Mass * Rad * Rad
 Iz = Iy
 
-# torque
+# Applied torque (along x-axis)
 tx = Rad * mth.Real("0.5")
 
 # Initial angular velocity (rad/s)
@@ -24,6 +25,7 @@ ID = 0
 
 
 def calError():
+	'''Logarithm of the relative error on angular velocity, at current O.time'''
 	R = O.bodies[ID].state.ori.conjugate().toRotationMatrix()
 	w = R * O.bodies[ID].state.angVel
 	ww = sol_w(O.time)
@@ -37,7 +39,8 @@ def setTorque():
 
 
 def sol_w(t):
-	A = (Ix - Iy) * (Iz - Ix) / (Iy * Iz)
+	'''Theoretical value for angular velocity vector at given time *t*, see Eq. (11) of delValle2024'''
+	A = (Ix - Iy) * (Iz - Ix) / (Iy * Iz) # this is < 0 (approx. - 0.25)
 	B = Iy / (Iz - Ix)
 	sqrt_A = mth.sqrt(-A)
 	E = mth.Real("2.0") * tx * B / Ix
@@ -66,7 +69,7 @@ def setup():
 
 	# Make it non spherical and put it to spin
 	Body.aspherical = True
-	Body.state.ori = mne.Quaternion(1.0, 0.0, 0.0, 0.0)
+	Body.state.ori = mne.Quaternion(1.0, 0.0, 0.0, 0.0) # the script does not seem to accomodate sthg else than identity. Failure with, e.g., Quaternion(3**(-0.5)*Vector3.Ones,pi/6) on version 58738755
 	Body.state.inertia = mne.Vector3(Ix, Iy, Iz)
 	Body.state.angVel = sol_w(mth.Real("0.0"))
 	Body.state.angMom = mne.Matrix3(Body.state.inertia) * mne.Vector3(wx0, wy0, wz0)

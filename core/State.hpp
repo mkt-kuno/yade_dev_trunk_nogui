@@ -62,7 +62,7 @@ public:
 		((Quaternionr,refOri,Quaternionr::Identity(),,"Reference orientation"))
 		((unsigned,blockedDOFs,,,"[Will be overridden]"))
 		((bool,isDamped,true,,"Damping in :yref:`NewtonIntegrator` can be deactivated for individual particles by setting this variable to FALSE. E.g. damping is inappropriate for particles in free flight under gravity but it might still be applicable to other particles in the same simulation."))
-		((Real,densityScaling,-1,,"|yupdate| see :yref:`GlobalStiffnessTimeStepper::targetDt`."))
+		((Real,densityScaling,-1,,"Multiplicative coefficient to reflect an artificial change in mass density (as per :yref:`GlobalStiffnessTimeStepper.targetDt`) which :yref:`NewtonIntegrator` (depending on the corresponding option :yref:`NewtonIntegrator.densityScaling`) will reflect into :yref:`linear<State.vel>` and :yref:`angular velocities<State.angVel>` (but not :yref:`angular momentum<State.angMom>` that still corresponds to the unbiaised inertia tensor) as a multiplicative coefficient |yupdate|."))
 #ifdef YADE_SPH
 		((Real,rho, -1.0,/*Attr::readonly*/, "Current density (only for SPH-model)"))      // [Mueller2003], (12)
 		((Real,rho0,-1.0,/*Attr::readonly*/, "Rest density (only for SPH-model)"))         // [Mueller2003], (12)

@@ -1360,7 +1360,7 @@ try {
 	                "stopAtIter", &pyOmega::stopAtIter_get, &pyOmega::stopAtIter_set, "Get/set number of iteration after which the simulation will stop.")
 	        .add_property("stopAtTime", &pyOmega::stopAtTime_get, &pyOmega::stopAtTime_set, "Get/set time after which the simulation will stop.")
 	        .add_property("time", &pyOmega::time, "Return virtual (model world) time of the simulation.")
-	        .add_property("realtime", &pyOmega::realTime, "Return clock (human world) time the simulation has been running.")
+	        .add_property("realtime", &pyOmega::realTime, "Return clock (human world) time the simulation has been running, in seconds.")
 	        .add_property("speed", &pyOmega::speed, "Return current calculation speed [iter/sec].")
 	        .add_property(
 	                "dt",
@@ -1474,7 +1474,7 @@ try {
 	                "interactions",
 	                &pyOmega::interactions_get,
 	                "Access to :yref:`interactions<Interaction>` of simulation, by using \n\n#. id's of both :yref:`Bodies<Body>` of the interactions, "
-	                "e.g. ``O.interactions[23,65]``\n#. iteraction over the whole container::\n\n\tfor i in O.interactions: print i.id1,i.id2\n\n.. "
+	                "e.g. ``O.interactions[23,65]``\n#. iteration over the whole container::\n\n\tfor i in O.interactions: print i.id1,i.id2\n\n.. "
 	                "note::\n\tIteration silently skips interactions that are not :yref:`real<Interaction.isReal>`.")
 	        .add_property("materials", &pyOmega::materials_get, "Shared materials; they can be accessed by id or by label")
 	        .add_property("forces", &pyOmega::forces_get, ":yref:`ForceContainer` (forces, torques) in the current simulation.")
