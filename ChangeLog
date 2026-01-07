@@ -40,8 +40,9 @@ Documentation & Comments
 Examples
 ********
 
-   Two examples of Bayesian calibration: one for particle-particle collision and one for triaxial compression (!1098)
-
+  Two examples of Bayesian calibration: one for particle-particle collision and one for triaxial compression (!1098)
+  Adding examples for particle coating. (!1143)
+  
 User Interface (GUI)
 ********************
 
@@ -57,6 +58,7 @@ Clumps
 
 Fluid & thermal & particle saturation
 -------------------------------------
+  Introducing particle coating feature (so called 'segmented bodies'). Fluid volume / film volume is modelled implicitly. (!1143)
 
 LevelSet & Volume-interacting LevelSet
 --------------------------------------
