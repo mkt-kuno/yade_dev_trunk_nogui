@@ -151,24 +151,24 @@ namespace CGT {
 		bool             factorExists;
 #ifdef PFV_GPU
 #define CHOLMOD(name) cholmod_l_##name
-		void add_T_entry(cholmod_triplet* T, long r, long c, Real x)
+		void add_T_entry(cholmod_triplet* triplet, long r, long c, Real value)
 		{
-			size_t k = T->nnz;
-			((long*)T->i)[k] = r;
-			((long*)T->j)[k] = c;
-			((Real*)T->x)[k] = x;
-			T->nnz++;
+			size_t k = triplet->nnz;
+			((long*)triplet->i)[k] = r;
+			((long*)triplet->j)[k] = c;
+			((Real*)triplet->x)[k] = value;
+			triplet->nnz++;
 		}
 #else
 #define CHOLMOD(name) cholmod_##name
-		void add_T_entry(cholmod_triplet* T2, int r, int c, Real x2)
+		void add_T_entry(cholmod_triplet* triplet, int r, int c, Real value)
 		// declaration of ‘T’ shadows a member of ‘yade::CGT::FlowBoundingSphereLinSolv<_Tesselation, FlowType>’ [-Werror=shadow]
 		{
-			size_t k = T2->nnz;
-			((int*)T2->i)[k] = r;
-			((int*)T2->j)[k] = c;
-			((Real*)T2->x)[k] = x2;
-			T2->nnz++;
+			size_t k = triplet->nnz;
+			((int*)triplet->i)[k] = r;
+			((int*)triplet->j)[k] = c;
+			((Real*)triplet->x)[k] = value;
+			triplet->nnz++;
 		}
 #endif
 		void CHOLMOD(wildcard)() { cout << "using cholmod in form of " << __func__ << endl; };

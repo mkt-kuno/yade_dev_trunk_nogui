@@ -42,7 +42,7 @@ Examples
 
   Two examples of Bayesian calibration: one for particle-particle collision and one for triaxial compression (!1098)
   Adding examples for particle coating. (!1143)
-  
+
 User Interface (GUI)
 ********************
 
@@ -98,6 +98,7 @@ Packaging & Build Improvements
   Enable -Wmaybe-uninitialized useful compiler error. This should be really helpful (!1132)
   Remove support for ubuntu 18.04 Bionic Beaver (!1138)
   Remove packaging support for ubuntu 18.04 Bionic Beaver (!1140)
+  Fix some compilation errors (!1148)
 
 Small Enhancements
 ******************

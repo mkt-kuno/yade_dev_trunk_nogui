@@ -110,6 +110,10 @@ public:
 	typedef std::vector<CellHandle>                    VectorCell;
 	typedef typename VectorCell::iterator              VCellIterator;
 
+	// Bring base class overloads into scope to avoid hiding
+	using PartialSatClayEngineT::buildTriangulation;
+	using PartialSatClayEngineT::trickPermeability;
+
 public:
 	//PartialSatClayEngineT* clayFlow;
 	shared_ptr<FlowSolver> gas_solver;

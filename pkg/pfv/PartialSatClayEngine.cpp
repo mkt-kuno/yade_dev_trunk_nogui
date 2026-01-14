@@ -67,7 +67,7 @@ void PartialSatClayEngine::action()
 		if (debug) cout << "about to build triangulation" << endl;
 		if (multithread)
 			setPositionsBuffer(false);
-		buildTriangulation(pZero, *solver);
+		buildTriangulation(pZero, *solver, false);
 		//if (debug) cout <<"about to add alphatopositionsbuffer" << endl;
 		if (alphaBound >= 0) addAlphaToPositionsBuffer(true);
 		if (debug) cout << "about to initializevolumes" << endl;
@@ -229,7 +229,7 @@ void PartialSatClayEngine::action()
 	{
 		if (updateTriangulation && !first) {
 			if (debug) cout << "building tri" <<endl;
-			buildTriangulation(pZero, *solver);
+			buildTriangulation(pZero, *solver, false);
 			if (debug) cout << "adding alpha to posbuf" <<endl;
 			if (alphaBound >= 0) addAlphaToPositionsBuffer(true);
 			if (debug) cout << "initializing volumes" <<endl;
