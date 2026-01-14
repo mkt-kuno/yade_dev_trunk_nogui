@@ -538,7 +538,7 @@ It is possible to create an interaction between a pair of particles independentl
 	# created by functors in InteractionLoop
 	Yade [2]: i.geom, i.phys
 
-This method will be rather slow if many interactions are to be created (the functor lookup will be repeated for each of them). In such case, ask on yade-dev@lists.launchpad.net to have the :yref:`createInteraction<yade._utils.createInteraction>` function accept list of pairs id's as well.
+This method will be rather slow if many interactions are to be created (the functor lookup will be repeated for each of them). In such case, ask `on gitlab answers <https://gitlab.com/yade-dev/answers/-/issues>`__  to have the :yref:`createInteraction<yade._utils.createInteraction>` function accept list of pairs id's as well.
 
 Assigning cohesive bonds (possibly between distant bodies)
 ----------------------------------------------------------
@@ -1803,23 +1803,6 @@ Public questions and answers for getting help
 .. Hint:: Please use the `GitLab interface <https://gitlab.com/yade-dev/answers>`_ for `asking questions <https://gitlab.com/yade-dev/answers#questions-and-answers>`_ about Yade.
 
 In case you're not familiar with computer oriented discussion lists, please read `this wiki page <https://gitlab.com/yade-dev/answers#questions-and-answers>`_ (a Yade-oriented and shortened version of `How To Ask Questions The Smart Way <http://catb.org/~esr/faqs/smart-questions.html>`_) before posting, in order to increase your chances getting help. Do not forget to state what *version* of Yade you use (shown when you start Yade, or even better as printed by function :yref:`yade.libVersions.printAllVersions`), whether you installed it from source code or a package, what operating system (such as Ubuntu 18.04), and if you have done any local modifications to source code in case of compiled version.
-
-Mailing lists
-=============
-
-In addition to the Q&A Launchpad interface, Yade has two mailing-lists. Both are hosted at http://www.launchpad.net and before posting, you must register to Launchpad and subscribe to the list by adding yourself to "team" of the same name running the list.
-
-yade-users@lists.launchpad.net
-	is a general discussion list for all Yade users. Add yourself to `yade-users team <https://launchpad.net/~yade-users>`_ so that you can post messages. List archives:
-
-* https://lists.launchpad.net/yade-users/
-* http://www.mail-archive.com/yade-users@lists.launchpad.net/
-
-yade-dev@lists.launchpad.net
-	is for discussions about Yade development; you must be member of `yade-dev team <https://launchpad.net/~yade-dev>`_ to post. This list is archived in two places:
-
-* https://lists.launchpad.net/yade-dev/
-* http://www.mail-archive.com/yade-dev@lists.launchpad.net/
 
 Private and/or paid support
 ===========================

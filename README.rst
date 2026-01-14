@@ -1,6 +1,6 @@
-===================================
-YADE - Yet Another Dynamic Engine
-===================================
+===============================
+YADE — Yet Another Dynamic Engine
+===============================
 
 An extensible open‑source framework for discrete numerical models, focused on the
 Discrete Element Method. Performance‑critical parts are written in C++ using a flexible
@@ -8,32 +8,37 @@ object model that allows independent implementation of new algorithms and interf
 Python is used for rapid and concise scene construction, simulation control,
 post‑processing and debugging.
 
-**Documentation:**
+Documentation
+=============
 
-- https://www.yade-dem.org/doc/ (includes C++ and Python reference)
-- https://yade-dem.org/doc/Yade.pdf (PDF-file with documentation)
-- https://yade-dem.org/doc/Yade.epub (EPUB-file with documentation)
+- `Online documentation (includes C++ and Python reference) <https://www.yade-dem.org/doc/>`_
+- `PDF documentation (Yade.pdf) <https://yade-dem.org/doc/Yade.pdf>`_
+- `EPUB documentation (Yade.epub) <https://yade-dem.org/doc/Yade.epub>`_
 
-**Downloads:**
+Downloads
+=========
 
-- Packages for Ubuntu and Debian:
+Packages (Ubuntu and Debian)
+----------------------------
 
-  - https://yade-dem.org/doc/installation.html#packages
-  - External packages: https://launchpad.net/~yade-users/+archive/external
+- `Debian package tracker <https://tracker.debian.org/pkg/yade>`_
+- `Ubuntu source package <https://launchpad.net/ubuntu/+source/yade>`_
+- `Installation instructions (packages) <https://yade-dem.org/doc/installation.html#packages>`_
 
-- Source tarballs of different versions:
+Source tarballs
+---------------
 
-  - https://gitlab.com/yade-dev/trunk/tags
-  - Repository snapshot on GitLab: https://gitlab.com/yade-dev/trunk/-/archive/master/trunk-master.tar.gz
-  - Debian packaging repository: https://salsa.debian.org/science-team/yade
+- `GitLab tags (released versions) <https://gitlab.com/yade-dev/trunk/tags>`_
+- `GitLab repository snapshot (master) <https://gitlab.com/yade-dev/trunk/-/archive/master/trunk-master.tar.gz>`_
+- `Debian packaging repository (salsa) <https://salsa.debian.org/science-team/yade>`_
 
-**Teams involved:**
+Community
+=========
 
-- General users: https://launchpad.net/~yade-users
-- Developers and advanced users: https://launchpad.net/~yade-dev
-- Developers for distributed‑memory parallelization of Yade: https://launchpad.net/~yade-mpi
+- `Yade developers (GitLab group members) <https://gitlab.com/groups/yade-dev/-/group_members>`_
 
-**Miscellaneous:**
+More links
+=========
 
 - `Wiki <https://yade-dem.org/wiki/>`_
 - `Screenshots <https://www.yade-dem.org/wiki/Screenshots_and_videos>`_
@@ -42,5 +47,3 @@ post‑processing and debugging.
 - `Yade on Open Hub <http://www.openhub.net/p/yade/>`_
 - `Yade on Debian PTS <https://tracker.debian.org/pkg/yade>`_
 - `Yade on Debian salsa <https://salsa.debian.org/science-team/yade/commits/master>`_
-- `Yade in Ubuntu <https://launchpad.net/ubuntu/+source/yade>`_
-- `Launchpad page <http://www.launchpad.net/yade>`_

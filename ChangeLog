@@ -36,6 +36,7 @@ Documentation & Comments
   Clarify documentation of shear deformation, typo and layout fixes (!1139)
   TriaxialStressController doc updates regarding axes numbering and max_vel (!1141)
   Removing invalid escape sequences from command-line documentation, and some Launchpad mention (!1142)
+  Remove remaining references to Launchpad from documentation (!1149)
 
 Examples
 ********

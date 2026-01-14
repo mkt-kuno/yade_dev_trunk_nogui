@@ -249,13 +249,6 @@ If you maintain your own dependency list for trixie/forky replace ``python3-pyqt
 
 Note: on Ubuntu 20.04, the VTK library should be ``libvtk6-dev`` instead of ``libvtk9-dev``.
 
-Most of the list above is very likely already packaged for your distribution. In case you are still confronted
-with some errors concerning not available packages (e.g., package ``libmetis-dev`` is not available) it may be necessary
-to add yade external ppa from https://launchpad.net/~yade-users/+archive/external (see below) as well as http://www.yade-dem.org/packages (see the top of this page)::
-
-	sudo add-apt-repository ppa:yade-users/external
-	sudo apt-get update
-
 If you are using other distributions than Debian or its derivatives you should
 install by yourself the software packages listed above. Their names in other distributions can differ from the
 names of the Debian-packages.

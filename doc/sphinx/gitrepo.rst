@@ -223,15 +223,6 @@ Welcome! At start it is very convenient to work on a local fork of YADE in your 
 
 	6. After we review the merge request we can click on it to run in our Continuous Integration (CI) pipeline. This pipeline can't start automatically for security reasons. It will be merged after the pipeline checks pass.
 
-
-Alternatively, create a patch from your commit via::
-
- git format-patch origin  #create patch file in current folder)
-
-and send to the developers mailing list (yade-dev@lists.launchpad.net) as attachment. In either way, after reviewing your changes they will be added to the main trunk.
-
-When the pull request has been reviewed and accepted, your changes are integrated in the main trunk. Everyone will get them via ``git fetch``.
-
 **********************
 Guidelines for pushing
 **********************

@@ -114,24 +114,19 @@ or any other editor of your choice.
 
 Hosting and versioning
 ----------------------
-The Yade project is kindly hosted at `Launchpad <https://launchpad.net/yade/>`__
-and `GitLab <https://gitlab.com/yade-dev/>`__:
+The Yade project is kindly hosted at `GitLab <https://gitlab.com/yade-dev/>`__:
 
 .. comment Old Version:   which is used for source code, bug tracking, planning, package downloads and more. 
 
 * `source code on gitlab <https://gitlab.com/yade-dev/trunk>`__
 * `issue and bug tracking on gitlab <https://gitlab.com/yade-dev/trunk/issues>`__
 * `release downloads on GitLab <https://gitlab.com/yade-dev/trunk/-/releases>`__
-* `yade-dev mailing list on launchpad <https://launchpad.net/~yade-dev>`__: yade-dev@lists.launchpad.net
-* `yade-users mailing list on launchpad <https://launchpad.net/~yade-users>`__: yade-users@lists.launchpad.net
 * `questions and answers on GitLab <https://gitlab.com/yade-dev/answers>`__
 
 The versioning software used is `GIT <http://git-scm.com/>`__, for which a short
 tutorial can be found in :ref:`yade-gitrepo-label`.
 GIT is a distributed revision control system. It is available packaged for all major linux distributions.
 
-The `source code <https://gitlab.com/yade-dev/>`__ is periodically
-imported to Launchpad for building PPA-packages.
 The repository `can be http-browsed <https://gitlab.com/yade-dev/trunk>`__.
 
 Development process
@@ -179,8 +174,6 @@ The release process will build the software, run tests, and generate the documen
 #.  Push master, new branch and tags to gitlab
 #.  Download tar.gz
 #.  Create asc-file (signature): ``gpg --armor --sign --detach-sig tarball.tar.gz``
-#.  Upload new tarball on Launchpad
-#.  Make announcement on mailing list and on `Launchpad <https://launchpad.net/yade>`__.
 
 
 RELEASE file should contain the version number in the following format:
@@ -194,8 +187,6 @@ where ``YYYY`` is the year and ``MM`` is the month of the release. For example, 
 .. code-block:: bash
 
 	2025.2.0
-
-
 
 
 Build robot
@@ -512,7 +503,7 @@ Check tests
 When check fails the script should return an error message via python command ``raise YadeCheckError(messageString)`` telling what went wrong. If the script itself fails for some reason and can't generate an output, the log will contain only "scriptName failure". If the script defines differences on obtained and awaited data, it should print some useful information about the problem. After this occurs, the automatic test will stop the execution with error message.
 
 An example dummy check test :ysrc:`scripts/checks-and-tests/checks/checkTestDummy.py` demonstrates a minimal empty test. A little more functional example check test can be found in :ysrc:`scripts/checks-and-tests/checks/checkTestTriax.py`. It shows results comparison, output, and how to define the path to data files using ``checksPath``.
-Users are encouraged to add their own scripts into the :ysrc:`scripts/checks-and-tests/checks/` folder. Discussion of some specific checktests design in `questions and answers <https://answers.launchpad.net/yade/>`__ is welcome. Note that :ref:`re-compiling <speed-up>` is required before the newly added scripts can be launched by ``yade --check`` (or direct changes have to be performed in "lib" subfolders).
+Users are encouraged to add their own scripts into the :ysrc:`scripts/checks-and-tests/checks/` folder. Discussion of some specific checktests design in `questions and answers <https://gitlab.com/yade-dev/answers/-/issues>`__ is welcome. Note that :ref:`re-compiling <speed-up>` is required before the newly added scripts can be launched by ``yade --check`` (or direct changes have to be performed in "lib" subfolders).
 A check test should never need more than a few seconds to run. If your typical script needs more, try to reduce the number of elements or the number of steps.
 
 To add a new check, the following steps must be performed:
