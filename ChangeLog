@@ -120,6 +120,7 @@ Testing & Continuous Integration
   Fix CI pipline (fix Archlinux, skip ompi:5.0.8, temporarily disable deb_*_long_double for CGAL) and remove allow_failure: true (!1099)
   Add Debian forky CI jobs (make/test/check, precision variants, deb package builds, doc & pages pipeline migration).
   Improve MPI tests reliability in root-run CI by setting OpenMPI root allowance env vars before spawning workers.
+  Update GUI reference screenshots (forky/ubuntu26_04) (!1151)
 
 High precision RealHP<N> ComplexHP<N>
 *************************************
