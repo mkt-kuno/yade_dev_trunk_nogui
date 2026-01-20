@@ -80,6 +80,10 @@ For their installation, you need to add the yade-dem.org/packages repository to 
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ noble main" >> /etc/apt/sources.list.d/yadedaily.list'
 
+- Ubuntu 26.04 **resolute**::
+
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ resolute main" >> /etc/apt/sources.list.d/yadedaily.list'
+
 
 Add the PGP-key AA915EEB as trusted and install ``yadedaily``::
 

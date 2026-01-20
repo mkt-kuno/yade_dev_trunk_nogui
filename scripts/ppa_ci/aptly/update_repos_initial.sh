@@ -10,7 +10,7 @@ NEW_ID=$(curl -L "https://gitlab.com/api/v4/projects/10133144/repository/commits
 echo $NEW_ID > ${PATHDEB}/OLD_ID
 
 
-for i in bullseye focal jammy bookworm trixie noble forky
+for i in bullseye focal jammy bookworm trixie noble forky resolute
 do
     cd ${PATHDEB}
     wget https://gitlab.com/api/v4/projects/10133144/jobs/artifacts/master/download?job=deb_$i -O yade.zip

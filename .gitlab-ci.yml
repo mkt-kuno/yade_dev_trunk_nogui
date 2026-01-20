@@ -8,6 +8,7 @@
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu22.04
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
+# image: registry.gitlab.com/yade-dev/docker-yade:ubuntu26.04
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bookworm
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
@@ -94,6 +95,8 @@ variables:
   <<: *gitlab_runner_retry_definition
   stage: build
   script:
+    - git config --global --add safe.directory ${CI_PROJECT_DIR}
+    - git config --global --add safe.directory ${CI_PROJECT_DIR}/data
     - cd ./data
     - git log --oneline -n 5
     - cd ..
@@ -256,6 +259,16 @@ make_24_04:
       - build
     expire_in: 2 weeks
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu24.04
+
+make_26_04:
+  <<: *make_definition
+  <<: *artifacts_definition
+  artifacts:
+    paths:
+      - install
+      - build
+    expire_in: 2 weeks
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu26.04
 
 make_bullseye:
   <<: *make_definition
@@ -538,6 +551,20 @@ make_SSE:
   <<: *platforms_definition
   <<: *gitlab_runner_retry_definition
   stage: test
+  before_script:
+    - export OMPI_ALLOW_RUN_AS_ROOT=1
+    - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+    - export PRTE_ALLOW_RUN_AS_ROOT=1
+    - export PRTE_ALLOW_RUN_AS_ROOT_CONFIRM=1
+    - export OMPI_MCA_rmaps_base_oversubscribe=1
+    - export OMPI_MCA_mpi_yield_when_idle=1
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - export OMPI_MCA_btl=self,vader,tcp
+    - export OMPI_MCA_pml=ob1
+    - export OMPI_MCA_orte_tmpdir_base=/tmp
+    - export OMPI_MCA_plm=isolated
+    - git config --global --add safe.directory ${CI_PROJECT_DIR}
+    - git config --global --add safe.directory ${CI_PROJECT_DIR}/data
   script:
     - cd ./data
     - git log --oneline -n 5
@@ -574,6 +601,13 @@ test_24_04:
   dependencies:
     - make_24_04
   needs: ["make_24_04"]
+
+test_26_04:
+  <<: *test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu26.04
+  dependencies:
+    - make_26_04
+  needs: ["make_26_04"]
 
 test_bullseye:
   <<: *test_definition
@@ -911,10 +945,20 @@ test_22_foam10:
   <<: *platforms_definition
   <<: *gitlab_runner_retry_definition
   stage: test
-#  before_script:
-#    - export OMPI_MCA_rmaps_base_oversubscribe=1
-#    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
-#    - export OMPI_MCA_mpi_yield_when_idle=1 #degraded mode when oversubscribing (https://www.open-mpi.org/faq/?category=running#oversubscribing)
+  before_script:
+    - export OMPI_ALLOW_RUN_AS_ROOT=1
+    - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+    - export PRTE_ALLOW_RUN_AS_ROOT=1
+    - export PRTE_ALLOW_RUN_AS_ROOT_CONFIRM=1
+    - export OMPI_MCA_rmaps_base_oversubscribe=1
+    - export OMPI_MCA_mpi_yield_when_idle=1
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - export OMPI_MCA_btl=self,vader,tcp
+    - export OMPI_MCA_pml=ob1
+    - export OMPI_MCA_orte_tmpdir_base=/tmp
+    - export OMPI_MCA_plm=isolated
+    - git config --global --add safe.directory ${CI_PROJECT_DIR}
+    - git config --global --add safe.directory ${CI_PROJECT_DIR}/data
   script:
     - cd ./data
     - git log --oneline -n 5
@@ -949,9 +993,15 @@ check_24_04:
     - make_24_04
   needs: ["make_24_04"]
 
+check_26_04:
+  <<: *check_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu26.04
+  dependencies:
+    - make_26_04
+  needs: ["make_26_04"]
+
 check_bullseye:
   <<: *check_definition
-  before_script:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_bullseye
@@ -959,7 +1009,6 @@ check_bullseye:
 
 check_bookworm:
   <<: *check_definition
-  before_script:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bookworm
   dependencies:
     - make_bookworm
@@ -967,7 +1016,6 @@ check_bookworm:
 
 check_trixie:
   <<: *check_definition
-  before_script:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-trixie
   dependencies:
     - make_trixie
@@ -975,7 +1023,6 @@ check_trixie:
 
 check_forky:
   <<: *check_definition
-  before_script:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-forky
   dependencies:
     - make_forky
@@ -983,7 +1030,6 @@ check_forky:
 
 check_archlinux:
   <<: *check_definition
-  before_script:
   image: registry.gitlab.com/yade-dev/docker-yade:archlinux-current
 # allow_failure: true
   dependencies:

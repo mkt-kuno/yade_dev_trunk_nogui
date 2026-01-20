@@ -100,6 +100,7 @@ Packaging & Build Improvements
   Remove support for ubuntu 18.04 Bionic Beaver (!1138)
   Remove packaging support for ubuntu 18.04 Bionic Beaver (!1140)
   Fix some compilation errors (!1148)
+  Add CI jobs for Ubuntu 26.04 (!1150)
 
 Small Enhancements
 ******************
