@@ -10,6 +10,7 @@ Code Formatting & Organization
 
 Documentation & Comments
 ************************
+  Discourage using pip and conda (!1155)
 
 Examples
 ********
@@ -45,7 +46,7 @@ OpenFoam coupling
 
 Packaging & Build Improvements
 ******************************
-Add CI job for building Debian packages for Ubuntu resolute 26.04 (!1154)
+  Add CI job for building Debian packages for Ubuntu resolute 26.04 (!1154)
 
 
 Small Enhancements

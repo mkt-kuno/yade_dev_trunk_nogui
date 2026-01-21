@@ -227,7 +227,7 @@ Following dependencies are for instance mandatory:
 
 They can be installed from the command line of your Linux distribution, assuming you have root privileges.
 
-**For Ubuntu 20.04, 22.04, 24.04**, **Debian 11, 12, 13** and their derivatives, just copy&paste to the terminal the following code block for installing all mandatory and optional dependencies::
+**For Ubuntu 20.04, 22.04, 24.04**, **Debian 11, 12, 13** and their derivatives, just copy&paste to the terminal the following code block for installing all mandatory and optional dependencies (better avoid installing python packages with pip or conda)::
 
 		sudo apt install cmake git freeglut3-dev libboost-all-dev fakeroot \
 		dpkg-dev build-essential g++ python3-dev python3-ipython python3-matplotlib \
