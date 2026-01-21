@@ -45,6 +45,8 @@ OpenFoam coupling
 
 Packaging & Build Improvements
 ******************************
+Add CI job for building Debian packages for Ubuntu resolute 26.04 (!1154)
+
 
 Small Enhancements
 ******************

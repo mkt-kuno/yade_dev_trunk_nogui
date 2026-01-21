@@ -1404,3 +1404,10 @@ deb_noble:
   before_script:
     - rm -rf ./deb
     - ./scripts/ppa_ci/builddeb.py -d "noble"
+
+deb_resolute:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu26.04
+  before_script:
+    - rm -rf ./deb
+    - ./scripts/ppa_ci/builddeb.py -d "resolute"
