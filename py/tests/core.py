@@ -351,6 +351,7 @@ class TestPyRunner(unittest.TestCase):
 		O.reset()
 
 	def testMissingFunction(self):
+		print("\n\n"+'\033[92m'+"*** Note: the following is testing that throwing exceptions from PyRunner works correctly. In here, lack of exception thrown is an error. Exception is expected in this test!! ***"+'\033[0m')
 		O.engines += [PyRunner(command='missingFunction()', iterPeriod=1)]
 		self.assertRaises(RuntimeError, lambda: O.run(5, True))
 		try:
@@ -374,6 +375,7 @@ NameError: name 'missingFunction' is not defined
 			)
 
 	def testRaisingFunction(self):
+		print("\n\n"+'\033[92m'+"*** Note: the following is testing that throwing exceptions from PyRunner works correctly. In here, lack of exception thrown is an error. Exception is expected in this test!! ***"+'\033[0m')
 		O.engines += [PyRunner(command='raise RuntimeError("raised RuntimeError")', iterPeriod=1)]
 		self.assertRaises(RuntimeError, lambda: O.run(5, True))
 		try:
@@ -397,6 +399,7 @@ RuntimeError: raised RuntimeError
 			)
 
 	def testPythonToCppToPythonThrow(self):
+		print("\n\n"+'\033[92m'+"*** Note: the following is testing that throwing exceptions from PyRunner works correctly. In here, lack of exception thrown is an error. Exception is expected in this test!! ***"+'\033[0m')
 		# NOTE: if we used 'spheresInCell=50' argument, then we could also trigger "Unable to shrink cell due to maximum body size ……" exception. But only if switchScene wasn't throwing earlier.
 		O.engines += [
 		        PyRunner(

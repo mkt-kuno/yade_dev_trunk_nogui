@@ -122,6 +122,7 @@ Testing & Continuous Integration
   Add Debian forky CI jobs (make/test/check, precision variants, deb package builds, doc & pages pipeline migration).
   Improve MPI tests reliability in root-run CI by setting OpenMPI root allowance env vars before spawning workers.
   Update GUI reference screenshots (forky/ubuntu26_04) (!1151)
+  Clarify testing of PyRunner (!1153)
 
 High precision RealHP<N> ComplexHP<N>
 *************************************

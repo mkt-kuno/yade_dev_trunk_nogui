@@ -95,6 +95,7 @@ variables:
   <<: *gitlab_runner_retry_definition
   stage: build
   script:
+    - chown -R root:root ${CI_PROJECT_DIR}
     - git config --global --add safe.directory ${CI_PROJECT_DIR}
     - git config --global --add safe.directory ${CI_PROJECT_DIR}/data
     - cd ./data
