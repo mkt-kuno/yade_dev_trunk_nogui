@@ -146,15 +146,7 @@ from traitlets.config import Config
 from IPython import InteractiveShell
 from IPython.core.profiledir import ProfileDir
 from IPython.utils import io
-try:
-	from IPython.utils.py3compat import PY3
-except ImportError:
-	from ipython_genutils.py3compat import PY3
-
-if PY3:
-	from io import StringIO
-else:
-	from io import StringIO
+from io import StringIO
 
 #-----------------------------------------------------------------------------
 # Globals

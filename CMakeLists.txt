@@ -328,7 +328,7 @@ ENDIF()
 
 
 #Find python
-IF(${PYTHON_VERSION} EQUAL -1) 
+IF(${PYTHON_VERSION} EQUAL -1)
 	FIND_PACKAGE(PythonInterp)
 ELSE()
 	FIND_PACKAGE(PythonInterp ${PYTHON_VERSION})
@@ -387,6 +387,11 @@ if(ENABLE_USEFUL_ERRORS)
     SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=maybe-uninitialized") # g++ older than 15.2.1 has many false positives, so disable it.
   ELSE()
     MESSAGE(STATUS   "g++ version " ${CMAKE_CXX_COMPILER_VERSION} " >= 15.2.1 can report -Wmaybe-uninitialized variables.")
+    # However, with LTO enabled, there are still many false positives in g++ 15.2.1
+    IF(CMAKE_CXX_FLAGS MATCHES "-flto")
+      MESSAGE(STATUS   "LTO is enabled, setting -Wno-error=maybe-uninitialized due to false positives in LTO mode")
+      SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=maybe-uninitialized")
+    ENDIF()
   ENDIF()
   # to keep a warning printed as not an error add to WORKAROUND_LIBRARY_WARNINGS -Wno-error=cast-align, to disable the warning and not print it at all add: -Wno-cast-align
   # So depending on compiler version I need to turn these errors off.
@@ -1188,10 +1193,10 @@ ENDIF(ENABLE_MASK_ARBITRARY)
 
 #===========================================================
 
-IF(ENABLE_THERMAL AND (NOT(${ARCHITECTURE} STREQUAL "amd64")))
+IF(ENABLE_THERMAL AND (NOT(${ARCHITECTURE} STREQUAL "amd64" OR ${ARCHITECTURE} STREQUAL "x86_64")))
   MESSAGE("ENABLE_THERMAL is currently supported only on amd64 architecture, disabling.")
   SET(ENABLE_THERMAL OFF)
-ENDIF(ENABLE_THERMAL AND (NOT(${ARCHITECTURE} STREQUAL "amd64")))
+ENDIF(ENABLE_THERMAL AND (NOT(${ARCHITECTURE} STREQUAL "amd64" OR ${ARCHITECTURE} STREQUAL "x86_64")))
 
 IF(ENABLE_THERMAL AND ENABLE_PFVFLOW AND ENABLE_OPENMP)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTHERMAL")

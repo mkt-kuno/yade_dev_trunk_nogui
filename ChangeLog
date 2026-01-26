@@ -163,6 +163,7 @@ Packaging & Build Improvements
   Remove packaging support for ubuntu 18.04 Bionic Beaver (!1140)
   Fix some compilation errors (!1148)
   Add CI jobs for Ubuntu 26.04 (!1150)
+  Fix some compilation errors gcc 15.2.1 and LTO enabled, simplify some redundant import code and fix detection of the `amd64` architecture (!1158)
 
 Small Enhancements
 ******************

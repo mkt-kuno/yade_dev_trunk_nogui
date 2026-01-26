@@ -15,7 +15,7 @@ import os, sys, _thread, time, logging, shlex, socket, xmlrpc.client, re, shutil
 # (old site, fixed bug) https://bugs.launchpad.net/yade/+bug/1254708
 
 
-#socket.setdefaulttimeout(10) 
+#socket.setdefaulttimeout(10)
 
 # Setup executable
 
@@ -63,16 +63,16 @@ prog = os.path.basename(sys.argv[0])
 parser=argparse.ArgumentParser(usage='%s --oar-script=[SCRIPT] [options] [ TABLE [SIMULATION.py] | SIMULATION.py[/nCores] [...] ]'%prog,description='%s runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.\n\nBatch can be specified either with parameter table TABLE (must not end in .py), which is either followed by exactly one SIMULATION.py (must end in .py), or contains !SCRIPT column specifying the simulation to be run. The second option is to specify multiple scripts, which can optionally have /nCores suffix to specify number of cores for that particular simulation (corresponds to !THREADS column in the parameter table), e.g. sim.py/3.'%prog)
 parser.add_argument('-v','--version',help='Print version and exit.',dest='version',action='store_true')
 parser.add_argument('--job-threads',dest='defaultThreads',type=int,help="Default number of threads for one job; can be overridden by per-job with !THREADS (or !OMP_NUM_THREADS) column. Defaults to 1.",metavar='NUM',default=1)
-parser.add_argument('--force-threads',action='store_true',dest='forceThreads',help='Force jobs to not use more cores than the maximum (see \-j), even if !THREADS colums specifies more.')
+parser.add_argument('--force-threads',action='store_true',dest='forceThreads',help=r'Force jobs to not use more cores than the maximum (see \-j), even if !THREADS colums specifies more.')
 parser.add_argument('--log',dest='logFormat',help='Format of job log files: must contain a $, %% or @, which will be replaced by script name, line number or by description column respectively (default: $.%%.log)',metavar='FORMAT',default='$.%.log')
-parser.add_argument('--global-log',dest='globalLog',help='Filename where to redirect output of yade-batch itself (as opposed to \-\-log); if not specified (default), stdout/stderr are used',metavar='FILE')
+parser.add_argument('--global-log',dest='globalLog',help=r'Filename where to redirect output of yade-batch itself (as opposed to \-\-log); if not specified (default), stdout/stderr are used',metavar='FILE')
 parser.add_argument('-l','--lines',dest='lineList',help='Lines of TABLE to use, in the format 2,3-5,8,11-13 (default: all available lines in TABLE)',metavar='LIST')
 parser.add_argument('--nice',dest='nice',type=int,help='Nice value of spawned jobs (default: 10)',default=10)
 parser.add_argument('--cpu-affinity',dest='affinity',action='store_true',help='Bind each job to specific CPU cores; cores are assigned in a quasi-random order, depending on availability at the moment the jobs is started. Each job can override this setting by setting AFFINE column.')
 parser.add_argument('--executable',dest='executable',help='Name of the program to run (default: %s). Jobs can override with !EXEC column.'%executable,default=executable,metavar='FILE')
 parser.add_argument('--dry-run',action='store_true',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
 parser.add_argument('--timing',type=int,dest='timing',default=0,metavar='COUNT',help='Repeat each job COUNT times, and output a simple table with average/variance/minimum/maximum job duration; used for measuring how various parameters affect execution time. Jobs can override the global value with the !COUNT column.')
-parser.add_argument('--timing-output',type=str,metavar='FILE',dest='timingOut',default=None,help='With \-\-timing, save measured durations to FILE, instead of writing to standard output.')
+parser.add_argument('--timing-output',type=str,metavar='FILE',dest='timingOut',default=None,help=r'With \-\-timing, save measured durations to FILE, instead of writing to standard output.')
 parser.add_argument('--randomize',action='store_true',dest='randomize',help='Randomize job order (within constraints given by assigned cores).')
 parser.add_argument('--disable-pynotify',action='store_true',dest='disablePynotify',help='Disable screen notifications')
 parser.add_argument('--oar-project',dest='oar_p',help='Project name to pass to oarsub')
@@ -96,7 +96,7 @@ if globalLog:
 	sys.stderr=open(globalLog,"w")
 	sys.stdout=sys.stderr
 
-if len([1 for a in args if re.match('.*\.py(/[0-9]+)?',a)])==len(args) and len(args)!=0:
+if len([1 for a in args if re.match(r'.*\.py(/[0-9]+)?',a)])==len(args) and len(args)!=0:
 	# if all args end in .py, they are simulations that we will run
 	table=None; scripts=args
 elif len(args)==2:
@@ -106,7 +106,7 @@ elif len(args)==1:
 else:
 	parser.print_help()
 	sys.exit(1)
-	
+
 if opts.oar_script == '' :
         print('--oar_script is mandatory');
         sys.exit(1);
@@ -183,12 +183,12 @@ for i,l in enumerate(useLines):
 	if not script:
 		raise ValueError('When only batch table is given without script to run, it must contain !SCRIPT column with simulation to be run.')
 	logFile=logFormat.replace('$',script.split('/')[-1]).replace('%',str(l)).replace('@',params[l]['description'])
-	
-	if (len(logFile)>230):                              #For very long files, to prevent system errors. 
+
+	if (len(logFile)>230):                              #For very long files, to prevent system errors.
 		logFile = logFile[0:230]+'_'+str(l)+logFile[-4:]  #l is added to prevent name duplications.
-	
+
 	executables.add(jobExecutable)
-	
+
 	for j in range(0,jobCount if jobCount>0 else 1):
 		jobNum=len(jobs)
 		logFile2=logFile+('.%d'%j if opts.timing>0 else '')
@@ -231,7 +231,7 @@ for job in jobs:
 
 		if job.oarprop != '':
 			prop='-p '+job.oarprop;
-			
+
 		if opts.oar_best:
 			prop+=' -t besteffort'
 
@@ -240,8 +240,8 @@ for job in jobs:
 		#os.system('%s'%(scriptname));
 		os.system('oarsub --project=%s %s -l/cpu=1/core=%i,walltime=%s -O %s -E %s.err %s\n'%(project, prop, job.nCores, walltime, job.log,job.log,scriptname));
 
-                
-                
+
+
 sys.stdout.flush()
 
 yade.Omega().exitNoBacktrace()
