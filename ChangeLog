@@ -14,6 +14,7 @@ Documentation & Comments
 
 Examples
 ********
+  simpleShear.py for illustrating the use of Kinem* engines to deform a non-periodic simple shear box (!1157)
 
 User Interface (GUI)
 ********************
