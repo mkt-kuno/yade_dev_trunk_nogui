@@ -49,6 +49,7 @@
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
 #  USE_QT5: use QT5 for GUI (ON by default)
+#  YADE_HEADLESS: headless build for HPC environments without X11/display. Forces ENABLE_GUI=OFF, ENABLE_GL2PS=OFF, USE_QT5=OFF (OFF by default)
 #  CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV (OFF by default)
 #  SUITESPARSEPATH: define this variable with the path to a custom suitesparse install
 #  PYTHON_VERSION: force python version to the given one, set -1 to automatically use the last version on the system. (-1 by default)
@@ -142,6 +143,16 @@ OPTION(ENABLE_USEFUL_ERRORS "enable useful compiler errors which help a lot in e
 OPTION(ENABLE_VTK "Enable VTK" ${DEFAULT_ON})
 OPTION(CHOLMOD_GPU "Enable GPU acceleration flow engine direct solver" ${DEFAULT_OFF})
 OPTION(USE_QT5 "USE Qt5 for GUI" ON)
+OPTION(YADE_HEADLESS "Headless build: disable all GUI/display dependencies (OpenGL, Qt5, GLUT, QGLViewer, GL2PS). Use this for HPC environments without X11/display." ${DEFAULT_OFF})
+
+# YADE_HEADLESS mode: force-disable all GUI-related options
+IF(YADE_HEADLESS)
+  MESSAGE(STATUS "${Esc}[36mYADE_HEADLESS=ON: Forcing ENABLE_GUI=OFF, ENABLE_GL2PS=OFF, USE_QT5=OFF for headless build${Esc}[0m")
+  SET(ENABLE_GUI OFF CACHE BOOL "Enable GUI (forced OFF by YADE_HEADLESS)" FORCE)
+  SET(ENABLE_GL2PS OFF CACHE BOOL "Enable GL2PS (forced OFF by YADE_HEADLESS)" FORCE)
+  SET(USE_QT5 OFF CACHE BOOL "USE Qt5 for GUI (forced OFF by YADE_HEADLESS)" FORCE)
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} HEADLESS")
+ENDIF(YADE_HEADLESS)
 
 #Set -DPYTHON_VERSION numeric option below:
 set(PYTHON_VERSION -1 CACHE STRING "Force python version to the given one. Defaults to -DPYTHON_VERSION=-1 which automatically uses the newest available python version on the system.")

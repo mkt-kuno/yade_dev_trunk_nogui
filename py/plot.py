@@ -10,9 +10,6 @@ __all__ = [
         'addData', 'addAutoData', 'saveGnuplot', 'saveDataTxt', 'savePlotSequence'
 ]
 
-# multi-threaded support for Tk
-# safe to import even if Tk will not be used
-import mtTkinter as Tkinter
 import _thread
 
 try:
@@ -41,6 +38,10 @@ from cycler import cycler
 import yade.runtime
 if not yade.runtime.hasDisplay:
 	matplotlib.use('Agg')
+	Tkinter = None  # Tkinter not available in headless mode
+else:
+	# multi-threaded support for Tk (only when display is available)
+	import mtTkinter as Tkinter
 
 import yade.minieigenHP as ME
 

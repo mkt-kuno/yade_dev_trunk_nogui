@@ -162,7 +162,14 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	# END find Boost for py_version
 
 	# Find Python modules and set the version variable in the parent scope which is CMakeLists.txt
-	FOREACH(module IN ITEMS IPython numpy matplotlib pygraphviz Xlib sphinx tkinter)
+	# When YADE_HEADLESS is ON, skip GUI-related Python modules (pygraphviz, Xlib, tkinter)
+	IF(YADE_HEADLESS)
+		SET(_python_modules IPython numpy matplotlib sphinx)
+		MESSAGE(STATUS "YADE_HEADLESS=ON: Skipping GUI-related Python modules (pygraphviz, Xlib, tkinter)")
+	ELSE()
+		SET(_python_modules IPython numpy matplotlib pygraphviz Xlib sphinx tkinter)
+	ENDIF()
+	FOREACH(module IN ITEMS ${_python_modules})
 		IF(${module} MATCHES "tkinter" AND ${PYTHON_VERSION_MAJOR} EQUAL 2)
 			SET(module "Tkinter")
 		ENDIF()
